@@ -1,0 +1,202 @@
+<header
+  class="dark:bg-[var(--body-color)] px-1 lg:py-3 md:py-3 py-2"
+>
+  <div
+    class="flex items-center justify-between pl-2 pr-6 font-mx-auto lg:px-4 md:px-4"
+  >
+    <!-- REPLACED "Welcome..." SPAN WITH PrimeNG BREADCRUMB -->
+    <p-breadcrumb [model]="breadcrumbItems" [home]="homeItem" class="!text-gray-500"
+              styleClass="bg-transparent   hidden md:block">
+    </p-breadcrumb>
+    <!-- END BREADCRUMB -->
+
+    <!-- Hamburger Menu Button for Mobile -->
+    <div class="md:hidden">
+      <button class="px-2 py-2 font-bold burger-button nav dark:text-white" (click)="toggleMenu()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          class="burger-icon"
+          viewBox="0 0 24 24"
+        >
+          <rect width="18" height="2" y="6" rx="1" />
+          <rect width="18" height="2" y="11" rx="1" />
+          <rect width="18" height="2" y="16" rx="1" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- sidenav content start  -->
+    <nav
+      *ngIf="isMenuVisible"
+      [@openClose]
+      class="sidebar  bg-white dark:!bg-[#071e3d]"
+    >
+      <header>
+        <div class="image-text">
+          <span class="image">
+            <img src="assets/login/geria.png" alt="QLab Logo" />
+          </span>
+          <div class="items-center dark:!text-center">
+            <span class="dark:text-white font-bold text-xl">{{ title }}</span>
+          </div>
+        </div>
+        <i class="bx bx-chevron-left !z-50 toggle" (click)="hideSidebar()"></i>
+      </header>
+
+      <div class="menu-bar">
+        <div class="menu">
+          <!-- Main Sidebar Items (before the separator) -->
+          <ul class="menu-links">
+            <li
+              *ngFor="let itemKey of mainItemKeys"
+              class="cursor-pointer select-none nav-link dark:text-white"
+              routerLinkActive="active"
+            >
+              <a
+                (click)="navigate(displayedItems[itemKey].redirect)"
+                [routerLink]="displayedItems[itemKey].routerLink"
+              >
+                <i class="bx {{ displayedItems[itemKey].icon }} icon"></i>
+                <span class="text nav-text">{{ itemKey }}</span>
+              </a>
+            </li>
+          </ul>
+
+          <!-- Separator -->
+          <br />
+          <hr class="dark:text-white" />
+
+          <!-- Special Sidebar Items (after the separator) -->
+          <div *ngIf="checkAccount() == '0'">
+            <li
+              *ngFor="let itemKey of getObjectKeys(studentExtraDashboardItems)"
+              class="cursor-pointer select-none nav-link dark:text-white"
+              routerLinkActive="active"
+            >
+              <a
+                (click)="navigate(studentExtraDashboardItems[itemKey].redirect)"
+                [routerLink]="studentExtraDashboardItems[itemKey].routerLink"
+              >
+                <i class="bx {{ studentExtraDashboardItems[itemKey].icon }} icon"></i>
+                <span class="text nav-text">{{ itemKey }}</span>
+              </a>
+            </li>
+          </div>
+          <div *ngIf="checkAccount() == '1'">
+            <li
+              *ngFor="let itemKey of getObjectKeys(teacherExtraDashboardItems)"
+              class="cursor-pointer select-none nav-link dark:text-white"
+              routerLinkActive="active"
+            >
+              <a
+                (click)="navigate(teacherExtraDashboardItems[itemKey].redirect)"
+                [routerLink]="teacherExtraDashboardItems[itemKey].routerLink"
+              >
+                <i class="bx {{ teacherExtraDashboardItems[itemKey].icon }} icon"></i>
+                <span class="text nav-text">{{ itemKey }}</span>
+              </a>
+            </li>
+          </div>
+        </div>
+
+        <div class="mb-3 bottom-content">
+          <li>
+            <a class="report">
+              <button
+                (click)="openModal()"
+                [ngClass]="{ 'smaller-text': isSidebarMinimized }"
+                class="w-full h-10 mt-2 mb-2 font-bold text-gray-500 dark:text-white rounded-lg  focus:outline-none"
+              >
+                {{ isSidebarMinimized ? "REPORT" : "REPORT A PROBLEM" }}
+              </button>
+            </a>
+          </li>
+
+          <li class="cursor-pointer select-none">
+            <a (click)="confirmBox()" class="dark:text-white">
+              <i class="bx bx-log-out icon"></i>
+              <span class="text nav-text ">Logout</span>
+            </a>
+          </li>
+        </div>
+      </div>
+    </nav>
+    <!-- sidenav content end -->
+
+    <div class="flex items-center ml-auto gap-4">
+      <!-- Search Bar -->
+      <!-- <div
+        class="w-[250px] md:w-[400px] lg:w-[550px] flex items-center p-0 h-10  rounded-2xl !pl-4 border-2 border-primary-950/10 bg-primary-100 relative overflow-hidden"
+      >
+        <input
+          class="w-full px-2 py-1 text-primary-950 bg-transparent border-none focus:outline-none "
+          type="text"
+          placeholder="Search"
+          aria-label="Search"
+          (keyup)="handleSearchInput($event)"
+          [(ngModel)]="search"
+        />
+        <button
+          (click)="activateSearch()"
+          class="w-11 h-full flex items-center justify-center"
+        >
+          <i class="pi pi-search text-primary-900"></i>
+        </button>
+
+        <div
+          *ngIf="searchbar.trim() != ''"
+          class="absolute top-0 z-50 w-full h-auto mt-8 bg-white rounded"
+        >
+          <ul>
+            <ng-container *ngFor="let route of routes">
+              <li
+                (click)="goTo(route.link)"
+                *ngIf="userType == route.for && has(route.name, searchbar)"
+                class="py-1 text-gray-500 cursor-pointer hover:bg-slate-100"
+              >
+                <span class="ml-4">{{ route.name }}</span>
+              </li>
+            </ng-container>
+          </ul>
+        </div>
+      </div> -->
+
+      <!-- Dark Mode Icon -->
+      <button
+        class="ml-2 relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-primary-100"
+        (click)="toggleDarkMode()"
+      >
+        <i class="fa-solid {{isDarkModeEnabled() ? 'fa-moon text-primary-900':'fa-sun text-yellow-500'}}  text-lg"></i>
+      </button>
+      <!-- Notification Icon -->
+      <button
+        class="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-primary-100"
+        (click)="toggleNotificationBox()"
+      >
+        <i class="fas fa-bell text-primary-900 text-lg"></i>
+        <div
+          *ngIf="getInbox() > 0"
+          class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
+        ></div>
+      </button>
+
+      <!-- Profile Picture -->
+      <button class="w-10 h-10 rounded-full overflow-hidden border border-gray-900">
+        <img
+          (click)="gotoProfile()"
+          [src]="reflectProfile() || 'assets/user.png'"
+          alt="Profile Logo"
+          class="w-full h-full object-cover"
+        />
+      </button>
+    </div>
+  </div>
+</header>
+
+<app-notificationbox
+  *ngIf="showNotificationBox"
+  [notifications]="notifications"
+></app-notificationbox>

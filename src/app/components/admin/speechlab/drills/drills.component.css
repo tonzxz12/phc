@@ -1,0 +1,284 @@
+/* General Container Styles */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 0 2.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Section Header */
+.section-header {
+  background-color: var(--secondary-color);
+  color: white;
+  font-size: 1.75rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 15px 0;
+  border-radius: 8px;
+}
+
+/* Table Container */
+/* Table Container */
+.table-container {
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden; /* Prevents overflow issues */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.table-container table {
+  width: 100%;
+  border-spacing: 0;
+  table-layout: fixed; /* Ensures equal column width and better control */
+}
+
+.table-container th,
+.table-container td {
+  padding: 12px;
+  text-align: center;
+  font-size: 1rem;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap; /* Prevents text from wrapping */
+  overflow: hidden; /* Ensures content stays within the cell */
+  text-overflow: ellipsis; /* Adds "..." if text is too long */
+}
+
+/* Set specific widths for each column */
+.table-container th:nth-child(1),
+.table-container td:nth-child(1) {
+  width: 5%; /* ID column */
+}
+
+.table-container th:nth-child(2),
+.table-container td:nth-child(2) {
+  width: 15%; /* Practice column */
+}
+
+.table-container th:nth-child(3),
+.table-container td:nth-child(3) {
+  width: 20%; /* Drill Name */
+}
+
+.table-container th:nth-child(4),
+.table-container td:nth-child(4),
+.table-container th:nth-child(5),
+.table-container td:nth-child(5) {
+  width: 20%; /* File Names */
+}
+
+.table-container th:nth-child(6),
+.table-container td:nth-child(6) {
+  width: 10%; /* Date column, fix width */
+}
+
+.table-container th:nth-child(7),
+.table-container td:nth-child(7) {
+  width: 15%; /* Action column with enough space for buttons */
+}
+
+.table-container th {
+  background-color: var(--secondary-color); /* Dark header background */
+  color: white;
+  font-weight: bold;
+}
+
+.table-container td {
+  color: var(--primary-color);
+}
+
+/* Button Styles */
+.btn-delete,
+.btn-edit {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.btn-delete {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
+.btn-edit {
+  background-color: #3498db;
+  color: white;
+  margin-left: 10px;
+}
+
+.btn-edit:hover {
+  background-color: #2980b9;
+}
+
+/* Modal Styles */
+.modal {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-width: 400px;
+  margin: auto;
+}
+
+.modal h4 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+.modal-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: auto;
+  position: relative;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  color: #212529;
+  margin: 0;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px 0;
+}
+
+.input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: #6c757d; /* Default color */
+  transition: color 0.3s ease;
+}
+
+.btn-close:hover {
+  color: #000000; /* Darker color on hover */
+}
+
+.btn-close svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor; /* Inherits the color for easy customization */
+}
+
+.btn-save {
+  background-color: var(--tertiary-color);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background-color: #d48a15;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.pagination-controls button {
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s;
+}
+
+.pagination-controls button:hover {
+  background-color: #eaeaea;
+}
+
+.pagination-controls span {
+  font-weight: bold;
+}
+

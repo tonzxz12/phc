@@ -1,0 +1,202 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50; /* Ensure it's above other content */
+  opacity: 0;
+  animation: fadeInBackdrop 0.5s forwards; /* Smooth fade-in effect for backdrop */
+}
+
+.custom-modal-content {
+  border-radius: 10px;
+  height: fit-content;
+  width: 75vw;
+  padding-top: 1%;
+  padding-bottom: 5%;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-50px); /* Start above the viewport */
+  opacity: 0;
+  animation: slideInModal 0.7s ease-out forwards; /* Smooth slide and fade-in effect for modal */
+}
+
+.custom-modal {
+  margin-left: -10vw;
+}
+
+.modal-header {
+  justify-content: center;
+  align-items: center;
+}
+
+.titlehead h1 {
+  color: var(--text-color);
+  font-size: 30px;
+  text-align: center;
+}
+
+/* CSS Animations for Smooth Opening */
+@keyframes fadeInBackdrop {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInModal {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* CSS for Futuristic AI Button */
+.futuristic-ai-button {
+  position: relative;
+  background: linear-gradient(45deg, #8e2de2, #4a00e0);
+  color: white;
+  overflow: hidden;
+  border: none;
+  border-radius: 50px;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.4s ease;
+  box-shadow: 0 0 20px rgba(142, 45, 226, 0.5), 0 0 40px rgba(74, 0, 224, 0.3);
+}
+
+.futuristic-ai-button::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0) 70%
+  );
+  opacity: 0;
+  transform: rotate(45deg);
+  transition: all 0.7s ease;
+}
+
+.futuristic-ai-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(142, 45, 226, 0.7), 0 0 50px rgba(74, 0, 224, 0.5);
+}
+
+.futuristic-ai-button:hover::before {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+/* Close Button */
+button.close-button {
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #fff;
+  transition: color 0.3s;
+}
+
+button.close-button:hover {
+  color: #e0e0e0;
+}
+
+/* Modal Input Field */
+.modal input {
+  transition: all 0.3s ease;
+}
+
+.modal input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 5px #6366f1;
+}
+
+
+
+/* CSS for Futuristic Black Button */
+.futuristic-black {
+  position: relative;
+  background: linear-gradient(45deg, #000000, #333333);
+  color: white;
+  overflow: hidden;
+  border: none;
+  border-radius: 50px;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.4s ease;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.3);
+}
+
+.futuristic-black::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0) 70%
+  );
+  opacity: 0;
+  transform: rotate(45deg);
+  transition: all 0.7s ease;
+}
+
+.futuristic-black:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.7), 0 0 50px rgba(255, 255, 255, 0.5);
+}
+
+.futuristic-black:hover::before {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+
+/* Add this to your component's CSS file */
+select:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Optional: Add a visual indicator that these fields are not needed for pre-tests */
+.pretest-inactive select:disabled {
+  position: relative;
+}
+
+.pretest-inactive select:disabled::after {
+  content: "Not required for pre-test";
+  position: absolute;
+  font-size: 11px;
+  color: #6b7280;
+  right: 8px;
+  bottom: -15px;
+}

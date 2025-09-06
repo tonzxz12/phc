@@ -1,0 +1,418 @@
+<body class="flex flex-col p-4" style="background-color: var(--body-color);">
+  <p-card class="rounded-xl" [style]="{'box-shadow': 'var(--card-shadow)', 'background-color': 'var(--card-bg)'}">
+    <div class="flex flex-col sm:flex-row justify-between items-center py-2 mb-2">
+      <div>
+        <h1 class="text-2xl font-bold" style="color: var(--text-color);">Manage Class</h1>
+        <p class="text-sm" style="color: var(--input-placeholder);">Manage existing class and students here</p>
+      </div>
+      <div>
+        <button (click)="openNewClassModal()"
+           class="flex items-center px-6 py-2 space-x-2 font-semibold text-white transition-transform duration-300 transform rounded-xl shadow-lg hover:scale-105"
+           style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); transition: var(--tran-03);">
+          <span class="text-2xl material-icons">add_circle_outline</span>
+          <span class="text-lg">New Class</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="flex space-x-4 mb-5">
+      <!-- Course Dropdown -->
+      <p-dropdown *ngIf="courses.length > 0" [options]="courses" [(ngModel)]="currentCourse" optionLabel="title" placeholder="Select Course"
+                  (onChange)="changeCourse($event.value)" class="w-1/5" [showClear]="true" 
+                  [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"></p-dropdown>
+      
+      <!-- Class Dropdown -->
+      <p-dropdown [options]="classes" [(ngModel)]="currentClass" optionLabel="name" placeholder="Select Class"
+                  [disabled]="!currentCourse" (onChange)="changeClass($event.value)" class="w-1/5" [showClear]="true"
+                  [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"></p-dropdown>
+    </div>
+    
+    <app-custom-tabs>
+      <app-custom-tab-panel title="Classes">
+        <!-- Content for Classes tab -->
+        <div class="w-full p-6" style="background-color: var(--card-bg);">
+          <!-- Class List Table -->
+          <app-custom-table 
+            [data]="getClassTableData()" 
+            [columns]="classTableColumns"
+            [paginator]="true"
+            [rows]="10"
+            (rowClick)="selectClass($event)"
+            (actionClick)="handleClassAction($event)">
+          </app-custom-table>
+          
+          <!-- Empty State -->
+          <div *ngIf="paginatedClasses().length === 0" class="text-center py-8" style="color: var(--input-placeholder);">
+            <div class="flex flex-col items-center justify-center" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+              <svg class="w-12 h-12 mb-2" style="color: var(--input-placeholder);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m6-10V7a4 4 0 00-4-4H9a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2" />
+              </svg>
+              <span class="text-lg font-medium" style="color: var(--text-color);">No classes found</span>
+              <span class="text-sm" style="color: var(--input-placeholder);">Create a new class to get started.</span>
+            </div>
+          </div>
+        </div>
+      </app-custom-tab-panel>
+      
+      <app-custom-tab-panel title="Students">
+        <!-- Content for Students tab -->
+        <div class="w-full p-6 rounded-lg" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+          <!-- Student Table -->
+          <div class="p-4 rounded-lg mb-6" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold" style="color: var(--text-color);">Students</h3>
+              <button 
+                *ngIf="currentClass"
+                (click)="openAddStudentModal()"
+                class="flex items-center px-4 py-2 space-x-2 font-semibold text-white transition-transform duration-300 transform rounded-lg shadow-lg hover:scale-105"
+                style="background: var(--btn-success-bg); color: var(--btn-success-text); transition: var(--tran-03);"
+                [style.hover:background]="'var(--btn-success-hover)'">
+                <span class="text-lg material-icons">person_add</span>
+                <span>Add Student</span>
+              </button>
+            </div>
+            
+            <div *ngIf="!currentClass" class="text-center py-4" style="color: var(--input-placeholder);">
+              <div class="flex flex-col items-center justify-center" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+                <svg class="w-12 h-12 mb-2" style="color: var(--input-placeholder);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m6-10V7a4 4 0 00-4-4H9a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2" />
+                </svg>
+                <span class="text-lg font-medium" style="color: var(--text-color);">Please select a class to view students</span>
+                <span class="text-sm" style="color: var(--input-placeholder);">Use the class dropdown above to select a class.</span>
+              </div>
+            </div>
+            
+            <div *ngIf="currentClass && (!filteredStudents || filteredStudents.length === 0)" class="text-center py-4" style="color: var(--input-placeholder);">
+              <div class="flex flex-col items-center justify-center" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+                <svg class="w-12 h-12 mb-2" style="color: var(--input-placeholder);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m6-10V7a4 4 0 00-4-4H9a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2" />
+                </svg>
+                <span class="text-lg font-medium" style="color: var(--text-color);">No students in this class</span>
+                <span class="text-sm" style="color: var(--input-placeholder);">Click "Add Student" to enroll students in this class.</span>
+              </div>
+            </div>
+            
+            <app-custom-table 
+              *ngIf="currentClass && filteredStudents && filteredStudents.length > 0" 
+              [data]="getStudentTableData()" 
+              [columns]="studentTableColumns"
+              [paginator]="true"
+              [rows]="10"
+              (rowClick)="selectStudent($event)"
+              (actionClick)="handleStudentAction($event)">
+            </app-custom-table>
+          </div>
+        </div>
+      </app-custom-tab-panel>
+    </app-custom-tabs>
+  </p-card>
+</body>
+
+<!-- New Class Modal -->
+<p-dialog 
+  [(visible)]="displayNewClassModal" 
+  [header]="'Create New Class'"
+  [modal]="true" 
+  [style]="{width: '500px'}" 
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="closeNewClassModal()"
+  [styleClass]="'modal-dialog'"
+>
+  <div class="p-4" style="background-color: var(--modal-bg);">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col">
+        <label for="className" class="font-semibold mb-2" style="color: var(--text-color);">Class Name <span style="color: var(--alert-error-border);">*</span></label>
+        <input 
+          id="className" 
+          pInputText 
+          [(ngModel)]="newClass.className" 
+          placeholder="Enter Class name" 
+          class="w-full p-2 rounded-md focus:outline-none transition-all"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          required
+          #className="ngModel"
+        />
+        <small style="color: var(--alert-error-border); margin-top: 4px;" *ngIf="className.touched && className.invalid">
+          Class name is required
+        </small>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="courseId" class="font-semibold mb-2" style="color: var(--text-color);">Course <span style="color: var(--alert-error-border);">*</span></label>
+        <p-dropdown 
+          id="courseId" 
+          [options]="courseOptions" 
+          [(ngModel)]="newClass.courseId" 
+          placeholder="Select a course" 
+          optionLabel="label" 
+          optionValue="value" 
+          class="w-full"
+          [showClear]="true"
+          [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+          [panelStyle]="{ 'background-color': 'var(--modal-bg)', 'color': 'var(--text-color)' }"
+        ></p-dropdown>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="duration" class="font-semibold mb-2" style="color: var(--text-color);">Duration (days) <span style="color: var(--alert-error-border);">*</span></label>
+        <input 
+          id="duration" 
+          pInputText 
+          type="number" 
+          [(ngModel)]="newClass.duration" 
+          placeholder="Enter Class duration" 
+          min="1" 
+          class="w-full p-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          required
+          #duration="ngModel"
+        />
+        <small style="color: var(--alert-error-border); margin-top: 4px;" *ngIf="duration.touched && duration.invalid">
+          Please enter a valid duration
+        </small>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="classCode" class="font-semibold mb-2" style="color: var(--text-color);">Class Code <span style="color: var(--alert-error-border);">*</span></label>
+        <input 
+          id="classCode" 
+          pInputText 
+          [(ngModel)]="newClass.classCode" 
+          placeholder="Enter class code" 
+          class="w-full p-2 rounded-md"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          required
+          #classCode="ngModel"
+        />
+        <small style="color: var(--alert-error-border); margin-top: 4px;" *ngIf="classCode.touched && classCode.invalid">
+          Class code is required
+        </small>    
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-between items-center p-2">
+      <p-checkbox 
+        [(ngModel)]="newClass.isActive" 
+        label="Active" 
+        binary="true" 
+        class="text-sm" 
+        [ngStyle]="{'color': 'var(--text-color)'}"
+      ></p-checkbox>
+      <div class="flex gap-2">
+        <button 
+          pButton 
+          label="Cancel" 
+          class="px-4 py-2 rounded-md transition-colors" 
+          style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text);"
+          (click)="closeNewClassModal()"
+        ></button>
+        <button 
+          pButton 
+          label="Create Class" 
+          class="px-4 py-2 rounded-md transition-colors" 
+          style="background-color: var(--btn-success-bg); color: var(--btn-primary-text);"
+          (click)="saveNewClass()"
+          [disabled]="!isClassFormValid()"
+          [loading]="isSaving"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Edit Class Modal -->
+<p-dialog 
+  [(visible)]="displayEditClassModal" 
+  [header]="'Edit Class'"
+  [modal]="true" 
+  [style]="{width: '500px'}" 
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="closeEditClassModal()"
+  [styleClass]="'modal-dialog'"
+>
+  <div class="p-4" style="background-color: var(--modal-bg);">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col">
+        <label for="editClassName" class="font-semibold mb-2" style="color: var(--text-color);">Class Name <span style="color: var(--alert-error-border);">*</span></label>
+        <input 
+          id="editClassName" 
+          pInputText 
+          [(ngModel)]="classToEdit.className" 
+          placeholder="e.g., Mathematics 101" 
+          class="w-full p-2 rounded-md focus:outline-none transition-all"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          required
+          #editClassName="ngModel"
+        />
+        <small style="color: var(--alert-error-border); margin-top: 4px;" *ngIf="editClassName.touched && editClassName.invalid">
+          Class name is required
+        </small>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="editCourseId" class="font-semibold mb-2" style="color: var(--text-color);">Course <span style="color: var(--alert-error-border);">*</span></label>
+        <p-dropdown 
+          id="editCourseId" 
+          [options]="courseOptions" 
+          [(ngModel)]="classToEdit.courseId" 
+          placeholder="Select a course" 
+          optionLabel="label" 
+          optionValue="value" 
+          class="w-full"
+          [showClear]="true"
+          [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+          [panelStyle]="{ 'background-color': 'var(--modal-bg)', 'color': 'var(--text-color)' }"
+        ></p-dropdown>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="editDuration" class="font-semibold mb-2" style="color: var(--text-color);">Duration (days) <span style="color: var(--alert-error-border);">*</span></label>
+        <input 
+          id="editDuration" 
+          pInputText 
+          type="number" 
+          [(ngModel)]="classToEdit.duration" 
+          placeholder="Enter Class duration" 
+          min="1" 
+          class="w-full p-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          required
+          #editDuration="ngModel"
+        />
+        <small style="color: var(--alert-error-border); margin-top: 4px;" *ngIf="editDuration.touched && editDuration.invalid">
+          Please enter a valid duration
+        </small>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="editClassCode" class="font-semibold mb-2" style="color: var(--text-color);">Class Code <span style="color: var(--alert-error-border);">*</span></label>
+        <input 
+          id="editClassCode" 
+          pInputText 
+          [(ngModel)]="classToEdit.classCode" 
+          placeholder="Enter class code" 
+          class="w-full p-2 rounded-md"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          required
+          #editClassCode="ngModel"
+        />
+        <small style="color: var(--alert-error-border); margin-top: 4px;" *ngIf="editClassCode.touched && editClassCode.invalid">
+          Class code is required
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end items-center p-2 gap-2">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="px-4 py-2 rounded-md transition-colors"
+        style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text);"
+        (click)="closeEditClassModal()"
+      ></button>
+      <button 
+        pButton 
+        label="Update Class" 
+        class="px-4 py-2 rounded-md transition-colors"
+        style="background-color: var(--btn-success-bg); color: var(--btn-primary-text);"
+        (click)="saveEditedClass()"
+        [disabled]="!isEditClassFormValid()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Error Modal -->
+<p-dialog 
+  [(visible)]="displayErrorModal" 
+  [header]="'Create a Pre-test for ' + getSelectedCourseName()"
+  [modal]="true" 
+  [style]="{width: '400px'}" 
+  [draggable]="false"
+  [closable]="true"
+  (onHide)="closeErrorModal()"
+  [styleClass]="'modal-dialog'"
+>
+  <div class="flex flex-col items-center p-4" style="background-color: var(--modal-bg);">
+    <div class="text-5xl mb-4" style="color: var(--alert-error-border);">
+      <i class="fas fa-exclamation-circle"></i>
+    </div>
+    <p class="text-center text-lg mb-6" style="color: var(--text-color);">A pre-test is required for this course before creating a class.</p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-center items-center p-2">
+      <button 
+        pButton 
+        label="Create here"
+        class="px-6 py-2 rounded-md transition-colors"
+        style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);"
+        (click)="navigateToCourses()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Add Student Modal -->
+<div *ngIf="showAddStudentModal" class="fixed inset-0 z-50 flex items-center justify-center" style="background: var(--modal-backdrop-bg);">
+  <div class="p-6 mx-4 max-w-md w-full rounded-lg shadow-lg" style="background-color: var(--modal-bg); border: 1px solid var(--modal-border);">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold" style="color: var(--text-color);">Add Student to Class</h3>
+      <button (click)="closeAddStudentModal()" class="text-xl hover:opacity-70" style="color: var(--text-color); transition: var(--tran-03);">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Class: {{currentClass?.name}}</label>
+      <div class="text-sm p-2 rounded" style="background-color: var(--input-bg); color: var(--input-placeholder);">
+        {{currentClass?.course || 'Unknown Course'}} - {{currentClass?.name}}
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Select Student</label>
+      <select 
+        [(ngModel)]="selectedStudentForAdd"
+        class="w-full p-3 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-300"
+        style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--input-border); transition: var(--tran-03);"
+        [style.focus:ring-color]="'var(--primary-color)'"
+        [style.focus:border-color]="'var(--primary-color)'">
+        <option value="" style="background-color: var(--input-bg); color: var(--text-color);">Select a student...</option>
+        <option 
+          *ngFor="let student of availableStudents" 
+          [value]="student.id"
+          style="background-color: var(--input-bg); color: var(--text-color);">
+          {{student.firstname}} {{student.lastname}}
+        </option>
+      </select>
+      <div *ngIf="availableStudents && availableStudents.length === 0" class="text-sm mt-2" style="color: var(--input-placeholder);">
+        All students are already enrolled in this class.
+      </div>
+    </div>
+    
+    <div class="flex justify-end space-x-3">
+      <button 
+        (click)="closeAddStudentModal()"
+        class="px-4 py-2 font-semibold transition-all duration-300 rounded-lg"
+        style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-color); transition: var(--tran-03);"
+        [style.hover:background-color]="'var(--btn-secondary-hover-bg)'">
+        Cancel
+      </button>
+      <button 
+        (click)="addStudentToClass()"
+        [disabled]="!selectedStudentForAdd"
+        class="px-4 py-2 font-semibold text-white transition-all duration-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        style="background: var(--btn-success-bg); color: var(--btn-success-text); transition: var(--tran-03);"
+        [style.hover:background]="'var(--btn-success-hover)'">
+        Add Student
+      </button>
+    </div>
+  </div>
+</div>

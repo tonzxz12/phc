@@ -1,0 +1,55 @@
+@media screen and (max-width: 480px) {
+  .top-container {
+    justify-content: start;
+    align-items: center;
+    margin-top: 2rem;
+  }
+  .instruction {
+    font-size: 24px;
+    margin-left: 1rem;
+  }
+  .description {
+    display: none;
+  }
+}
+
+/* Button Styling */
+/* .bg-[var(--primary-color)] {
+  background-color: var(--primary-color);
+} */
+/* .hover\:bg-[var(--tertiary-color)]:hover {
+  background-color: var(--tertiary-color);
+} */
+.text-white {
+  color: #ffffff;
+}
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+.hover\:shadow-lg:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Card Styling */
+/* .bg-[var(--secondary-color)] {
+  background-color: var(--secondary-color);
+}
+.hover\:bg-[var(--tertiary-color)]:hover {
+  background-color: var(--tertiary-color);
+} */
+.hover\:shadow-2xl:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Common Transformations */
+.transform {
+  transform: translate(0);
+}
+.transition-transform {
+  transition: transform 0.3s;
+}
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}

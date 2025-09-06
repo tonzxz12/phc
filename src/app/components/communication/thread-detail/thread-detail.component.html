@@ -1,0 +1,357 @@
+<div class="thread-detail-container p-6">
+    <!-- Header Card -->
+    <div class="thread-card p-6 mb-6">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-4">
+          <button 
+            class="btn btn-secondary px-4 py-2"
+            (click)="goBack()">
+            <i class="pi pi-arrow-left mr-2"></i>
+            Back
+          </button>
+        </div>
+        
+        <!-- Thread Status Badges -->
+        <div class="flex items-center gap-2">
+          <span *ngIf="threadInfo.ispinned" 
+                class="thread-badge-pinned inline-flex items-center">
+            <i class="pi pi-thumbtack mr-1.5"></i>
+            Pinned
+          </span>
+          
+          <span *ngIf="threadInfo.islocked" 
+                class="thread-badge-locked inline-flex items-center">
+            <i class="pi pi-lock mr-1.5"></i>
+            Locked
+          </span>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <h1 class="text-3xl font-bold text-primary-theme mb-3">{{ threadInfo.title }}</h1>
+        <p *ngIf="threadInfo.body" class="text-secondary-theme text-lg leading-relaxed">{{ threadInfo.body }}</p>
+      </div>
+    </div>
+
+    <!-- New Post Form -->
+    <div *ngIf="!threadInfo.islocked || currentUserType === '1'" 
+         class="thread-card p-6 mb-8">
+      <div class="flex items-center mb-4">
+        <div class="thread-icon-container">
+          <i class="pi pi-user text-sm"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-primary-theme ml-3">Share your thoughts</h3>
+      </div>
+      
+      <div class="mb-4">
+        <textarea 
+          [(ngModel)]="newPostBody"
+          rows="4"
+          class="w-full thread-textarea"
+          placeholder="What would you like to discuss? Share your thoughts, ask questions, or contribute to the conversation..."></textarea>
+      </div>
+      
+      <div class="flex justify-between items-center">
+        <div class="flex items-center text-sm text-secondary-theme">
+          <i class="pi pi-info-circle mr-1"></i>Be respectful and constructive in your discussions
+          <span></span>
+        </div>
+        <button 
+          class="btn btn-primary px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="createPost()"
+          [disabled]="!newPostBody.trim()">
+          <i class="pi pi-send mr-2"></i>
+          Post Message
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex items-center justify-center py-16">
+      <div class="thread-loading-card">
+        <div class="thread-loading-icon">
+          <i class="pi pi-spin pi-spinner text-2xl" style="color: var(--alert-info-border);"></i>
+        </div>
+        <p class="text-secondary-theme font-medium">Loading discussion posts...</p>
+      </div>
+    </div>
+
+    <!-- Posts List -->
+    <div *ngIf="!isLoading" class="space-y-6">
+      <div *ngFor="let post of posts; let i = index" 
+           class="thread-post-item">
+        
+        <!-- Main Post -->
+        <div class="p-6">
+          <div class="flex items-start gap-4">
+            <!-- Author Avatar -->
+            <div class="relative">
+              <img 
+                [src]="getAuthorProfile(post)"
+                [alt]="getAuthorName(post)"
+                class="w-12 h-12 rounded-full object-cover" style="border: 2px solid var(--card-border);"
+                onerror="this.src='assets/images/default-avatar.png'">
+              <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full" style="border: 2px solid var(--card-bg);"></div>
+            </div>
+            
+            <div class="flex-1 min-w-0">
+              <!-- Author & Timestamp -->
+              <div class="flex items-center gap-3 mb-3">
+                <h4 class="font-bold text-primary-theme text-lg">{{ getAuthorName(post) }}</h4>
+                <div class="flex items-center gap-2">
+                  <span *ngIf="getAuthorRole(post) === 'teacher'" 
+                        class="thread-badge-teacher inline-flex items-center">
+                    <i class="pi pi-star-fill mr-1"></i>
+                    Teacher
+                  </span>
+                  <span *ngIf="getAuthorRole(post) === 'student'" 
+                        class="thread-badge-student inline-flex items-center">
+                    <i class="pi pi-graduation-cap mr-1"></i>
+                    Student
+                  </span>
+                  <span class="thread-badge-time inline-flex items-center">
+                    <i class="pi pi-clock mr-1"></i>
+                    {{ API.parseDateFromNow(post.createdat) }}
+                  </span>
+                  <span *ngIf="post.isedited" 
+                        class="thread-badge-edited inline-flex items-center">
+                    <i class="pi pi-pencil mr-1"></i>
+                    edited
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Post Content -->
+              <div *ngIf="editingPostId !== post.postid" 
+                   class="prose prose-gray max-w-none">
+                <div class="thread-content">
+                  {{ post.body }}
+                </div>
+              </div>
+              
+              <!-- Edit Form -->
+              <div *ngIf="editingPostId === post.postid" class="space-y-4">
+                <textarea 
+                  [(ngModel)]="editBody"
+                  rows="4"
+                  class="w-full thread-textarea"></textarea>
+                <div class="flex justify-end gap-2">
+                  <button 
+                    class="btn btn-secondary px-4 py-2"
+                    (click)="cancelEdit()">
+                    Cancel
+                  </button>
+                  <button 
+                    class="btn btn-primary px-4 py-2"
+                    (click)="editPost()">
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between mt-6 pt-4" style="border-top: 1px solid var(--card-border);">
+            <div class="flex items-center gap-3">
+              <button 
+                class="btn-action-reply inline-flex items-center"
+                (click)="startReply(post.id)"
+                [disabled]="threadInfo.islocked && currentUserType !== '1'">
+                <i class="pi pi-reply mr-2"></i>
+                Reply
+              </button>
+              
+              <!-- Report Button for non-authors -->
+              <button *ngIf="(post.author_studentid && post.author_studentid !== currentUserId) || (post.author_teacherid && post.author_teacherid !== currentUserId)"
+                class="btn-action-report inline-flex items-center"
+                (click)="reportPost(post)"
+                title="Report this post">
+                <i class="pi pi-flag mr-2"></i>
+                Report
+              </button>
+            </div>
+            
+            <div class="flex items-center gap-2" *ngIf="canModifyPost(post)">
+              <button 
+                class="btn-action-edit inline-flex items-center"
+                (click)="startEdit(post)"
+                title="Edit Post">
+                <i class="pi pi-pencil"></i>
+              </button>
+              
+              <button 
+                class="btn-action-delete inline-flex items-center"
+                (click)="deletePost(post)"
+                title="Delete Post">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reply Form -->
+        <div *ngIf="replyingToId === post.id" class="thread-reply-form">
+          <div class="flex items-center mb-4">
+            <div class="thread-icon-container-sm">
+              <i class="pi pi-reply text-xs"></i>
+            </div>
+            <h5 class="text-lg font-semibold text-primary-theme ml-3">
+              Replying to <span class="text-accent-theme">{{ getAuthorName(post) }}</span>
+            </h5>
+          </div>
+            
+          <textarea 
+            [(ngModel)]="replyBody"
+            rows="3"
+            class="w-full thread-textarea mb-4"
+            placeholder="Share your thoughts on this post..."></textarea>
+          
+          <div class="flex justify-end gap-3">
+            <button 
+              class="btn btn-secondary px-4 py-2"
+              (click)="cancelReply()">
+              Cancel
+            </button>
+            <button 
+              class="btn btn-primary px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              (click)="createReply()" 
+              [disabled]="!replyBody.trim()">
+              <i class="pi pi-send mr-2"></i>
+              Post Reply
+            </button>
+          </div>
+        </div>
+
+        <!-- Replies Section -->
+        <div *ngIf="post.replies && post.replies.length > 0" class="thread-replies-container">
+          <div class="flex items-center mb-4">
+            <i class="pi pi-comments text-secondary-theme mr-2"></i>
+            <span class="text-sm font-medium text-primary-theme">
+              {{ post.replies.length }} {{ post.replies.length === 1 ? 'Reply' : 'Replies' }}
+            </span>
+          </div>
+            
+          <div class="space-y-4">
+            <div *ngFor="let reply of post.replies; let replyIndex = index" 
+                 class="thread-reply-item">
+              <div class="flex items-start gap-3">
+                <img 
+                  [src]="getAuthorProfile(reply)"
+                  [alt]="getAuthorName(reply)"
+                  class="w-10 h-10 rounded-full object-cover" style="border: 2px solid var(--card-border);"
+                  onerror="this.src='assets/images/default-avatar.png'">
+                
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-3 mb-2">
+                    <h6 class="font-semibold text-primary-theme">{{ getAuthorName(reply) }}</h6>
+                    <div class="flex items-center gap-2">
+                      <span *ngIf="getAuthorRole(reply) === 'teacher'" 
+                            class="thread-badge-teacher inline-flex items-center">
+                        <i class="pi pi-star-fill mr-1"></i>
+                        Teacher
+                      </span>
+                      <span *ngIf="getAuthorRole(reply) === 'student'" 
+                            class="thread-badge-student inline-flex items-center">
+                        <i class="pi pi-graduation-cap mr-1"></i>
+                        Student
+                      </span>
+                      <span class="thread-badge-time inline-flex items-center">
+                        <i class="pi pi-clock mr-1"></i>
+                        {{ API.parseDateFromNow(reply.createdat) }}
+                      </span>
+                      <span *ngIf="reply.isedited" 
+                            class="thread-badge-edited inline-flex items-center">
+                        <i class="pi pi-pencil mr-1"></i>
+                        edited
+                      </span>
+                    </div>
+                  </div>
+                    
+                  <!-- Reply Content -->
+                  <div *ngIf="editingPostId !== reply.postid">
+                    <div class="thread-content p-3">
+                      {{ reply.body }}
+                    </div>
+                  </div>
+                    
+                  <!-- Edit Form -->
+                  <div *ngIf="editingPostId === reply.postid" class="space-y-3">
+                    <textarea 
+                      [(ngModel)]="editBody"
+                      rows="3"
+                      class="w-full thread-textarea"></textarea>
+                    <div class="flex justify-end gap-2">
+                      <button 
+                        class="btn btn-secondary px-3 py-1.5 text-sm"
+                        (click)="cancelEdit()">
+                        Cancel
+                      </button>
+                      <button 
+                        class="btn btn-primary px-3 py-1.5 text-sm"
+                        (click)="editPost()">
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                    
+                  <!-- Reply Actions -->
+                  <div class="flex items-center gap-3 mt-3">
+                    <!-- Report Button for non-authors -->
+                    <button *ngIf="(reply.author_studentid && reply.author_studentid !== currentUserId) || (reply.author_teacherid && reply.author_teacherid !== currentUserId)"
+                      class="btn-action-report inline-flex items-center text-sm"
+                      (click)="reportPost(reply)"
+                      title="Report this reply">
+                      <i class="pi pi-flag mr-1"></i>
+                      Report
+                    </button>
+                    
+                    <div *ngIf="canModifyPost(reply)" class="flex items-center gap-3">
+                      <button 
+                        class="btn-action-edit inline-flex items-center text-sm"
+                        (click)="startEdit(reply)">
+                        <i class="pi pi-pencil mr-1"></i>
+                        Edit
+                      </button>
+                      
+                      <button 
+                        class="btn-action-delete inline-flex items-center text-sm"
+                        (click)="deletePost(reply)">
+                        <i class="pi pi-trash mr-1"></i>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="posts.length === 0 && !isLoading" 
+         class="thread-empty-state">
+      <div class="thread-empty-icon">
+        <i class="pi pi-comments text-3xl text-secondary-theme"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-primary-theme mb-3">Start the Conversation</h3>
+      <p class="text-secondary-theme mb-6 max-w-md mx-auto">
+        This discussion is waiting for its first post. Share your thoughts, ask questions, or start an engaging conversation with your peers.
+      </p>
+      <div class="flex items-center justify-center space-x-4 text-sm text-secondary-theme">
+        <div class="flex items-center">
+          <i class="pi pi-lightbulb mr-1.5 text-yellow-500"></i>
+          Share insights
+        </div>
+        <div class="flex items-center">
+          <i class="pi pi-question-circle mr-1.5 text-blue-500"></i>
+          Ask questions
+        </div>
+        <div class="flex items-center">
+          <i class="pi pi-users mr-1.5 text-green-500"></i>
+          Engage with peers
+        </div>
+      </div>
+    </div>
+</div>

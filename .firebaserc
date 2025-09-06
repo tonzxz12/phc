@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "quanbylms-b4b15": {
+      "hosting": {
+        "quanlab": [
+          "quanbylms-b4b15"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "quanbylms-b4b15"
+  }
+}

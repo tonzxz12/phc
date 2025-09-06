@@ -1,0 +1,398 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Student Performance Dashboard</h1>
+        <p class="text-gray-600">Generate comprehensive reports for test scores, assessments, and student activities</p>
+      </div>
+  
+      <!-- Filter Controls -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Select Class</mat-label>
+            <mat-select formControlName="class">
+              <mat-option *ngFor="let class of classes" [value]="class">{{ class }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Date Range</mat-label>
+            <mat-select formControlName="dateRange">
+              <mat-option *ngFor="let range of dateRanges" [value]="range">{{ range }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Assessment</mat-label>
+            <mat-select formControlName="assessment">
+              <mat-option value="">All Assessments</mat-option>
+              <mat-option *ngFor="let assessment of assessments" [value]="assessment.id">{{ assessment.name }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Start Date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+  
+        <div class="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
+          <button mat-raised-button color="primary" (click)="generateReport()" 
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200">
+            <mat-icon class="mr-2">assessment</mat-icon>
+            Generate Report
+          </button>
+  
+          <div class="flex space-x-3">
+            <button mat-stroked-button (click)="exportReport('pdf')" 
+                    class="border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors duration-200">
+              <mat-icon class="mr-2">picture_as_pdf</mat-icon>
+              Export PDF
+            </button>
+            <button mat-stroked-button (click)="exportReport('excel')" 
+                    class="border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors duration-200">
+              <mat-icon class="mr-2">table_chart</mat-icon>
+              Export Excel
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Main Content Tabs -->
+      <mat-tab-group [(selectedIndex)]="selectedTab" class="bg-white rounded-lg shadow-sm border border-gray-200">
+        
+        <!-- Test Scores & Assessments Tab -->
+        <mat-tab label="Test Scores & Assessments">
+          <div class="p-6">
+            <!-- Assessment Overview Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-blue-100 text-sm font-medium">Total Assessments</p>
+                    <p class="text-3xl font-bold">{{ totalAssessments }}</p>
+                  </div>
+                  <mat-icon class="text-4xl text-blue-200">assignment</mat-icon>
+                </div>
+              </div>
+  
+              <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-green-100 text-sm font-medium">Average Score</p>
+                    <p class="text-3xl font-bold">{{ averageScore }}%</p>
+                  </div>
+                  <mat-icon class="text-4xl text-green-200">trending_up</mat-icon>
+                </div>
+              </div>
+  
+              <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-purple-100 text-sm font-medium">Completion Rate</p>
+                    <p class="text-3xl font-bold">{{ averageCompletionRate }}%</p>
+                  </div>
+                  <mat-icon class="text-4xl text-purple-200">check_circle</mat-icon>
+                </div>
+              </div>
+  
+              <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-orange-100 text-sm font-medium">Total Students</p>
+                    <p class="text-3xl font-bold">{{ totalStudents }}</p>
+                  </div>
+                  <mat-icon class="text-4xl text-orange-200">people</mat-icon>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Assessment Details -->
+            <div class="mb-8">
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">Assessment Details</h3>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div *ngFor="let assessment of assessments" 
+                     class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+                  <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-lg font-semibold text-gray-900">{{ assessment.name }}</h4>
+                    <span [class]="'px-3 py-1 rounded-full text-sm font-medium ' + getAssessmentTypeColor(assessment.type)">
+                      {{ assessment.type | titlecase }}
+                    </span>
+                  </div>
+                  
+                  <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-600">Due Date:</span>
+                      <span class="font-medium">{{ assessment.dueDate | date:'mediumDate' }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-600">Average Score:</span>
+                      <span class="font-medium text-blue-600">{{ assessment.averageScore }}%</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-600">Completion Rate:</span>
+                      <span [class]="'font-medium ' + getCompletionRateColor(assessment.completionRate)">
+                        {{ assessment.completionRate }}%
+                      </span>
+                    </div>
+                  </div>
+  
+                  <div class="mt-4">
+                    <div class="flex justify-between text-xs text-gray-500 mb-1">
+                      <span>Progress</span>
+                      <span>{{ assessment.completionRate }}%</span>
+                    </div>
+                    <mat-progress-bar mode="determinate" [value]="assessment.completionRate" 
+                                     class="h-2 rounded-full"></mat-progress-bar>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Test Scores Table -->
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">Individual Test Scores</h3>
+              <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <table mat-table [dataSource]="testScores" class="w-full">
+                  <ng-container matColumnDef="studentName">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                          <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="text-sm font-medium text-gray-700">{{ element.studentName.charAt(0) }}</span>
+                          </div>
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900">{{ element.studentName }}</div>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="testName">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ element.testName }}</td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="score">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {{ element.score }}/{{ element.maxScore }}
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="percentage">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap">
+                      <span class="text-sm font-medium" [class]="element.percentage >= 70 ? 'text-green-600' : 'text-red-600'">
+                        {{ element.percentage }}%
+                      </span>
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap">
+                      <span [class]="'px-2 py-1 text-xs font-medium rounded-full ' + getStatusColor(element.status)">
+                        {{ element.status | titlecase }}
+                      </span>
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ element.date | date:'shortDate' }}</td>
+                  </ng-container>
+  
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+  
+        <!-- Student Participation & Activity Tab -->
+        <mat-tab label="Student Participation & Activity">
+          <div class="p-6">
+            <!-- Activity Overview Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-indigo-100 text-sm font-medium">Total Students</p>
+                    <p class="text-3xl font-bold">{{ studentActivities.length }}</p>
+                  </div>
+                  <mat-icon class="text-4xl text-indigo-200">school</mat-icon>
+                </div>
+              </div>
+  
+              <div class="bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-teal-100 text-sm font-medium">Avg. Attendance</p>
+                    <p class="text-3xl font-bold">{{ averageAttendanceRate }}%</p>
+                  </div>
+                  <mat-icon class="text-4xl text-teal-200">event_available</mat-icon>
+                </div>
+              </div>
+  
+              <div class="bg-gradient-to-r from-pink-500 to-pink-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-pink-100 text-sm font-medium">Avg. Participation</p>
+                    <p class="text-3xl font-bold">{{ averageParticipationScore }}%</p>
+                  </div>
+                  <mat-icon class="text-4xl text-pink-200">forum</mat-icon>
+                </div>
+              </div>
+  
+              <div class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-amber-100 text-sm font-medium">Avg. Completion</p>
+                    <p class="text-3xl font-bold">{{ averageAssignmentCompletion }}%</p>
+                  </div>
+                  <mat-icon class="text-4xl text-amber-200">task_alt</mat-icon>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Student Activity Table -->
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-4">Student Activity Details</h3>
+              <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <table mat-table [dataSource]="studentActivities" class="w-full">
+                  <ng-container matColumnDef="studentName">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                          <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="text-sm font-medium text-gray-700">{{ element.studentName.charAt(0) }}</span>
+                          </div>
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900">{{ element.studentName }}</div>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="loginCount">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Logins</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ element.loginCount }}</td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="attendanceRate">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap">
+                      <span class="text-sm font-medium" [class]="element.attendanceRate >= 90 ? 'text-green-600' : element.attendanceRate >= 75 ? 'text-yellow-600' : 'text-red-600'">
+                        {{ element.attendanceRate }}%
+                      </span>
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="participationScore">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Participation</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap">
+                      <span class="text-sm font-medium" [class]="getParticipationScoreColor(element.participationScore)">
+                        {{ element.participationScore }}%
+                      </span>
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="completionRate">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignments</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-900">{{ element.assignmentsCompleted }}/{{ element.totalAssignments }}</span>
+                        <div class="w-16">
+                          <mat-progress-bar mode="determinate" 
+                                           [value]="(element.assignmentsCompleted / element.totalAssignments) * 100"
+                                           class="h-2 rounded-full"></mat-progress-bar>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+  
+                  <ng-container matColumnDef="lastLogin">
+                    <th mat-header-cell *matHeaderCellDef class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
+                    <td mat-cell *matCellDef="let element" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ element.lastLogin | date:'short' }}</td>
+                  </ng-container>
+  
+                  <tr mat-header-row *matHeaderRowDef="activityColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: activityColumns;"></tr>
+                </table>
+              </div>
+            </div>
+  
+            <!-- Activity Charts Section -->
+            <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">Attendance Distribution</h4>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">90-100%</span>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-32 bg-gray-200 rounded-full h-2">
+                        <div class="bg-green-500 h-2 rounded-full" style="width: 60%"></div>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900">3 students</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">75-89%</span>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-32 bg-gray-200 rounded-full h-2">
+                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 40%"></div>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900">2 students</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Below 75%</span>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-32 bg-gray-200 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full" style="width: 20%"></div>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900">1 student</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">Participation Trends</h4>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">High (85%+)</span>
+                    <span class="text-sm font-medium text-green-600">2 students</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Medium (70-84%)</span>
+                    <span class="text-sm font-medium text-yellow-600">2 students</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Low (Below 70%)</span>
+                    <span class="text-sm font-medium text-red-600">1 student</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+.calendar-days div {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    position: relative;
+  }
+  
+  .calendar-days div:hover {
+    background-color: #f1f5f9;
+  }
+  
+  .calendar-days .current-date {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .calendar-days .current-date span {
+    font-size: 0.625rem; /* Adjust as needed for visibility */
+    /* padding: 0.125rem 0.25rem; */
+    border-radius: 0.375rem;
+    background-color: #3b82f6; /* Match the background for seamless integration */
+  }

@@ -1,0 +1,271 @@
+<!-- Forum Thread View -->
+<div class="forum-thread-container">
+  <!-- Header with Back Navigation -->
+  <div class="thread-header">
+    <button class="btn btn-secondary btn-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i> Back to Forum
+    </button>
+    
+    <div class="thread-info" *ngIf="thread">
+      <h2 class="thread-title">{{ thread.title }}</h2>
+      <div class="thread-meta">
+        <span class="thread-author">
+          Created by: {{ thread.creator_teacher_firstname || thread.creator_student_firstname }} 
+          {{ thread.creator_teacher_lastname || thread.creator_student_lastname }}
+          <span class="author-role" [class.teacher-role]="thread.creator_teacher_firstname">
+            ({{ thread.creator_teacher_firstname ? 'Teacher' : 'Student' }})
+          </span>
+        </span>
+        <span class="thread-date">{{ formatDate(thread.created_at) }}</span>
+      </div>
+      <p class="thread-description" *ngIf="thread.description">{{ thread.description }}</p>
+    </div>
+  </div>
+
+  <!-- Posts Section -->
+  <div class="posts-section">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading posts...</p>
+    </div>
+
+    <!-- Posts List -->
+    <div *ngIf="!loading" class="posts-list">
+      <!-- Main Post Form -->
+      <div class="new-post-form" *ngIf="!replyingTo">
+        <h4>Add a new post</h4>
+        <div class="post-form">
+          <textarea 
+            [(ngModel)]="newPostBody" 
+            placeholder="Write your post here..."
+            class="form-control post-textarea"
+            rows="4">
+          </textarea>
+          <div class="form-actions">
+            <button 
+              class="btn btn-primary" 
+              (click)="createPost()"
+              [disabled]="!newPostBody.trim()">
+              <i class="fas fa-paper-plane"></i> Post
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Posts -->
+      <div class="posts-container" *ngIf="posts.length > 0">
+        <div *ngFor="let post of posts" class="post-item">
+          <!-- Main Post -->
+          <div class="post-content">
+            <div class="post-header">
+              <div class="author-info">
+                <span class="author-name">{{ getAuthorName(post) }}</span>
+                <span class="author-role" [class.teacher-role]="getAuthorRole(post) === 'Teacher'">
+                  {{ getAuthorRole(post) }}
+                </span>
+                <span class="post-date">{{ formatDate(post.created_at) }}</span>
+              </div>
+              
+              <div class="post-actions">
+                <!-- Edit Button -->
+                <button 
+                  *ngIf="canEditPost(post)" 
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="startEdit(post)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                
+                <!-- Delete Button -->
+                <button 
+                  *ngIf="canDeletePost(post)" 
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deletePost(post)">
+                  <i class="fas fa-trash"></i>
+                </button>
+                
+                <!-- Report Button -->
+                <button 
+                  *ngIf="canReportPost(post)" 
+                  class="btn btn-sm btn-outline-warning"
+                  (click)="startReport(post)">
+                  <i class="fas fa-flag"></i>
+                </button>
+                
+                <!-- Reply Button -->
+                <button 
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="startReply(post)">
+                  <i class="fas fa-reply"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Post Body (Normal View) -->
+            <div *ngIf="editingPost?.id !== post.id" class="post-body">
+              {{ post.body }}
+            </div>
+
+            <!-- Post Body (Edit Mode) -->
+            <div *ngIf="editingPost?.id === post.id" class="edit-post-form">
+              <textarea 
+                [(ngModel)]="editPostBody" 
+                class="form-control"
+                rows="3">
+              </textarea>
+              <div class="form-actions">
+                <button class="btn btn-sm btn-success" (click)="saveEdit()">
+                  <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Reply Form -->
+            <div *ngIf="replyingTo?.id === post.id" class="reply-form">
+              <h6>Reply to {{ getAuthorName(post) }}:</h6>
+              <textarea 
+                [(ngModel)]="newPostBody" 
+                placeholder="Write your reply here..."
+                class="form-control reply-textarea"
+                rows="3">
+              </textarea>
+              <div class="form-actions">
+                <button 
+                  class="btn btn-sm btn-primary" 
+                  (click)="createPost()"
+                  [disabled]="!newPostBody.trim()">
+                  <i class="fas fa-reply"></i> Reply
+                </button>
+                <button class="btn btn-sm btn-secondary" (click)="cancelReply()">
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Replies -->
+            <div *ngIf="post.replies && post.replies.length > 0" class="replies-container">
+              <div *ngFor="let reply of post.replies" class="reply-item">
+                <div class="post-header">
+                  <div class="author-info">
+                    <span class="author-name">{{ getAuthorName(reply) }}</span>
+                    <span class="author-role" [class.teacher-role]="getAuthorRole(reply) === 'Teacher'">
+                      {{ getAuthorRole(reply) }}
+                    </span>
+                    <span class="post-date">{{ formatDate(reply.created_at) }}</span>
+                  </div>
+                  
+                  <div class="post-actions">
+                    <!-- Edit Button -->
+                    <button 
+                      *ngIf="canEditPost(reply)" 
+                      class="btn btn-sm btn-outline-primary"
+                      (click)="startEdit(reply)">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    
+                    <!-- Delete Button -->
+                    <button 
+                      *ngIf="canDeletePost(reply)" 
+                      class="btn btn-sm btn-outline-danger"
+                      (click)="deletePost(reply)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                    
+                    <!-- Report Button -->
+                    <button 
+                      *ngIf="canReportPost(reply)" 
+                      class="btn btn-sm btn-outline-warning"
+                      (click)="startReport(reply)">
+                      <i class="fas fa-flag"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Reply Body (Normal View) -->
+                <div *ngIf="editingPost?.id !== reply.id" class="post-body">
+                  {{ reply.body }}
+                </div>
+
+                <!-- Reply Body (Edit Mode) -->
+                <div *ngIf="editingPost?.id === reply.id" class="edit-post-form">
+                  <textarea 
+                    [(ngModel)]="editPostBody" 
+                    class="form-control"
+                    rows="3">
+                  </textarea>
+                  <div class="form-actions">
+                    <button class="btn btn-sm btn-success" (click)="saveEdit()">
+                      <i class="fas fa-save"></i> Save
+                    </button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelEdit()">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Posts Message -->
+      <div *ngIf="posts.length === 0 && !loading" class="no-posts">
+        <div class="empty-state">
+          <i class="fas fa-comments fa-3x"></i>
+          <h4>No posts yet</h4>
+          <p>Be the first to start the conversation!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" *ngIf="reportingPost">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Report Post</h5>
+        <button type="button" class="btn-close" (click)="cancelReport()"></button>
+      </div>
+      <div class="modal-body">
+        <p>You are reporting a post by <strong>{{ getAuthorName(reportingPost) }}</strong></p>
+        
+        <div class="mb-3">
+          <label class="form-label">Reason for reporting:</label>
+          <select class="form-control" [(ngModel)]="reportData.reason_id">
+            <option value="">Select a reason...</option>
+            <option *ngFor="let reason of reportReasons" [value]="reason.id">
+              {{ reason.reason }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Additional details (optional):</label>
+          <textarea 
+            class="form-control" 
+            [(ngModel)]="reportData.description"
+            placeholder="Provide additional context for this report..."
+            rows="3">
+          </textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelReport()">
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-warning" 
+          (click)="submitReport()"
+          [disabled]="!reportData.reason_id">
+          <i class="fas fa-flag"></i> Submit Report
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

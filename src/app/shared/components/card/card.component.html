@@ -1,0 +1,51 @@
+<div class="w-full bg-primary-100 cursor-pointer max-w-lg mx-auto overflow-hidden transition-transform transform border-2 border-primary-900/10 hover:border-primary-800 rounded-xl shadow-xl hover:scale-105 hover:shadow-xl h-[500px]">
+  <!-- Image Section -->
+  <div class="relative h-[200px]">
+    <img
+      class="object-cover w-full h-full"
+      [src]="picture ? picture : 'https://img.freepik.com/free-vector/online-tutorials-concept_52683-37480.jpg'"
+      alt="Lecture Image">
+    <div class="absolute px-3 py-1 text-xs text-white uppercase bg-[var(--tertiary-color)] rounded-full top-4 right-4">
+      {{number}}
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="p-4 space-y-3 h-[calc(100%-200px-80px)]">
+    <!-- Lecture Title -->
+    <h3 class="text-lg font-bold text-center text-primary-950 truncate">{{lecture}}</h3>
+
+    <!-- Description Section -->
+    <div class="p-3 h-fit">
+      <p class="text-sm text-primary-900 line-clamp-3"><span class="font-semibold"> Description: </span> {{description}}</p>
+    </div>
+
+    <!-- Target Audience Section -->
+    <div class="flex flex-wrap items-center justify-center px-3 gap-1">
+      <span *ngFor="let audience of targetAudience" class="max-w-[100px] px-2 py-1 text-xs text-[var(--tertiary-color)] truncate bg-amber-100 rounded-full">
+        {{audience ? audience : 'N/A'}}
+      </span>
+      <!-- <ng-container *ngIf="targetAudience.length === 0">
+        <span class="text-sm text-gray-500"></span>
+      </ng-container> -->
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <div class="flex items-center justify-between px-4 py-3 border-t border-primary-100 bg-primary-50 h-[80px]">
+    <!-- Profile Section -->
+    <div class="flex items-center">
+      <img src="{{profilepic}}" class="object-cover w-10 h-10 mr-3 border-2 border-[var(--tertiary-color)] bg-slate-50 rounded-full" alt="Profile Picture">
+      <p class="text-sm font-medium text-primary-900 truncate max-w-[100px]">{{name}}</p>
+    </div>
+
+    <!-- Enrolled Section -->
+      <div *ngIf="enrolled > 0" class="flex items-center px-2 py-1 rounded-3xl bg-green-200">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Enrolled Icon">
+          <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+          <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="ml-2 text-xs font-semibold truncate text-black">ENROLLED</p>
+      </div>
+  </div>
+</div>

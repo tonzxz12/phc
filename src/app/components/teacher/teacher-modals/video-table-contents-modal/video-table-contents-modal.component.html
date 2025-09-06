@@ -1,0 +1,236 @@
+<!-- Video Table of Contents Management Modal -->
+<div class="modal-header bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+  <h4 class="modal-title flex items-center">
+    <i class="fas fa-list-ul mr-3"></i>
+    Table of Contents - {{ videoTitle }}
+  </h4>
+  <button type="button" class="btn-close text-white" (click)="closeModal()">
+    <i class="fas fa-times"></i>
+  </button>
+</div>
+
+<div class="modal-body p-0">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-12">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p class="mt-4 text-gray-600">Loading table of contents...</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="max-h-[70vh] overflow-hidden flex flex-col">
+    
+    <!-- Header Actions -->
+    <div class="px-6 py-4 border-b bg-gray-50">
+      <div class="flex justify-between items-center">
+        <div>
+          <h5 class="text-lg font-semibold text-gray-800">Content Sections</h5>
+          <p class="text-sm text-gray-600">
+            Create chapters and timestamps for your video content
+          </p>
+        </div>
+        <button 
+          *ngIf="!isEditing"
+          (click)="addContentSection()" 
+          class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center space-x-2">
+          <i class="fas fa-plus"></i>
+          <span>Add Section</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content Form (Add/Edit) -->
+    <div *ngIf="isEditing" class="px-6 py-4 bg-blue-50 border-b">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Content Name -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Section Name <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="contentForm.content_name"
+            placeholder="e.g., Introduction, Main Topic, Summary"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Start Time -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Start Time (MM:SS) <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="contentForm.start_time_display"
+            placeholder="00:00"
+            pattern="[0-9]{1,2}:[0-9]{2}"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- End Time -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            End Time (MM:SS) <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="contentForm.end_time_display"
+            placeholder="01:30"
+            pattern="[0-9]{1,2}:[0-9]{2}"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Description -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+          <textarea 
+            [(ngModel)]="contentForm.description"
+            placeholder="Brief description of this section..."
+            rows="2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="md:col-span-2 flex justify-end space-x-3 pt-2">
+          <button 
+            (click)="cancelEdit()" 
+            class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
+            Cancel
+          </button>
+          <button 
+            (click)="saveContentSection()" 
+            class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all duration-200">
+            {{ editingIndex >= 0 ? 'Update' : 'Add' }} Section
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table of Contents List -->
+    <div class="flex-1 overflow-y-auto px-6 py-4">
+      <!-- Empty State -->
+      <div *ngIf="tableContents.length === 0 && !isEditing" class="text-center py-12">
+        <div class="text-gray-400">
+          <i class="fas fa-list-ul text-4xl mb-4"></i>
+          <h6 class="text-lg font-semibold text-gray-600 mb-2">No Content Sections</h6>
+          <p class="text-gray-500 mb-4">Add sections to create a table of contents for your video</p>
+          <button 
+            (click)="addContentSection()" 
+            class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-200">
+            Add First Section
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Sections List -->
+      <div 
+        *ngIf="tableContents.length > 0"
+        cdkDropList
+        (cdkDropListDropped)="onContentDrop($event)"
+        class="space-y-3">
+        
+        <div 
+          *ngFor="let content of tableContents; let i = index"
+          cdkDrag
+          class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 cursor-move">
+          
+          <!-- Drag Handle -->
+          <div cdkDragHandle class="absolute top-2 left-2 text-gray-400 hover:text-gray-600 cursor-grab">
+            <i class="fas fa-grip-vertical"></i>
+          </div>
+
+          <div class="ml-6">
+            <!-- Content Header -->
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex-1">
+                <h6 class="font-semibold text-gray-800 text-lg">{{ content.content_name }}</h6>
+                <div class="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                  <span class="flex items-center">
+                    <i class="fas fa-play text-green-500 mr-1"></i>
+                    {{ apiService.formatTimestamp(content.start_timestamp) }}
+                  </span>
+                  <span class="text-gray-400">→</span>
+                  <span class="flex items-center">
+                    <i class="fas fa-stop text-red-500 mr-1"></i>
+                    {{ apiService.formatTimestamp(content.end_timestamp) }}
+                  </span>
+                  <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                    {{ apiService.formatTimestamp(content.end_timestamp - content.start_timestamp) }} duration
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Actions -->
+              <div class="flex space-x-2 ml-4">
+                <button 
+                  (click)="editContentSection(i)"
+                  class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                  title="Edit Section">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button 
+                  (click)="deleteContentSection(i)"
+                  class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                  title="Delete Section">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <p *ngIf="content.description" class="text-gray-600 text-sm leading-relaxed">
+              {{ content.description }}
+            </p>
+          </div>
+
+          <!-- Drag Preview -->
+          <div *cdkDragPreview class="bg-white border-2 border-blue-300 rounded-lg p-4 shadow-lg">
+            <h6 class="font-semibold text-gray-800">{{ content.content_name }}</h6>
+            <div class="text-sm text-gray-600 mt-1">
+              {{ apiService.formatTimestamp(content.start_timestamp) }} - 
+              {{ apiService.formatTimestamp(content.end_timestamp) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usage Instructions -->
+    <div class="px-6 py-3 bg-gray-50 border-t">
+      <div class="text-xs text-gray-600">
+        <p class="mb-1"><strong>Tips:</strong></p>
+        <ul class="list-disc list-inside space-y-1">
+          <li>Use MM:SS format for timestamps (e.g., 01:30 for 1 minute 30 seconds)</li>
+          <li>Sections cannot overlap in time</li>
+          <li>Drag and drop to reorder sections</li>
+          <li>Students will see these as clickable chapters in the video player</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer bg-gray-50 border-t">
+  <div class="flex justify-between items-center w-full">
+    <div class="text-sm text-gray-600">
+      {{ tableContents.length }} section{{ tableContents.length !== 1 ? 's' : '' }} created
+    </div>
+    <div class="space-x-3">
+      <button 
+        type="button" 
+        (click)="closeModal()" 
+        class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
+        Cancel
+      </button>
+      <button 
+        type="button" 
+        (click)="saveAndClose()" 
+        class="px-6 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-lg hover:shadow-lg transition-all duration-200">
+        Save & Close
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,287 @@
+<div class="min-h-screen course-forum-container">
+  <div class="max-w-6xl mx-auto p-6">
+    <!-- Header Card -->
+    <div class="forum-card p-8 mb-8">
+      <div class="flex justify-between items-start">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="forum-icon-container">
+              <i class="pi pi-comments text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-3xl font-bold text-primary-theme">Course Forum</h1>
+              <p class="text-secondary-theme text-lg">{{ courseTitle }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 mt-4">
+            <div class="flex items-center text-sm text-secondary-theme">
+              <i class="pi pi-users mr-2 text-blue-500"></i>
+              <span>{{ threads.length }} {{ threads.length === 1 ? 'Discussion' : 'Discussions' }}</span>
+            </div>
+            <div class="flex items-center text-sm text-secondary-theme">
+              <i class="pi pi-clock mr-2 text-green-500"></i>
+              <span>Active Community</span>
+            </div>
+          </div>
+        </div>
+        
+        <button 
+          class="btn btn-primary px-6 py-3 font-semibold"
+          (click)="showCreateThread = true">
+          <i class="pi pi-plus mr-2"></i>
+          Start New Discussion
+        </button>
+      </div>
+    </div>
+
+    <!-- Create Thread Form -->
+    <div *ngIf="showCreateThread" 
+         class="forum-create-form mb-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="forum-icon-container">
+          <i class="pi pi-plus text-sm"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-primary-theme">Start a New Discussion</h2>
+      </div>
+      
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-semibold text-primary-theme mb-3">
+            <i class="pi pi-tag mr-2 text-blue-500"></i>
+            Discussion Title
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="newThreadTitle"
+            class="w-full forum-input text-lg"
+            placeholder="What would you like to discuss? Make it engaging and clear..."
+            maxlength="255">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-primary-theme mb-3">
+            <i class="pi pi-file-edit mr-2 text-purple-500"></i>
+            Description <span class="text-secondary-theme font-normal">(Optional)</span>
+          </label>
+          <textarea 
+            [(ngModel)]="newThreadBody"
+            rows="4"
+            class="w-full forum-textarea"
+            placeholder="Provide more context, ask specific questions, or share relevant details to spark meaningful conversations..."></textarea>
+        </div>
+        
+        <div class="flex items-center justify-between pt-4" style="border-top: 1px solid var(--card-border);">
+          <div class="flex items-center text-sm text-secondary-theme">
+            <i class="pi pi-lightbulb mr-2 text-yellow-500"></i>
+            <span>Tip: Clear, specific titles get better engagement</span>
+          </div>
+          
+          <div class="flex gap-3">
+            <button 
+              class="btn btn-secondary px-6 py-3"
+              (click)="cancelCreateThread()">
+              Cancel
+            </button>
+            <button 
+              class="btn btn-primary px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              (click)="createThread()"
+              [disabled]="!newThreadTitle.trim()">
+              <i class="pi pi-send mr-2"></i>
+              Create Discussion
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+      <div class="forum-loading-card">
+        <div class="forum-icon-container-large mb-6">
+          <i class="pi pi-spin pi-spinner text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-primary-theme mb-2">Loading Discussions</h3>
+        <p class="text-secondary-theme">Fetching the latest forum conversations...</p>
+      </div>
+    </div>
+
+    <!-- Threads List -->
+    <div *ngIf="!isLoading" class="grid gap-6">
+      <div 
+        *ngFor="let thread of threads; let i = index" 
+        class="group forum-thread-item"
+        (click)="openThread(thread)">
+        
+        <div class="flex items-start justify-between">
+          <div class="flex-1 pr-6">
+            <!-- Status Badges & Priority -->
+            <div class="flex items-center gap-3 mb-4">
+              <span *ngIf="thread.ispinned" 
+                    class="forum-badge-pinned inline-flex items-center">
+                <i class="pi pi-thumbtack mr-1.5"></i>
+                PINNED
+              </span>
+              
+              <span *ngIf="thread.islocked" 
+                    class="forum-badge-locked inline-flex items-center">
+                <i class="pi pi-lock mr-1.5"></i>
+                LOCKED
+              </span>
+              
+              <span class="forum-badge-discussion inline-flex items-center">
+                <i class="pi pi-hashtag mr-1"></i>
+                Discussion #{{ i + 1 }}
+              </span>
+            </div>
+            
+            <!-- Thread Title -->
+            <h3 class="text-xl font-bold mb-3 group-hover:text-accent-theme transition-colors" 
+                [class.text-primary-theme]="!thread.islocked"
+                [class.text-secondary-theme]="thread.islocked">
+              {{ thread.title }}
+              <i *ngIf="thread.islocked" class="pi pi-lock text-red-500 text-sm ml-2 opacity-60" title="This thread is locked"></i>
+            </h3>
+            
+            <!-- Thread Description -->
+            <p *ngIf="thread.body" class="text-secondary-theme mb-4 leading-relaxed line-clamp-2">
+              {{ thread.body }}
+            </p>
+            
+            <!-- Thread Meta Information -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <!-- Author Info -->
+                <div class="flex items-center gap-3">
+                  <div class="relative">
+                    <img 
+                      [src]="getAuthorProfile(thread)"
+                      [alt]="getAuthorName(thread)"
+                      class="w-10 h-10 rounded-full object-cover" style="border: 2px solid var(--card-border); box-shadow: var(--card-shadow);">
+                    <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-400 rounded-full" style="border: 2px solid var(--card-bg);"></div>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-primary-theme text-sm">{{ getAuthorName(thread) }}</p>
+                    <p class="text-xs text-secondary-theme">{{ formatDate(thread.createdat) }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Thread Stats -->
+              <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 text-sm">
+                  <div class="forum-stats-item">
+                    <i class="pi pi-comment text-xs" style="color: var(--alert-info-border);"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-primary-theme">{{ thread.postCount || 0 }}</p>
+                    <p class="text-xs text-secondary-theme">{{ (thread.postCount || 0) === 1 ? 'Post' : 'Posts' }}</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2 text-sm">
+                  <div class="forum-stats-item forum-stats-success">
+                    <i class="pi pi-eye text-xs" style="color: var(--alert-success-border);"></i>
+                  </div>
+                  <div>
+                    <p class="font-bold text-primary-theme">{{ (thread.postCount || 0) * 3 + 12 }}</p>
+                    <p class="text-xs text-secondary-theme">Views</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Teacher Action Panel -->
+          <div *ngIf="isTeacher" 
+               class="flex flex-col gap-2" 
+               (click)="$event.stopPropagation()">
+            
+            <!-- Pin/Unpin Button -->
+            <button 
+              class="forum-action-btn"
+              [class.pinned]="thread.ispinned"
+              (click)="pinThread(thread); $event.stopPropagation()"
+              [title]="thread.ispinned ? 'Unpin Thread' : 'Pin Thread'"
+              type="button">
+              <i class="pi pi-thumbtack text-xs mr-1"></i>
+              <span class="text-xs font-bold">{{ thread.ispinned ? 'UNPIN' : 'PIN' }}</span>
+            </button>
+            
+            <!-- Lock/Unlock Button -->
+            <button 
+              class="forum-action-btn"
+              [class.locked]="thread.islocked"
+              (click)="lockThread(thread); $event.stopPropagation()"
+              [title]="thread.islocked ? 'Unlock Thread' : 'Lock Thread'"
+              type="button">
+              <i class="pi pi-lock text-xs mr-1"></i>
+              <span class="text-xs font-bold">{{ thread.islocked ? 'UNLOCK' : 'LOCK' }}</span>
+            </button>
+            
+            <!-- Delete Button -->
+            <button 
+              class="forum-action-btn delete"
+              (click)="deleteThread(thread); $event.stopPropagation()"
+              [title]="'Delete Thread - This action cannot be undone'"
+              type="button">
+              <i class="pi pi-trash text-xs mr-1"></i>
+              <span class="text-xs font-bold">DEL</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="threads.length === 0 && !isLoading" 
+         class="forum-empty-state">
+      <div class="inline-flex items-center justify-center w-24 h-24 rounded-full mb-8" style="background: linear-gradient(135deg, var(--alert-info-bg), var(--alert-info-border));">
+        <i class="pi pi-comments text-4xl" style="color: var(--alert-info-border);"></i>
+      </div>
+      
+      <h3 class="text-3xl font-bold text-primary-theme mb-4">Start the Conversation</h3>
+      <p class="text-secondary-theme mb-8 max-w-2xl mx-auto text-lg leading-relaxed">
+        This course forum is ready for its first discussion! Share your thoughts, ask questions, 
+        or start engaging conversations with your classmates and instructors.
+      </p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-4xl mx-auto">
+        <div class="forum-card p-6" style="background: linear-gradient(135deg, var(--alert-info-bg), var(--primary-color-light)); border-color: var(--alert-info-border);">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 mx-auto" style="background-color: var(--alert-info-border);">
+            <i class="pi pi-question-circle text-white text-xl"></i>
+          </div>
+          <h4 class="font-bold text-primary-theme mb-2">Ask Questions</h4>
+          <p class="text-secondary-theme text-sm">Get help with course material and assignments</p>
+        </div>
+        
+        <div class="forum-card p-6" style="background: linear-gradient(135deg, var(--alert-success-bg), var(--primary-color-light)); border-color: var(--alert-success-border);">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 mx-auto" style="background-color: var(--alert-success-border);">
+            <i class="pi pi-lightbulb text-white text-xl"></i>
+          </div>
+          <h4 class="font-bold text-primary-theme mb-2">Share Ideas</h4>
+          <p class="text-secondary-theme text-sm">Contribute insights and creative solutions</p>
+        </div>
+        
+        <div class="forum-card p-6" style="background: linear-gradient(135deg, var(--alert-warning-bg), var(--primary-color-light)); border-color: var(--alert-warning-border);">
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4 mx-auto" style="background-color: var(--alert-warning-border);">
+            <i class="pi pi-users text-white text-xl"></i>
+          </div>
+          <h4 class="font-bold text-primary-theme mb-2">Connect</h4>
+          <p class="text-secondary-theme text-sm">Build relationships with classmates</p>
+        </div>
+      </div>
+      
+      <button 
+        class="btn btn-primary px-8 py-4 text-lg font-bold"
+        (click)="showCreateThread = true">
+        <i class="pi pi-plus mr-3"></i>
+        Create Your First Discussion
+      </button>
+      
+      <p class="text-xs text-secondary-theme mt-6">
+        <i class="pi pi-info-circle mr-1"></i>
+        Discussions help build a collaborative learning environment
+      </p>
+    </div>
+    </div>
+  </div>
+</div>

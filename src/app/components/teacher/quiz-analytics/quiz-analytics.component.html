@@ -1,0 +1,53 @@
+<div class="container">
+  <!-- Container for back button and dropdown -->
+  <div class="buttons-container">
+    <!-- button backshits -->
+    <div class="back-container">
+      <div class="flex w-auto">
+        <button
+        class="flex items-center  shadow-sm text-lg rounded-lg px-3 py-1.5 bg-transparent gradient-green-purple-blue hover:scale-105 hover:ease-out duration-300"
+              (click)="navigateBack()"
+            >
+              Back
+            </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-container">
+    <!-- Bar Chart -->
+    <div class="chart-container">
+      <ngx-charts-bar-vertical
+        [view]="[1500, 300]"
+        [scheme]="colorScheme"
+        [results]="barChartData1"
+        [gradient]="gradient"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="true"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        xAxisLabel="Students"
+        [yAxisLabel]="selectedQuiz.title + ' Score'"> <!-- Update the y-axis label -->
+      </ngx-charts-bar-vertical>
+    </div>
+
+    <!-- Line Chart -->
+    <div class="chart-container">
+      <ngx-charts-line-chart
+        [view]="[1500, 300]"
+        [scheme]="colorScheme"
+        [results]="lineChartData"
+        [gradient]="gradient"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="true"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        xAxisLabel="Students"
+        [yAxisLabel]="selectedQuiz.title + ' Score'"> <!-- Update the y-axis label -->
+      </ngx-charts-line-chart>
+    </div>
+  </div>
+</div>
+

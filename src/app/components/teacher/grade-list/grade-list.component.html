@@ -1,0 +1,800 @@
+<div class="grade-dashboard container mx-auto px-4 py-6 max-w-6xl" style="background-color: var(--body-color);">
+  <!-- Main Heading -->
+  <h1 class="text-3xl font-bold mb-6 text-center bg-clip-text" style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: var(--text-color);">Student Performance Dashboard</h1>
+  
+  <!-- Navigation Tabs -->
+  <div class="tabs-container mb-8"> 
+    <div class="grid grid-cols-4 gap-4 rounded-lg overflow-hidden" style="box-shadow: var(--card-shadow);">
+      <button
+        (click)="selectTab('quizzes')"
+        [style.background-color]="selectedTab === 'quizzes' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [style.color]="selectedTab === 'quizzes' ? 'var(--btn-primary-text)' : 'var(--btn-secondary-text)'"
+        style="transition: var(--tran-03);"
+        onmouseover="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-hover)' : 'var(--btn-secondary-hover)'"
+        onmouseout="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [attr.data-selected]="selectedTab === 'quizzes'"
+        class="py-4 px-6 font-medium text-center flex items-center justify-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        Quizzes
+      </button>
+      <button
+        (click)="selectTab('assignments')"
+        [style.background-color]="selectedTab === 'assignments' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [style.color]="selectedTab === 'assignments' ? 'var(--btn-primary-text)' : 'var(--btn-secondary-text)'"
+        style="transition: var(--tran-03);"
+        onmouseover="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-hover)' : 'var(--btn-secondary-hover)'"
+        onmouseout="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [attr.data-selected]="selectedTab === 'assignments'"
+        class="py-4 px-6 font-medium text-center flex items-center justify-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Assignments
+      </button>
+      <button
+        (click)="selectTab('attendanceHistory')"
+        [style.background-color]="selectedTab === 'attendanceHistory' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [style.color]="selectedTab === 'attendanceHistory' ? 'var(--btn-primary-text)' : 'var(--btn-secondary-text)'"
+        style="transition: var(--tran-03);"
+        onmouseover="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-hover)' : 'var(--btn-secondary-hover)'"
+        onmouseout="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [attr.data-selected]="selectedTab === 'attendanceHistory'"
+        class="py-4 px-6 font-medium text-center flex items-center justify-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        Attendance
+      </button>
+      <button
+        (click)="selectTab('individual')"
+        [style.background-color]="selectedTab === 'individual' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [style.color]="selectedTab === 'individual' ? 'var(--btn-primary-text)' : 'var(--btn-secondary-text)'"
+        style="transition: var(--tran-03);"
+        onmouseover="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-hover)' : 'var(--btn-secondary-hover)'"
+        onmouseout="this.style.backgroundColor = this.dataset.selected === 'true' ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+        [attr.data-selected]="selectedTab === 'individual'"
+        class="py-4 px-6 font-medium text-center flex items-center justify-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        Individual
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Panel -->
+  <div class="content-panel rounded-lg p-6 min-h-96" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+    <!-- Quizzes Tab Content -->
+    <div *ngIf="selectedTab === 'quizzes'" class="animate-fadeIn">
+      <div class="select-container relative mb-6">
+        <select
+          [(ngModel)]="selectedQuiz"
+          class="w-full appearance-none px-4 py-3 pr-8 rounded-lg shadow-sm focus:outline-none transition"
+          style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); transition: var(--tran-02);"
+          onfocus="this.style.borderColor='var(--input-focus-border)'"
+          onblur="this.style.borderColor='var(--input-border)'"
+        >
+          <option value="" disabled selected>Select a quiz to view details</option>
+          <option
+            *ngFor="let quiz of quizGrades | keyvalue"
+            [value]="quiz.value.name"
+          >
+            {{ quiz.value.name }}
+          </option>
+          <option
+            *ngFor="let quiz of labGrades | keyvalue"
+            [value]="quiz.value.name"
+          >
+            {{ quiz.value.name }}
+          </option>
+        </select>
+        <!-- <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </div> -->
+      </div>
+
+      <ng-container *ngIf="quizGrades.size || labGrades.size; else emptyState">
+        <div *ngIf="selectedQuiz" class="quiz-details">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold" style="color: var(--text-color);">Quiz Performance</h2>
+            <div class="quiz-stats flex gap-4">
+              <div class="stat-item px-4 py-2 rounded-lg flex items-center" style="background-color: var(--btn-success-bg); color: var(--btn-success-text);">
+                <span class="font-medium">Average: {{ getSelectedQuizAverage() }}</span>
+              </div>
+              <button 
+                (click)="exportToCSV('quizzes')" 
+                class="export-btn px-4 py-2 rounded-lg flex items-center gap-2 transition"
+                style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); transition: var(--tran-02);"
+                onmouseover="this.style.backgroundColor='var(--btn-secondary-hover)'"
+                onmouseout="this.style.backgroundColor='var(--btn-secondary-bg)'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Export
+              </button>
+            </div>
+          </div>
+          
+          <ng-container *ngFor="let quiz of quizGrades | keyvalue">
+            <div
+              *ngIf="quiz.value.name === selectedQuiz"
+              class="rounded-lg p-6 mb-4"
+              style="background-color: var(--card-bg);"
+            >
+              <div class="quiz-header flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold" style="color: var(--text-color);">{{ quiz.value.name }}</h3>
+                <span class="text-sm px-3 py-1 rounded-full" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+                  {{quiz.value.grades.length}} Students
+                </span>
+              </div>
+              
+              <div class="overflow-hidden rounded-lg" style="box-shadow: var(--card-shadow); border: 1px solid var(--card-border); background-color: var(--card-bg);">
+                <table class="min-w-full" style="color: var(--text-color);">
+                  <thead style="background-color: var(--nav-bg);">
+                    <tr>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">No.</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Student Name</th>
+                      <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Score</th>
+                    </tr>
+                  </thead>
+                  <tbody style="background-color: var(--card-bg);" class="divide-y" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                    <tr *ngFor="let grade of quiz.value.grades; let k = index" style="transition: var(--tran-02);" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm" style="color: var(--input-placeholder);">{{ k + 1 }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium" style="color: var(--text-color);">{{ grade.studentName }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <span 
+                          *ngIf="grade.grade != null" 
+                          class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full"
+                          [ngClass]="getScoreColorClass(grade.grade)"
+                        >
+                          {{ grade.grade }}
+                        </span>
+                        <span
+                          *ngIf="grade.grade == null"
+                          class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full"
+                          style="background-color: var(--input-bg); color: var(--input-placeholder);"
+                        >
+                          NOT GRADED
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngFor="let quiz of labGrades | keyvalue">
+            <div
+              *ngIf="quiz.value.name === selectedQuiz"
+              class="rounded-lg p-6"
+              style="background-color: var(--card-bg);"
+            >
+              <div class="quiz-header flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold" style="color: var(--text-color);">{{ quiz.value.name }}</h3>
+                <span class="text-sm px-3 py-1 rounded-full" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+                  {{quiz.value.grades.length}} Students
+                </span>
+              </div>
+              
+              <div class="overflow-hidden rounded-lg" style="box-shadow: var(--card-shadow); border: 1px solid var(--card-border);">
+                <table class="min-w-full" style="color: var(--text-color);">
+                  <thead style="background-color: var(--nav-bg);">
+                    <tr>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">No.</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Student Name</th>
+                      <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Score</th>
+                    </tr>
+                  </thead>
+                  <tbody style="background-color: var(--card-bg);">
+                    <tr *ngFor="let grade of quiz.value.grades; let k = index" style="transition: var(--tran-02);" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm" style="color: var(--input-placeholder);">{{ k + 1 }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium" style="color: var(--text-color);">{{ grade.studentName }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <span 
+                          *ngIf="grade.grade != null" 
+                          class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full"
+                          [ngClass]="getScoreColorClass(grade.grade)"
+                        >
+                          {{ grade.grade }}
+                        </span>
+                        <span
+                          *ngIf="grade.grade == null"
+                          class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full"
+                          style="background-color: var(--input-bg); color: var(--input-placeholder);"
+                        >
+                          NOT GRADED
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        
+        <div *ngIf="!selectedQuiz" class="empty-selection flex flex-col items-center justify-center py-12 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--btn-primary-bg);">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 class="text-xl font-medium mb-2" style="color: var(--text-color);">Select a Quiz</h3>
+          <p class="max-w-md" style="color: var(--input-placeholder);">Choose a quiz from the dropdown above to view detailed performance metrics and student scores.</p>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Assignments Tab Content -->
+    <div *ngIf="selectedTab === 'assignments'" class="animate-fadeIn">
+      <div class="select-container relative mb-6">
+        <select
+          [(ngModel)]="selectedAssignment"
+          class="w-full appearance-none px-4 py-3 pr-8 rounded-lg shadow-sm focus:outline-none transition"
+          style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); transition: var(--tran-02);"
+          onfocus="this.style.borderColor='var(--input-focus-border)'"
+          onblur="this.style.borderColor='var(--input-border)'"
+        >
+          <option value="" disabled selected>Select an assignment to view details</option>
+          <option
+            *ngFor="let assignment of assignmentGrades | keyvalue"
+            [value]="assignment.value.name"
+          >
+            {{ assignment.value.name }}
+          </option>
+        </select>
+        <!-- <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </div> -->
+      </div>
+
+      <ng-container *ngIf="assignmentGrades.size; else emptyState">
+        <div *ngIf="selectedAssignment" class="assignment-details">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold" style="color: var(--text-color);">Assignment Grades</h2>
+            <div class="assignment-stats flex gap-4">
+              <div class="stat-item px-4 py-2 rounded-lg flex items-center" style="background-color: var(--btn-success-bg); color: var(--btn-success-text);">
+                <span class="font-medium">Average: {{ getSelectedAssignmentAverage() }}</span>
+              </div>
+              <button 
+                (click)="exportToCSV('assignments')" 
+                class="export-btn px-4 py-2 rounded-lg flex items-center gap-2 transition"
+                style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); transition: var(--tran-02);"
+                onmouseover="this.style.backgroundColor='var(--btn-secondary-hover)'"
+                onmouseout="this.style.backgroundColor='var(--btn-secondary-bg)'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Export
+              </button>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 gap-6">
+            <ng-container *ngFor="let assignment of assignmentGrades | keyvalue">
+              <div 
+                *ngIf="assignment.value.name === selectedAssignment"
+                class="assignment-card rounded-lg overflow-hidden"
+                style="background-color: var(--card-bg); box-shadow: var(--card-shadow);"
+              >
+                <div class="card-header px-6 py-4" style="background-color: var(--nav-bg);">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold" style="color: var(--text-color);">{{ assignment.value.name }}</h3>
+                    <span class="text-sm px-3 py-1 rounded-full" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+                      {{assignment.value.grades.length}} Submissions
+                    </span>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full rounded-lg" style="border: 1px solid var(--card-border);">
+                      <thead style="background-color: var(--nav-bg);">
+                        <tr>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">No.</th>
+                          <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Student Name</th>
+                          <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Grade</th>
+                        </tr>
+                      </thead>
+                      <tbody style="background-color: var(--card-bg);">
+                        <tr *ngFor="let grade of assignment.value.grades; let k = index" style="transition: var(--tran-02);" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                          <td class="px-6 py-4 whitespace-nowrap text-sm" style="color: var(--input-placeholder);">{{ k + 1 }}</td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium" style="color: var(--text-color);">{{ grade.studentName }}</div>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <span 
+                              *ngIf="grade.grade != null" 
+                              class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full"
+                              [ngClass]="getScoreColorClass(grade.grade)"
+                            >
+                              {{ grade.grade }}
+                            </span>
+                            <span
+                              *ngIf="grade.grade == null"
+                              class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full"
+                              style="background-color: var(--input-bg); color: var(--input-placeholder);"
+                            >
+                              NOT GRADED
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        
+        <div *ngIf="!selectedAssignment" class="empty-selection flex flex-col items-center justify-center py-12 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--btn-primary-bg);">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <h3 class="text-xl font-medium mb-2" style="color: var(--text-color);">Select an Assignment</h3>
+          <p class="max-w-md" style="color: var(--input-placeholder);">Choose an assignment from the dropdown above to view detailed grades and student performance.</p>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Attendance Tab Content -->
+    <div *ngIf="selectedTab === 'attendanceHistory'" class="animate-fadeIn">
+      <div class="select-container relative mb-6">
+        <select
+          [(ngModel)]="selectedMeeting"
+          class="w-full appearance-none px-4 py-3 pr-8 rounded-lg shadow-sm focus:outline-none transition"
+          style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text); transition: var(--tran-02);"
+          onfocus="this.style.borderColor='var(--input-focus-border)'"
+          onblur="this.style.borderColor='var(--input-border)'"
+        >
+          <option value="" disabled selected>Select date and time of the meeting</option>
+          <option
+            *ngFor="let meeting of attendanceHistory | keyvalue"
+            [value]="meeting.key"
+          >
+            {{ parseDateTime(meeting.key) }}
+          </option>
+        </select>
+        <!-- <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </div> -->
+      </div>
+
+      <ng-container *ngIf="attendanceHistory.size; else emptyState">
+        <div *ngIf="selectedMeeting" class="attendance-details">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold" style="color: var(--text-color);">Attendance Records</h2>
+            <div class="attendance-stats flex gap-4">
+              <div class="stat-item px-4 py-2 rounded-lg flex items-center" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+                <span class="font-medium">Total Sessions: {{attendanceHistory.size}}</span>
+              </div>
+              <button 
+                (click)="exportToCSV('attendanceHistory')" 
+                class="export-btn px-4 py-2 rounded-lg flex items-center gap-2 transition"
+                style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); transition: var(--tran-02);"
+                onmouseover="this.style.backgroundColor='var(--btn-secondary-hover)'"
+                onmouseout="this.style.backgroundColor='var(--btn-secondary-bg)'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Export
+              </button>
+            </div>
+          </div>
+          
+          <div class="rounded-lg overflow-hidden" style="background-color: var(--card-bg); border: 1px solid var(--card-border); box-shadow: var(--card-shadow);">
+            <div class="meeting-header px-6 py-4" style="background-color: var(--nav-bg); border-bottom: 1px solid var(--card-border);">
+              <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold" style="color: var(--text-color);">{{ parseDateTime(selectedMeeting) }}</h3>
+                <span class="text-sm px-3 py-1 rounded-full" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+                  {{attendanceHistory.get(selectedMeeting)?.length || 0}} Students
+                </span>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full">
+                <thead style="background-color: var(--nav-bg);">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">No.</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Student Name</th>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Check-in Time</th>
+                  </tr>
+                </thead>
+                <tbody style="background-color: var(--card-bg);">
+                  <tr *ngFor="let student of attendanceHistory.get(selectedMeeting); let k = index" style="transition: var(--tran-02);" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm" style="color: var(--input-placeholder);">{{ k + 1 }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium" style="color: var(--text-color);">{{ student.student }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                      <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full" style="background-color: var(--btn-success-bg); color: var(--btn-success-text);">
+                        {{ parseTime(student.time) }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="!selectedMeeting" class="empty-selection flex flex-col items-center justify-center py-12 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--btn-primary-bg);">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <h3 class="text-xl font-medium mb-2" style="color: var(--text-color);">Select a Meeting</h3>
+          <p class="max-w-md" style="color: var(--input-placeholder);">Choose a meeting date from the dropdown above to view attendance records.</p>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Individual Tab Content -->
+    <div *ngIf="selectedTab === 'individual'" class="individual-content">
+      <div *ngIf="!selectedStudentProgress" class="student-search-section">
+        <div class="rounded-lg overflow-hidden" style="background-color: var(--card-bg); box-shadow: var(--card-shadow); border: 1px solid var(--card-border);">
+          <div class="px-6 py-4" style="border-bottom: 1px solid var(--card-border);">
+            <h3 class="text-lg font-semibold flex items-center gap-2" style="color: var(--text-color);">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--btn-primary-bg);">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Individual Student Progress
+            </h3>
+            <p class="mt-1" style="color: var(--input-placeholder);">Search and select a student to view their detailed progress report</p>
+          </div>
+
+          <div class="p-6">
+            <!-- Search Bar -->
+            <div class="mb-6">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--input-placeholder);">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  [(ngModel)]="searchTermForIndividual"
+                  (input)="filterStudentsForIndividual()"
+                  class="block w-full pl-10 pr-3 py-2 rounded-md leading-5 focus:outline-none transition"
+                  style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text); transition: var(--tran-02);"
+                  placeholder="Search students by name..."
+                  onfocus="this.style.borderColor='var(--input-focus-border)'"
+                  onblur="this.style.borderColor='var(--input-border)'"
+                >
+              </div>
+            </div>
+
+            <!-- Students List -->
+            <div *ngIf="filteredStudentsForIndividual.length > 0" class="grid gap-3 max-h-96 overflow-y-auto">
+              <div
+                *ngFor="let student of filteredStudentsForIndividual"
+                (click)="loadStudentProgress(student)"
+                class="flex items-center justify-between p-4 rounded-lg cursor-pointer transition-all duration-200"
+                style="background-color: var(--input-bg); border: 1px solid var(--card-border); transition: var(--tran-02);"
+                onmouseover="this.style.backgroundColor='var(--card-bg)'; this.style.borderColor='var(--btn-primary-bg)'"
+                onmouseout="this.style.backgroundColor='var(--input-bg)'; this.style.borderColor='var(--card-border)'"
+              >
+                <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                    <div class="h-10 w-10 rounded-full flex items-center justify-center" style="background-color: var(--btn-primary-bg);">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--btn-primary-text);">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-medium" style="color: var(--text-color);">{{ student.fullName }}</h4>
+                    <p class="text-sm" style="color: var(--input-placeholder);">Click to view progress report</p>
+                  </div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--input-placeholder);">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- No Students Found -->
+            <div *ngIf="filteredStudentsForIndividual.length === 0 && searchTermForIndividual" class="text-center py-8">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--input-placeholder);">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <p style="color: var(--input-placeholder);">No students found matching "{{ searchTermForIndividual }}"</p>
+            </div>
+
+            <!-- Loading State -->
+            <div *ngIf="studentsForIndividual.length === 0 && !searchTermForIndividual" class="text-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 mx-auto" style="border: 2px solid var(--input-placeholder); border-top: 2px solid var(--btn-primary-bg);"></div>
+              <p class="mt-2" style="color: var(--input-placeholder);">Loading students...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Progress Report -->
+      <div *ngIf="selectedStudentProgress" class="student-progress-section">
+        <div class="rounded-lg overflow-hidden" style="background-color: var(--card-bg); box-shadow: var(--card-shadow); border: 1px solid var(--card-border);">
+          <!-- Header -->
+          <div class="px-6 py-6" style="border-bottom: 1px solid var(--card-border); background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-2xl font-bold mb-1" style="color: var(--btn-primary-text);">{{ selectedStudentProgress.student.fullName }}</h2>
+                <p class="text-sm mb-1" style="color: var(--btn-primary-text); opacity: 0.8;">{{ selectedStudentProgress.student.id || 'N/A' }}</p>
+                <p class="text-xs" style="color: var(--btn-primary-text); opacity: 0.7;">Student ID: {{ getStudentId(selectedStudentProgress.student) }}</p>
+              </div>
+              <div class="flex gap-3">
+                <button
+                  (click)="exportIndividualProgressPDF()"
+                  class="px-6 py-3 rounded-lg flex items-center gap-2 font-medium shadow-sm transition"
+                  style="background-color: var(--btn-success-bg); color: var(--btn-success-text); transition: var(--tran-02);"
+                  onmouseover="this.style.transform='scale(1.05)'"
+                  onmouseout="this.style.transform='scale(1)'"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Export Report
+                </button>
+                <button
+                  (click)="selectedStudentProgress = null"
+                  class="px-4 py-3 rounded-lg flex items-center gap-2 font-medium shadow-sm transition"
+                  style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); transition: var(--tran-02);"
+                  onmouseover="this.style.backgroundColor='var(--btn-secondary-hover)'"
+                  onmouseout="this.style.backgroundColor='var(--btn-secondary-bg)'"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Performance Cards -->
+          <div class="px-6 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <!-- Quiz Average -->
+              <div class="rounded-xl p-6" style="background: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover)); border: 1px solid var(--card-border);">
+                <div class="text-center">
+                  <h3 class="text-lg font-semibold mb-2" style="color: var(--btn-primary-text);">Quiz Average</h3>
+                  <div class="text-4xl font-bold mb-2" style="color: var(--btn-primary-text);">
+                    {{ getQuizAveragePercentage().toFixed(2) }}%
+                  </div>
+                  <p class="text-sm font-medium" style="color: var(--btn-primary-text); opacity: 0.8;">{{ getCompletedQuizzes() }} quizzes completed</p>
+                  <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block" [ngClass]="getPerformanceStatusClass(getQuizAveragePercentage())">
+                    {{ getPerformanceStatus(getQuizAveragePercentage()) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Assignment Average -->
+              <div class="rounded-xl p-6" style="background: linear-gradient(135deg, var(--btn-success-bg), var(--btn-secondary-bg)); border: 1px solid var(--card-border);">
+                <div class="text-center">
+                  <h3 class="text-lg font-semibold mb-2" style="color: var(--btn-success-text);">Assignment Average</h3>
+                  <div class="text-4xl font-bold mb-2" style="color: var(--btn-success-text);">
+                    {{ getAssignmentAveragePercentage().toFixed(2) }}%
+                  </div>
+                  <p class="text-sm font-medium" style="color: var(--btn-success-text); opacity: 0.8;">{{ getSubmittedAssignments() }} assignments completed</p>
+                  <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block" [ngClass]="getPerformanceStatusClass(getAssignmentAveragePercentage())">
+                    {{ getPerformanceStatus(getAssignmentAveragePercentage()) }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Overall Performance -->
+              <div class="rounded-xl p-6" style="background: linear-gradient(135deg, var(--btn-secondary-bg), var(--btn-secondary-hover)); border: 1px solid var(--card-border);">
+                <div class="text-center">
+                  <h3 class="text-lg font-semibold mb-2" style="color: var(--btn-secondary-text);">Overall Performance</h3>
+                  <div class="text-4xl font-bold mb-2" style="color: var(--btn-secondary-text);">
+                    {{ calculateAverageGrade().toFixed(2) }}%
+                  </div>
+                  <p class="text-sm font-medium" style="color: var(--btn-secondary-text); opacity: 0.8;">{{ calculateOverallProgress().completed }}/{{ calculateOverallProgress().total }} activities</p>
+                  <div class="mt-3 text-xs px-3 py-1 rounded-full inline-block" [ngClass]="getPerformanceStatusClass(calculateAverageGrade())">
+                    {{ getPerformanceStatus(calculateAverageGrade()) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Results Tabs -->
+            <div class="mb-6" style="border-bottom: 1px solid var(--card-border);">
+              <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button
+                  (click)="setActiveResultTab('quizzes')"
+                  [style.border-color]="activeResultTab === 'quizzes' ? 'var(--btn-primary-bg)' : 'transparent'"
+                  [style.color]="activeResultTab === 'quizzes' ? 'var(--btn-primary-bg)' : 'var(--input-placeholder)'"
+                  class="py-2 px-1 border-b-2 font-medium text-sm transition"
+                  style="transition: var(--tran-02);"
+                  onmouseover="if(this.dataset.active !== 'true') { this.style.color='var(--text-color)'; this.style.borderColor='var(--card-border)'; }"
+                  onmouseout="if(this.dataset.active !== 'true') { this.style.color='var(--input-placeholder)'; this.style.borderColor='transparent'; }"
+                  [attr.data-active]="activeResultTab === 'quizzes'"
+                >
+                  Quiz Results
+                </button>
+                <button *ngIf="selectedStudentProgress.labs.length > 0"
+                  (click)="setActiveResultTab('labs')"
+                  [style.border-color]="activeResultTab === 'labs' ? 'var(--btn-primary-bg)' : 'transparent'"
+                  [style.color]="activeResultTab === 'labs' ? 'var(--btn-primary-bg)' : 'var(--input-placeholder)'"
+                  class="py-2 px-1 border-b-2 font-medium text-sm transition"
+                  style="transition: var(--tran-02);"
+                  onmouseover="if(this.dataset.active !== 'true') { this.style.color='var(--text-color)'; this.style.borderColor='var(--card-border)'; }"
+                  onmouseout="if(this.dataset.active !== 'true') { this.style.color='var(--input-placeholder)'; this.style.borderColor='transparent'; }"
+                  [attr.data-active]="activeResultTab === 'labs'"
+                >
+                  Lab Results
+                </button>
+                <button
+                  (click)="setActiveResultTab('assignments')"
+                  [style.border-color]="activeResultTab === 'assignments' ? 'var(--btn-primary-bg)' : 'transparent'"
+                  [style.color]="activeResultTab === 'assignments' ? 'var(--btn-primary-bg)' : 'var(--input-placeholder)'"
+                  class="py-2 px-1 border-b-2 font-medium text-sm transition"
+                  style="transition: var(--tran-02);"
+                  onmouseover="if(this.dataset.active !== 'true') { this.style.color='var(--text-color)'; this.style.borderColor='var(--card-border)'; }"
+                  onmouseout="if(this.dataset.active !== 'true') { this.style.color='var(--input-placeholder)'; this.style.borderColor='transparent'; }"
+                  [attr.data-active]="activeResultTab === 'assignments'"
+                >
+                  Assignment Results
+                </button>
+              </nav>
+            </div>
+
+            <!-- Results Table -->
+            <div class="overflow-hidden rounded-lg" style="box-shadow: var(--card-shadow); border: 1px solid var(--card-border);">
+              <!-- Quiz Results -->
+              <div *ngIf="activeResultTab === 'quizzes' && selectedStudentProgress.quizzes.length > 0">
+                <table class="min-w-full">
+                  <thead style="background-color: var(--nav-bg);">
+                    <tr>
+                      <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Quiz Name</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Score</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Percentage</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Date Taken</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody style="background-color: var(--card-bg);">
+                    <tr *ngFor="let quiz of selectedStudentProgress.quizzes; let i = index" style="transition: var(--tran-02);" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" style="color: var(--text-color);">{{ quiz.title }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-center" style="color: var(--input-placeholder);">{{ quiz.grade }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="text-sm font-semibold" [ngClass]="getPercentageColorClass(quiz.percentage)">
+                          {{ quiz.percentage.toFixed(2) }}%
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-center" style="color: var(--input-placeholder);">
+                        {{ getCurrentDateString() }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="getStatusColorClass(quiz.status)">
+                          {{ quiz.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Lab Results -->
+              <div *ngIf="activeResultTab === 'labs' && selectedStudentProgress.labs.length > 0">
+                <table class="min-w-full">
+                  <thead style="background-color: var(--nav-bg);">
+                    <tr>
+                      <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Lab Name</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Score</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Percentage</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Date Taken</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody style="background-color: var(--card-bg);">
+                    <tr *ngFor="let lab of selectedStudentProgress.labs; let i = index" style="transition: var(--tran-02);" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" style="color: var(--text-color);">{{ lab.title }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-center" style="color: var(--input-placeholder);">{{ lab.grade }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="text-sm font-semibold" [ngClass]="getPercentageColorClass(lab.percentage)">
+                          {{ lab.percentage.toFixed(2) }}%
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-center" style="color: var(--input-placeholder);">
+                        {{ getCurrentDateString() }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="getStatusColorClass(lab.status)">
+                          {{ lab.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Assignment Results -->
+              <div *ngIf="activeResultTab === 'assignments' && selectedStudentProgress.assignments.length > 0">
+                <table class="min-w-full">
+                  <thead style="background-color: var(--nav-bg);">
+                    <tr>
+                      <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Assignment Name</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Score</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Percentage</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Date Submitted</th>
+                      <th class="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider" style="color: var(--input-placeholder);">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody style="background-color: var(--card-bg);">
+                    <tr *ngFor="let assignment of selectedStudentProgress.assignments; let i = index" style="transition: var(--tran-02);" onmouseover="this.style.backgroundColor='var(--input-bg)'" onmouseout="this.style.backgroundColor='var(--card-bg)'">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" style="color: var(--text-color);">{{ assignment.title }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-center" style="color: var(--input-placeholder);">{{ assignment.grade }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span *ngIf="assignment.percentage > 0" class="text-sm font-semibold" [ngClass]="getPercentageColorClass(assignment.percentage)">
+                          {{ assignment.percentage.toFixed(2) }}%
+                        </span>
+                        <span *ngIf="assignment.percentage === 0" class="text-sm" style="color: var(--input-placeholder);">N/A</span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-center" style="color: var(--input-placeholder);">
+                        {{ getCurrentDateString() }}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="getStatusColorClass(assignment.status)">
+                          {{ assignment.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Empty State -->
+              <div *ngIf="(activeResultTab === 'quizzes' && selectedStudentProgress.quizzes.length === 0) || 
+                          (activeResultTab === 'labs' && selectedStudentProgress.labs.length === 0) ||
+                          (activeResultTab === 'assignments' && selectedStudentProgress.assignments.length === 0)" 
+                   class="text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--input-placeholder);">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p style="color: var(--input-placeholder);">No {{ activeResultTab }} results available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Empty State -->
+    <ng-template #emptyState>
+      <div class="empty-state flex flex-col items-center justify-center py-16 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--input-placeholder);">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h3 class="text-xl font-medium mb-2" style="color: var(--text-color);">No Data Available</h3>
+        <p class="max-w-md" style="color: var(--input-placeholder);">There's no information to display at the moment. Data will appear here once it becomes available.</p>
+      </div>
+    </ng-template>
+
+    <!-- Initial Message (No Tab Selected) -->
+    <div *ngIf="!selectedTab" class="initial-message flex flex-col items-center justify-center py-16 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--btn-primary-bg);">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+      </svg>
+      <h3 class="text-xl font-medium mb-2" style="color: var(--text-color);">Welcome to the Student Performance Dashboard</h3>
+      <p class="max-w-md" style="color: var(--input-placeholder);">Select a tab above to view quiz scores, assignment grades, or attendance records. This dashboard helps you track student performance and engagement in one place.</p>
+    </div>
+  </div>
+</div>

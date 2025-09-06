@@ -1,0 +1,484 @@
+<div class="evaluation-container" [style]="{'background': 'var(--body-color)', 'color': 'var(--text-color)', 'min-height': '100vh'}">
+  <!-- Header Section -->
+  <div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 [style]="{'color': 'var(--text-color)'}">Student <span [style]="{'color': 'var(--primary-color)'}">Evaluation System</span></h1>
+        <p [style]="{'color': 'var(--text-muted)'}">Share your feedback to help improve our courses and teaching quality</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evaluation Tabs Section -->
+  <div class="evaluation-section" *ngIf="!showCourseForm && !showTeacherForm">
+    <div class="evaluation-container-inner" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="evaluation-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+        <div class="evaluation-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Evaluation Center</span>
+        </div>
+      </div>
+      
+      <div class="evaluation-content">
+        <!-- Custom Tabs for Course/Teacher Selection -->
+        <div class="custom-tabs">
+          <div class="tab-buttons">
+            <button class="tab-button" 
+                    [class.active]="selectedTab === 0" 
+                    (click)="selectedTab = 0">
+              Evaluate Courses
+            </button>
+            <button class="tab-button" 
+                    [class.active]="selectedTab === 1" 
+                    (click)="selectedTab = 1">
+              Evaluate Teachers
+            </button>
+          </div>
+          
+          <div class="tab-content" *ngIf="selectedTab === 0">
+            <h2 [style]="{'color': 'var(--text-color)'}" class="section-title">Select a Course to Evaluate</h2>
+          
+              <!-- Loading State -->
+              <div *ngIf="isLoadingCourses" class="loading-state">
+                <div class="spinner"></div>
+                <p [style]="{'color': 'var(--text-muted)'}">Loading courses...</p>
+              </div>
+
+              <!-- Error State -->
+              <div *ngIf="errorMessage" class="error-state" [style]="{'background': 'var(--alert-error-bg)', 'border': '1px solid var(--alert-error-border)'}">
+                <p [style]="{'color': 'var(--danger-color)'}">{{ errorMessage }}</p>
+              </div>
+
+            <!-- Course Cards Grid -->
+            <div class="courses-grid" *ngIf="!isLoadingCourses && courses.length > 0">
+              <div *ngFor="let course of courses" 
+                   class="course-card"
+                   [class.opacity-50]="courseAlreadyEvaluated[course.id]"
+                   [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}"
+                   (click)="selectCourse(course)">
+              <div class="relative">
+                <!-- Course Image -->
+                <div class="h-48 rounded-t-lg overflow-hidden">
+                  <img *ngIf="course.image && course.image !== 'undefined' && course.image !== 'null' && course.image !== 'Course Image'" 
+                       [src]="getCourseImage(course)" 
+                       [alt]="course.course"
+                       class="w-full h-full object-cover"
+                       (error)="onImageError($event, course)"
+                       loading="lazy">
+                  <div *ngIf="!course.image || course.image === 'undefined' || course.image === 'null' || course.image === 'Course Image'" 
+                       class="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <div class="text-white text-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="white" class="mb-2 mx-auto">
+                        <path d="M5,3H7V5H21V19H19V21H17V19H15V21H13V19H11V21H9V19H7V21H5V19H3V5H5V3Z"/>
+                      </svg>
+                      <p class="text-lg font-semibold">{{ course.course || 'Course Title' }}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Evaluation Status Badge -->
+                <div *ngIf="courseAlreadyEvaluated[course.id]" 
+                     class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                  ✓ Evaluated
+                </div>
+                
+                <!-- Course Info -->
+                <div class="card-content">
+                  <h3 [style]="{'color': 'var(--text-color)'}" class="course-title">
+                    {{ course.course || 'Course Title' }}
+                  </h3>
+                  
+                  <div class="course-details">
+                    <div class="detail-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="var(--text-muted)">
+                        <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 7.5V9M15 11.5L21 12V14L15 13.5V11.5M21 16V18L15 17.5V16H9L15 16M15 20V22L21 21V19L15 20Z"/>
+                      </svg>
+                      <span [style]="{'color': 'var(--text-muted)'}">
+                        {{ (course.firstname && course.lastname) ? (course.firstname + ' ' + course.lastname) : 'Instructor Name' }}
+                      </span>
+                    </div>
+                    
+                    <div class="detail-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="var(--text-muted)">
+                        <path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/>
+                      </svg>
+                      <span [style]="{'color': 'var(--text-muted)'}">
+                        Level: {{ course.complexity ? (course.complexity <= 2 ? 'Beginner' : course.complexity <= 4 ? 'Intermediate' : 'Advanced') : 'Not specified' }}
+                      </span>
+                    </div>
+                    
+                    <div class="detail-item">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="var(--text-muted)">
+                        <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M5,19V5H19V19H5Z"/>
+                      </svg>
+                      <span [style]="{'color': 'var(--text-muted)'}">{{ course.lessoncount || 0 }} lessons</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Evaluate Button -->
+                  <button class="evaluate-btn" 
+                          [class.evaluated]="courseAlreadyEvaluated[course.id]"
+                          [disabled]="courseAlreadyEvaluated[course.id]">
+                    {{ courseAlreadyEvaluated[course.id] ? 'Already Evaluated' : 'Evaluate Course' }}
+                  </button>
+                </div>
+              </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!isLoadingCourses && courses.length === 0" class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="var(--text-muted)" class="empty-icon">
+                <path d="M5,3H7V5H21V19H19V21H17V19H15V21H13V19H11V21H9V19H7V21H5V19H3V5H5V3Z"/>
+              </svg>
+              <h3 [style]="{'color': 'var(--text-color)'}">No courses available</h3>
+              <p [style]="{'color': 'var(--text-muted)'}">There are no courses available for evaluation at the moment.</p>
+            </div>
+          </div>
+
+          <div class="tab-content" *ngIf="selectedTab === 1">
+            <h2 [style]="{'color': 'var(--text-color)'}" class="section-title">Select a Teacher to Evaluate</h2>
+          
+              <!-- Loading State -->
+              <div *ngIf="isLoadingTeachers" class="loading-state">
+                <div class="spinner"></div>
+                <p [style]="{'color': 'var(--text-muted)'}">Loading teachers...</p>
+              </div>
+
+            <!-- Teachers Grid -->
+            <div class="courses-grid" *ngIf="!isLoadingTeachers && teachers.length > 0">
+              <div *ngFor="let teacher of teachers" 
+                   class="teacher-card"
+                   [class.opacity-50]="teacherAlreadyEvaluated[teacher.id]"
+                   [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}"
+                   (click)="selectTeacher(teacher)">
+                <div class="teacher-card-content">
+                  <!-- Evaluation Status Badge -->
+                  <div *ngIf="teacherAlreadyEvaluated[teacher.id]" 
+                       class="evaluation-badge" [style]="{'background': 'var(--success-color)'}">
+                    ✓ Evaluated
+                  </div>
+                  
+                  <!-- Teacher Avatar -->
+                  <div class="teacher-avatar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="var(--text-on-primary)">
+                      <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                  </div>
+                  
+                  <!-- Teacher Info -->
+                  <h3 [style]="{'color': 'var(--text-color)'}" class="teacher-name">
+                    {{ (teacher.firstname && teacher.lastname) ? (teacher.firstname + ' ' + teacher.lastname) : 'Teacher Name' }}
+                  </h3>
+                  
+                  <p [style]="{'color': 'var(--text-muted)'}" class="teacher-position">{{ teacher.job || 'Position not specified' }}</p>
+                
+                  <!-- Evaluate Button -->
+                  <button class="evaluate-btn teacher-btn" 
+                          [class.evaluated]="teacherAlreadyEvaluated[teacher.id]"
+                          [disabled]="teacherAlreadyEvaluated[teacher.id]">
+                    {{ teacherAlreadyEvaluated[teacher.id] ? 'Already Evaluated' : 'Evaluate Teacher' }}
+                  </button>
+              </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!isLoadingTeachers && teachers.length === 0" class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="var(--text-muted)" class="empty-icon">
+                <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+              </svg>
+              <h3 [style]="{'color': 'var(--text-color)'}">No teachers available</h3>
+              <p [style]="{'color': 'var(--text-muted)'}">There are no teachers available for evaluation at the moment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course Evaluation Form -->
+  <div class="form-section" *ngIf="showCourseForm">
+    <div class="form-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+      <!-- Header -->
+      <div class="form-header">
+        <button class="back-btn" (click)="showCourseForm = false" [style]="{'color': 'var(--text-color)'}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+          </svg>
+        </button>
+        <h2 [style]="{'color': 'var(--text-color)'}">Course Evaluation: {{ selectedCourse?.course }}</h2>
+      </div>
+
+      <form [formGroup]="courseEvaluationForm" (ngSubmit)="submitCourseEvaluation()">
+        <!-- Overall Assessment -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Overall Assessment</h3>
+          
+          <!-- Overall Course Rating -->
+          <div class="form-group">
+            <label class="form-label">Overall Course Rating*</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="isStarFilled('overall_rating', star)"
+                     (click)="setRating('overall_rating', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+              <span class="rating-text">{{ getCurrentRating('overall_rating') }}/5</span>
+            </div>
+          </div>
+
+          <!-- Content Quality -->
+          <div class="form-group">
+            <label class="form-label">Content Quality*</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="isStarFilled('content_quality', star)"
+                     (click)="setRating('content_quality', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+              <span class="rating-text">{{ getCurrentRating('content_quality') }}/5</span>
+            </div>
+          </div>
+
+          <!-- Difficulty Level -->
+          <div class="form-group">
+            <label class="form-label">Difficulty Level*</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="isStarFilled('difficulty', star)"
+                     (click)="setRating('difficulty', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+              <span class="rating-text">{{ getCurrentRating('difficulty') }}/5</span>
+            </div>
+          </div>
+
+          <!-- Materials Quality -->
+          <div class="form-group">
+            <label class="form-label">Materials Quality*</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="isStarFilled('materials', star)"
+                     (click)="setRating('materials', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+              <span class="rating-text">{{ getCurrentRating('materials') }}/5</span>
+            </div>
+          </div>
+
+          <!-- Strengths -->
+          <div class="form-group">
+            <label class="form-label">Course Strengths*</label>
+            <textarea formControlName="strengths" 
+                      rows="3" 
+                      class="form-textarea"
+                      placeholder="What did you like about this course?"></textarea>
+          </div>
+
+          <!-- Improvements -->
+          <div class="form-group">
+            <label class="form-label">Areas for Improvement*</label>
+            <textarea formControlName="improvements" 
+                      rows="3" 
+                      class="form-textarea"
+                      placeholder="What could be improved?"></textarea>
+          </div>
+
+          <!-- Additional Feedback -->
+          <div class="form-group">
+            <label class="form-label">Additional Comments*</label>
+            <textarea formControlName="additional_feedback" 
+                      rows="4" 
+                      class="form-textarea"
+                      placeholder="Any other feedback or suggestions?"></textarea>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="button" 
+                  class="btn btn-secondary"
+                  (click)="showCourseForm = false">
+            Cancel
+          </button>
+          <button type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="!courseEvaluationForm.valid">
+            Submit Evaluation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Teacher Evaluation Form -->
+  <div *ngIf="showTeacherForm && selectedTeacher" class="form-section">
+    <div class="form-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+      <div class="form-header">
+        <h2 [style]="{'color': 'var(--text-color)'}">Evaluate Teacher: {{ selectedTeacher.firstname }} {{ selectedTeacher.lastname }}</h2>
+        <button class="close-btn" (click)="showTeacherForm = false" [style]="{'color': 'var(--text-color)'}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="teacherEvaluationForm" (ngSubmit)="submitTeacherEvaluation()">
+        <!-- Rating Fields -->
+        <div class="teacher-ratings-grid">
+          <div class="rating-item">
+            <label class="form-label">Overall Rating</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="star <= currentTeacherRatings['overall_rating']"
+                     (click)="setTeacherRating('overall_rating', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="rating-item">
+            <label class="form-label">Communication</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="star <= currentTeacherRatings['communication']"
+                     (click)="setTeacherRating('communication', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="rating-item">
+            <label class="form-label">Knowledge</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="star <= currentTeacherRatings['knowledge']"
+                     (click)="setTeacherRating('knowledge', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="rating-item">
+            <label class="form-label">Teaching Style</label>
+            <div class="rating-container">
+              <div class="stars">
+                <svg *ngFor="let star of [1,2,3,4,5]" 
+                     xmlns="http://www.w3.org/2000/svg" 
+                     viewBox="0 0 24 24" 
+                     width="24" 
+                     height="24" 
+                     class="star-icon"
+                     [class.filled]="star <= currentTeacherRatings['teaching_style']"
+                     (click)="setTeacherRating('teaching_style', star)">
+                  <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text Fields -->
+        <div class="teacher-form-fields">
+          <div class="form-group">
+            <label class="form-label">Teacher Strengths</label>
+            <textarea formControlName="strengths" 
+                     rows="3"
+                     class="form-textarea"
+                     placeholder="What did you like most about this teacher?"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Areas for Improvement</label>
+            <textarea formControlName="improvements" 
+                     rows="3"
+                     class="form-textarea"
+                     placeholder="What could be improved?"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Additional Feedback</label>
+            <textarea formControlName="additional_feedback" 
+                     rows="3"
+                     class="form-textarea"
+                     placeholder="Any other comments or suggestions?"></textarea>
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="recommend" class="custom-checkbox">
+              <span class="checkmark"></span>
+              I would recommend this teacher to others
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="button" 
+                  class="btn btn-secondary"
+                  (click)="showTeacherForm = false">
+            Cancel
+          </button>
+          <button type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="!teacherEvaluationForm.valid">
+            Submit Teacher Evaluation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

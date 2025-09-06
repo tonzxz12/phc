@@ -1,0 +1,133 @@
+<div class="h-[90dvh] w-full max-w-[90vw] sm:max-w-[90vw] md:max-w-[80vw] lg:w-[90dvh] flex flex-col mx-auto my-auto bg-white dark:!bg-[#071e3d] rounded-lg p-2 sm:p-4 shadow-lg relative">
+    <!-- Close button -->
+    <div class="w-full p-2 sm:p-4 bg-white dark:!bg-[#071e3d]">
+        <div class="title flex justify-between items-center text-left text-[var(--primary-color)] text-lg sm:text-xl md:text-2xl font-semibold">
+            <p class="font-bold font- line-clamp-2 sm:line-clamp-1 pr-2">{{course.course}}</p>
+        </div>
+        <button class="text-xl sm:text-2xl border-none absolute top-1 right-1 sm:top-2 sm:right-2 cursor-pointer close-button bg-none bg-white z-[50] p-1"
+            (click)="close()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24"
+                stroke="var(--secondary-color)" stroke-width="4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    
+    <div class="overflow-y-auto h-full w-full">
+        <div class="h-full w-full p-2 sm:p-4 pb-4 space-y-4 sm:space-y-6">
+            <!-- Content Section -->
+            <div class="flex flex-col gap-4 sm:gap-6 contentwrap">
+                <!-- Image Section -->
+                <div class="w-full dark:border rounded-md">
+                    <img class="w-full h-[200px] sm:h-[250px] md:h-[300px] object-cover shadow-md rounded-md"
+                        [src]="course?.image ? getUrl(course.image) : 'https://img.freepik.com/free-vector/online-tutorials-concept_52683-37480.jpg'"
+                        alt="Course image">
+                </div>
+
+                <!-- Creator, Lessons, and Language Info -->
+                <div class="flex flex-wrap justify-between gap-4 sm:gap-6">
+                    <div class="flex-1 space-y-3 sm:space-y-4">
+                        <!-- Information Card -->
+                        <div class="p-3 sm:p-4 space-y-2 sm:space-y-3 bg-white dark:!bg-[#071e3d] dark:border rounded-md shadow-md">
+                            <div class="flex items-start sm:items-center text-xs sm:text-sm dark:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-0.5 sm:mt-0 text-[var(--primary-color)] flex-shrink-0"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5.121 17.804A7.002 7.002 0 0112 5a7.002 7.002 0 016.879 12.804M12 15v6m0 0h4m-4 0H8" />
+                                </svg>
+                                <p class="font-medium break-words">Instructor: <span
+                                        class="font-semibold text-[var(--tertiary-color)]">{{course.firstname + ' ' +
+                                        course.lastname}}</span></p>
+                            </div>
+                            <div class="flex items-center text-xs sm:text-sm dark:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-[var(--primary-color)] flex-shrink-0"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3M5 11h14M7 16h10M7 20h10" />
+                                </svg>
+                                <p class="font-medium">Lessons: <span class="font-semibold">{{course.lessoncount || 0}}</span></p>
+                            </div>
+                            <div class="flex items-start text-xs sm:text-sm dark:text-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-2 mt-0.5 text-[var(--primary-color)] flex-shrink-0"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 7l6 6 4-4 8 8" />
+                                </svg>
+                                <p class="font-medium break-words">Objectives: <span class="font-semibold">{{course.details || course.objectives || 'Not specified'}}</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Enroll Button and Input -->
+                        <div class="flex flex-col gap-3">
+                            <input 
+                                [(ngModel)]="courseCode"
+                                [readonly]="isQrEnrollment"
+                                [placeholder]="isQrEnrollment ? 'Course code auto-filled from QR' : 'Enter course code'"
+                                class="h-10 sm:h-12 w-full p-2 sm:p-3 text-sm sm:text-base rounded-md border dark:text-white border-gray-300 focus:ring-2 focus:ring-[var(--tertiary-color)] font-"
+                                type="text">
+
+                            <button 
+                                (click)="enroll()"
+                                [disabled]="!courseCode.trim()"
+                                class="font- bg-gradient-to-r from-[var(--secondary-color)] to-[var(--primary-color)] w-full h-10 sm:h-12 text-sm sm:text-base text-white rounded-md hover:shadow-md transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                {{ isQrEnrollment ? 'Enroll via QR Code' : 'Enroll Now' }}
+                            </button>
+
+                            <!-- Course Forum Link for enrolled students -->
+                            <div *ngIf="course.enrolled" class="mt-3">
+                                <button 
+                                    (click)="navigateToCourseforum(course.id)"
+                                    class="flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-[#00cc99] transition-colors duration-200 bg-transparent border border-[#00cc99] rounded-lg hover:bg-[#00cc99] hover:text-white">
+                                    <i class="mr-2 fas fa-users"></i>
+                                    Course Forum
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details Section -->
+                <div class="space-y-3 sm:space-y-4 detailswrap">
+                    <div class="details font- text-lg sm:text-xl font-bold text-[var(--tertiary-color)] dark:text-white">
+                        <h1>Details</h1>
+                    </div>
+                    <p #detailsContent 
+                       class="detailscontent max-h-[80px] sm:max-h-[100px] overflow-hidden text-sm sm:text-base text-gray-600 dark:text-white leading-relaxed"
+                       [ngClass]="{ 'show-more': showFullContent }">
+                       {{course.details ? course.details : '[NONE]'}}
+                    </p>
+                    <button *ngIf="showReadMoreButton" 
+                            (click)="toggleReadMore()"
+                            class="text-sm sm:text-base text-[var(--tertiary-color)] font-medium dark:text-white hover:underline">
+                            {{ showFullContent ? 'Show less' : 'Read more' }}
+                    </button>
+                </div>
+
+                <!-- Lessons Section -->
+                <div class="space-y-3 sm:space-y-4 lessonwrap">
+                    <div class="lesson font- text-lg sm:text-xl font-bold text-[var(--tertiary-color)] dark:text-white">
+                        <h1>Lessons</h1>
+                    </div>
+                    
+                    <!-- No lessons message -->
+                    <div *ngIf="lessons.length == 0" class="p-4 sm:p-6 text-center text-gray-500 dark:text-white bg-white dark:!bg-[#071e3d] dark:border rounded-md shadow-md">
+                        Currently, this course has no lessons.
+                    </div>
+                    
+                    <!-- Lessons list -->
+                    <div *ngFor="let lesson of lessons; let i = index" 
+                         class="p-3 sm:p-4 mb-3 sm:mb-4 bg-white dark:!bg-[#071e3d] dark:border rounded-md shadow-md">
+                        <div class="space-y-2 lessontitle">
+                            <div class="thislesson text-sm sm:text-base md:text-lg text-[var(--primary-color)] font-medium">
+                                Lesson {{i+1}}: <span class="font-semibold break-words">{{lesson.title}}</span>
+                            </div>
+                            <div class="text-xs sm:text-sm text-gray-600 dark:text-white lessontext leading-relaxed">
+                                <p class="break-words">{{lesson.details || 'No description available'}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

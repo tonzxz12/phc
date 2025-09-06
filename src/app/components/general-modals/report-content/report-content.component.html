@@ -1,0 +1,123 @@
+<!-- Report Content Modal -->
+<div class="report-modal" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border-radius': '16px', 'max-width': '500px', 'width': '100%'}">
+  
+  <!-- Modal Header -->
+  <div class="modal-header" [style]="{'padding': '1.5rem 2rem 1rem 2rem', 'border-bottom': '1px solid var(--card-border)'}">
+    <div class="header-content" [style]="{'display': 'flex', 'align-items': 'center', 'gap': '1rem'}">
+      <i class="pi pi-exclamation-triangle" [style]="{'color': 'var(--warning-color)', 'font-size': '1.5rem'}"></i>
+      <div>
+        <h3 [style]="{'margin': '0', 'font-size': '1.25rem', 'font-weight': '600', 'color': 'var(--text-color)'}">
+          Report {{getContentTypeDisplay()}}
+        </h3>
+        <p [style]="{'margin': '0.25rem 0 0 0', 'font-size': '0.85rem', 'color': 'var(--text-color)', 'opacity': '0.7'}">
+          Help us maintain a safe and respectful community
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body" [style]="{'padding': '1.5rem 2rem'}">
+    
+    <!-- Content Preview -->
+    <div class="content-preview" [style]="{'background': 'var(--input-bg)', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'padding': '1rem', 'margin-bottom': '1.5rem'}">
+      <div class="preview-header" [style]="{'margin-bottom': '0.5rem'}">
+        <span class="content-type" [style]="{'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--primary-color)', 'text-transform': 'uppercase', 'letter-spacing': '0.5px'}">
+          {{getContentTypeDisplay()}}
+        </span>
+        <span *ngIf="data.author" class="author" [style]="{'font-size': '0.8rem', 'color': 'var(--text-color)', 'opacity': '0.8', 'margin-left': '1rem'}">
+          by {{data.author}}
+        </span>
+      </div>
+      <div class="preview-title" *ngIf="data.title" [style]="{'font-weight': '600', 'margin-bottom': '0.5rem', 'color': 'var(--text-color)'}">
+        {{data.title}}
+      </div>
+      <div class="preview-content" [style]="{'font-size': '0.875rem', 'color': 'var(--text-color)', 'opacity': '0.9', 'line-height': '1.4'}">
+        {{(data.content || 'No content available') | slice:0:150}}{{(data.content?.length || 0) > 150 ? '...' : ''}}
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state" [style]="{'text-align': 'center', 'padding': '2rem', 'color': 'var(--text-color)', 'opacity': '0.7'}">
+      <i class="pi pi-spinner pi-spin" [style]="{'font-size': '1.5rem', 'margin-bottom': '0.5rem', 'display': 'block'}"></i>
+      <p [style]="{'margin': '0', 'font-size': '0.9rem'}">Loading report options...</p>
+    </div>
+
+    <!-- Report Form -->
+    <div *ngIf="!loading" class="report-form">
+      
+      <!-- Reason Selection -->
+      <div class="form-group" [style]="{'margin-bottom': '1.5rem'}">
+        <label class="form-label" [style]="{'display': 'block', 'margin-bottom': '0.5rem', 'font-weight': '600', 'color': 'var(--text-color)', 'font-size': '0.9rem'}">
+          Reason for reporting *
+        </label>
+        <div class="reason-options" [style]="{'display': 'flex', 'flex-direction': 'column', 'gap': '0.75rem'}">
+          <div *ngFor="let reason of reportReasons" 
+               class="reason-option"
+               [class.selected]="selectedReasonId === reason.id"
+               (click)="selectedReasonId = reason.id"
+               [style]="selectedReasonId === reason.id ? 
+                 {'padding': '0.75rem 1rem', 'border': '2px solid var(--primary-color)', 'border-radius': '8px', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--alert-info-bg)'} : 
+                 {'padding': '0.75rem 1rem', 'border': '2px solid var(--input-border)', 'border-radius': '8px', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--input-bg)'}">
+            <div class="reason-header" [style]="{'display': 'flex', 'align-items': 'center', 'gap': '0.5rem', 'margin-bottom': '0.25rem'}">
+              <div class="radio-indicator" 
+                   [style]="selectedReasonId === reason.id ? 
+                     {'width': '16px', 'height': '16px', 'border': '2px solid var(--primary-color)', 'border-radius': '50%', 'background': 'var(--primary-color)', 'position': 'relative'} : 
+                     {'width': '16px', 'height': '16px', 'border': '2px solid var(--input-border)', 'border-radius': '50%', 'background': 'transparent'}">
+                <div *ngIf="selectedReasonId === reason.id" 
+                     [style]="{'width': '6px', 'height': '6px', 'background': 'white', 'border-radius': '50%', 'position': 'absolute', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%, -50%)'}">
+                </div>
+              </div>
+              <span class="reason-name" [style]="{'font-weight': '600', 'color': 'var(--text-color)', 'font-size': '0.9rem'}">
+                {{reason.name}}
+              </span>
+            </div>
+            <div *ngIf="reason.description" class="reason-description" [style]="{'font-size': '0.8rem', 'color': 'var(--text-color)', 'opacity': '0.8', 'margin-left': '1.5rem'}">
+              {{reason.description}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Description -->
+      <div class="form-group" [style]="{'margin-bottom': '1.5rem'}">
+        <label class="form-label" [style]="{'display': 'block', 'margin-bottom': '0.5rem', 'font-weight': '600', 'color': 'var(--text-color)', 'font-size': '0.9rem'}">
+          Additional details (optional)
+        </label>
+        <textarea 
+          [(ngModel)]="description"
+          placeholder="Provide additional context about why you're reporting this content..."
+          rows="3"
+          [style]="{'width': '100%', 'padding': '0.75rem', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'font-size': '0.875rem', 'resize': 'vertical', 'min-height': '80px', 'transition': 'var(--tran-02)'}">
+        </textarea>
+        <div class="helper-text" [style]="{'font-size': '0.75rem', 'color': 'var(--text-color)', 'opacity': '0.6', 'margin-top': '0.25rem'}">
+          Help our moderation team understand the issue better
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer" [style]="{'padding': '1rem 2rem 1.5rem 2rem', 'border-top': '1px solid var(--card-border)', 'display': 'flex', 'gap': '1rem', 'justify-content': 'flex-end'}">
+    <button 
+      class="cancel-btn"
+      (click)="onCancel()"
+      [disabled]="submitting"
+      [style]="{'padding': '0.75rem 1.5rem', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'background': 'transparent', 'color': 'var(--text-color)', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)'}">
+      Cancel
+    </button>
+    <button 
+      class="submit-btn"
+      (click)="submitReport()"
+      [disabled]="!selectedReasonId || submitting || loading"
+      [style]="(!selectedReasonId || submitting || loading) ? 
+        {'padding': '0.75rem 1.5rem', 'border': 'none', 'border-radius': '8px', 'background': 'var(--input-border)', 'color': 'var(--text-color)', 'font-weight': '600', 'cursor': 'not-allowed', 'transition': 'var(--tran-02)', 'display': 'flex', 'align-items': 'center', 'gap': '0.5rem'} : 
+        {'padding': '0.75rem 1.5rem', 'border': 'none', 'border-radius': '8px', 'background': 'var(--danger-color)', 'color': 'white', 'font-weight': '600', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'display': 'flex', 'align-items': 'center', 'gap': '0.5rem'}">
+      <i *ngIf="submitting" class="pi pi-spinner pi-spin"></i>
+      <i *ngIf="!submitting" class="pi pi-flag"></i>
+      <span>{{submitting ? 'Submitting...' : 'Submit Report'}}</span>
+    </button>
+  </div>
+
+</div>

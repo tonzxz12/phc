@@ -1,0 +1,118 @@
+<nav class="sidebar  overflow-y-scroll   hidden md:block">
+  <header>
+    <div class="image-text mt-2">
+      <span class="image">
+        <img src="{{environment.appLogo}}" alt="QLab Logo" />
+      </span>
+
+      <div class="text logo-text  items-center">
+        <span class="name font-sans !font-bold text-primary-950">{{environment.appShortTitle}}</span>
+        <span class="profession"></span>
+      </div>
+    </div>
+
+    <i class="bx bx-chevron-left !z-50 toggle"></i>
+  </header>
+
+  <div class="menu-bar pr-3">
+    <div class="menu mt-3">
+      <ul class="menu-links">
+        <li
+          *ngFor="let itemKey of itemKeys"
+          class="nav-link cursor-pointer select-none"
+          routerLinkActive="active"
+        >
+          <a
+            (click)="navigate(displayedItems[itemKey].redirect)"
+            routerLink="{{ displayedItems[itemKey].routerLink }}"
+            class="flex items-center justify-between w-full"
+          >
+            <div class="flex items-center">
+              <i class="bx {{ displayedItems[itemKey].icon }} icon"></i>
+              <span class="text nav-text"> {{ itemKey }}</span>
+            </div>
+            <!-- Moderation Badge -->
+            <span 
+              *ngIf="itemKey === 'MODERATION' && getReportedMessageCount() > 0"
+              class="badge bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] h-5 flex items-center justify-center"
+              style="font-size: 10px; line-height: 1;"
+            >
+              {{ getReportedMessageCount() }}
+            </span>
+          </a>
+        </li>
+        <br />
+        <hr />
+        <div *ngIf="checkAccount() == '0'">
+          <li
+          *ngFor="let itemKey of getObjectKeys(studentExtraDashboardItems)"
+          class="nav-link cursor-pointer select-none"
+          routerLinkActive="active"
+        >
+          <a
+            (click)="navigate(studentExtraDashboardItems[itemKey].redirect)"
+            routerLink="{{ studentExtraDashboardItems[itemKey].routerLink }}"
+          >
+            <i class="bx {{ studentExtraDashboardItems[itemKey].icon }} icon"></i>
+            <span class="text nav-text"> {{ itemKey }}</span>
+          </a>
+        </li>
+        </div>
+        <div *ngIf="checkAccount() == '1'">
+          <li
+          *ngFor="let itemKey of getObjectKeys(teacherExtraDashboardItems)"
+          class="nav-link cursor-pointer select-none"
+          routerLinkActive="active"
+        >
+          <a
+            (click)="navigate(teacherExtraDashboardItems[itemKey].redirect)"
+            routerLink="{{ teacherExtraDashboardItems[itemKey].routerLink }}"
+          >
+            <i class="bx {{ teacherExtraDashboardItems[itemKey].icon }} icon"></i>
+            <span class="text nav-text"> {{ itemKey }}</span>
+          </a>
+        </li>
+        </div>
+      </ul>
+    </div>
+
+    <div class="bottom-content mb-3">
+      <li class="">
+        <a class="report">
+          <button
+            (click)="openModal()"
+            [ngClass]="{ 'smaller-text': isSidebarMinimized }"
+            class="h-10 mb-2 w-full font-bold  rounded-lg text-gray-500 focus:outline-none mt-2"
+          >
+            {{ isSidebarMinimized ? "REPORT" : "REPORT A PROBLEM" }}
+          </button>
+        </a>
+      </li>
+
+      <!-- <li class="" *ngIf="isStudent">
+        <button
+          *ngIf="progress"
+          (click)="goOffline()"
+          [ngStyle]="{ width: progress + '%' }"
+          class="h-10 mb-2 flex justify-center items-center text-white hover:bg-blue-500 bg-blue-400 w-full font-bold  rounded-lg mt-2"
+        >
+          <span *ngIf="progress < 100">Downloading</span>
+          <span *ngIf="progress >= 100">Offline Available</span>
+        </button>
+        <button
+          *ngIf="!progress"
+          [ngStyle]="{ width: '100%'}"
+          class="h-10 mb-2 flex justify-center items-center text-white hover:bg-slate-400 bg-slate-300 w-full font-bold  rounded-lg mt-2"
+        >
+          <span>Loading</span>
+        </button>
+      </li> -->
+      <li class="cursor-pointer select-none">
+        <a (click)="confirmBox()">
+          <i class="bx bx-log-out icon"></i>
+          <span class="text nav-text">Logout</span>
+        </a>
+      </li>
+    </div>
+  </div>
+</nav>

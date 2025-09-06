@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/D:\\harfai_lms\\src\\app\\components\\texttospeech/**)",
+      "Read(/D:\\harfai_lms\\src\\app\\components\\texttospeech/**)",
+      "Read(/D:\\harfai_lms\\src\\app\\components\\general-modals\\problemreport/**)",
+      "Read(/D:\\harfai_lms\\src\\app\\components\\general-modals\\problemreport/**)",
+      "Read(/D:\\harfai_lms\\src\\app\\components\\student\\student-evaluation/**)",
+      "Read(/D:\\harfai_lms\\src\\app\\components\\student\\student-evaluation/**)",
+      "Bash(ng generate component:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

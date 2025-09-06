@@ -1,0 +1,713 @@
+<div class="h-dvh text-[var(--text-color)] w-dvw fixed inset-0 z-[1000] flex items-center justify-center" style="background-color: var(--modal-overlay);">
+  <div class="w-full h-full flex flex-col gap-4 max-h-[80%] lg:max-h-[90%] md:max-w-[90%] max-w-[95%] rounded-xl overflow-hidden p-4" style="background-color: var(--modal-bg);">
+    <div class="modal-header">
+      <div class="titlehead">
+        <h1 style="color: var(--text-color);">{{ quiz ? 'Edit Quiz' : 'Create Quiz' }}</h1>
+      </div>
+    </div>
+    <div class="w-full h-full overflow-y-auto">
+      <div class="flex flex-col w-full gap-4 p-2">
+        <!-- First Row -->
+        <div class="flex flex-col w-full gap-2 md:flex-row">
+          <div class="flex flex-col flex-1 gap-2">
+            <input
+              class="rounded-lg border-2 border-solid p-2" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+              [(ngModel)]="title" type="text" placeholder="Quiz Title" />
+            <textarea
+              class="p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+              [(ngModel)]="description" name="description" id="description" cols="32" rows="4" placeholder="Description"></textarea>
+          </div>
+          <div class="flex flex-col flex-1 gap-2">
+            <input
+              class="p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+              [(ngModel)]="retakeLimit" type="number" placeholder="Retake Limit" min="0" />
+            <input
+              class="p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border); padding-left: 10px;"
+              type="text" [(ngModel)]="deadline" name="deadline" id="deadline" placeholder="Deadline"
+              onfocus="this.type='date'" onblur="this.type='text'" required />
+
+            <select
+              class="p-2 border-2 border-solid rounded-lg appearance-auto" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+              [(ngModel)]="selectedCourseId"
+              (ngModelChange)="onCourseDropdownChange()"
+              name="course">
+              <option value="" disabled selected hidden>Select Course</option>
+              <option *ngFor="let course of availableCourses" [value]="course.courseid">
+                {{ course.course }}
+              </option>
+            </select>
+
+            <select
+              class="p-2 border-2 border-solid rounded-lg appearance-auto" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+              [(ngModel)]="selectedClassID"
+              (ngModelChange)="onClassSelectionChange()"
+              name="class"
+              [disabled]="isPreTest || !selectedCourseId || availableClasses.length === 0">
+              <option value="" disabled selected hidden>Select Class</option>
+              <option *ngFor="let _class of availableClasses" [value]="_class.id">
+                {{ _class.class }}
+              </option>
+            </select>
+
+            <select
+              class="p-2 border-2 border-solid rounded-lg appearance-auto" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+              [(ngModel)]="lesson"
+              (ngModelChange)="onLessonChange()"
+              name="lesson"
+              [disabled]="isPreTest || !selectedClassID || lessons.length === 0">
+              <option value="" selected>Select Lesson</option>
+              <option *ngFor="let _lesson of lessons" [value]="_lesson.id">
+                {{ _lesson.title }}
+              </option>
+            </select>
+
+            <select
+              class="p-2 border-2 border-solid rounded-lg appearance-auto" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+              [(ngModel)]="topic"
+              name="topic"
+              [disabled]="isPreTest || !lesson || topics.length === 0">
+              <option value="" selected>Select Topic</option>
+              <option *ngFor="let _topic of topics" [value]="_topic.id">
+                {{ _topic.title }}
+              </option>
+            </select>
+          </div>
+          <div class="rightwrap">
+            <h3 class="mb-2 font-bold" style="color: var(--text-color);">Quiz Settings</h3>
+            <div class="">
+              <input [(ngModel)]="settings.random_question" type="checkbox" /><span class="ml-2" style="color: var(--text-color);">Randomize Question</span>
+            </div>
+            <div class="">
+              <input [(ngModel)]="settings.allow_backtrack" type="checkbox" /><span class="ml-2" style="color: var(--text-color);">Allow Backtracking</span>
+            </div>
+            <div class="">
+              <input [(ngModel)]="settings.allow_review" type="checkbox" /><span class="ml-2" style="color: var(--text-color);">Allow Review After Submission</span>
+            </div>
+            <div class="">
+              <input [(ngModel)]="settings.popup_quiz" type="checkbox" /><span class="ml-2" style="color: var(--text-color);">Enable Popup Quiz</span>
+            </div>
+            <div class="" *ngIf="showPreTestOption">
+              <label class="flex items-center">
+                <input
+                  [(ngModel)]="isPreTest"
+                  (ngModelChange)="onPreTestToggle()"
+                  type="checkbox"
+                  id="preTestCheckbox"
+                  name="preTest"
+                  class="mr-2" />
+                <span style="color: var(--text-color);">Mark as Pre-Test</span>
+              </label>
+            </div>
+            <!-- Time Limit Settings -->
+            <div class="poppins mt-3 p-3 rounded-lg border-2" style="background-color: var(--input-bg); border-color: var(--input-border);">
+              <h4 class="mb-2 font-bold text-sm" style="color: var(--text-color);">⏱️ Time Limit Settings</h4>
+              <div class="mb-2">
+                <input 
+                  [(ngModel)]="enableQuestionTimeLimits" 
+                  (ngModelChange)="toggleQuestionTimeLimits()"
+                  type="checkbox" 
+                  id="enableTimeLimits" />
+                <span class="ml-2 text-sm" style="color: var(--text-color);">Enable per-question time limits</span>
+              </div>
+              <div *ngIf="enableQuestionTimeLimits" class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <label class="text-xs" style="color: var(--text-color);">Default:</label>
+                  <input 
+                    [(ngModel)]="defaultQuestionTimeLimit" 
+                    type="number" 
+                    min="5" 
+                    max="600" 
+                    class="w-16 p-1 text-xs border rounded" />
+                  <span class="text-xs" style="color: var(--text-color);">seconds</span>
+                </div>
+                <button 
+                  (click)="applyDefaultTimeLimitToAll()" 
+                  class="px-2 py-1 text-xs rounded" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+                  Apply to All
+                </button>
+                <div class="text-xs text-center p-1 rounded border" style="background-color: var(--input-bg); border-color: var(--input-border); color: var(--text-color);">
+                  Total: {{ formatTime(getTotalEstimatedTime()) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Start of Question Section -->
+        <div class="flex flex-col w-full gap-8 leftwrap">
+          <div *ngFor="let question of questions; let i = index" class="flex flex-col w-full gap-2 mt-3 md:flex-row">
+            <div class="md:flex-[2_2_1%] flex flex-col gap-2">
+              <!-- First Row in Question Section -->
+              <div class="flex items-center">
+                <h1 class="text-lg font-bold" style="color: var(--text-color);">Question # {{ i + 1 }}</h1>
+                <select
+                  class="p-2 ml-4 text-xs border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border); color: var(--text-color);"
+                  [(ngModel)]="question.type" (change)="setType(question)" name="language_{{i}}" id="language_{{i}}">
+                  <option class="placeholder " value="" disabled selected hidden>Select Type</option>
+                  <option *ngFor="let type of types; let val = index" [value]="val">
+                    {{ types[val] }}
+                  </option>
+                </select>
+                <button class="px-3 py-2 ml-4 text-xs rounded-md futuristic-ai-button" (click)="openAIModal(question)">AI</button>
+                <button class="px-3 py-2 ml-4 text-xs rounded-md" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);" (click)="openQuestionBankModal(question)">Use from Bank</button>
+                <button class="px-3 py-2 ml-4 text-xs text-white bg-red-500 rounded-md hover:scale-105" (click)="removeQuestion(i)">Remove</button>
+              </div>
+              <!-- Time Limit Control for Question -->
+              <div *ngIf="enableQuestionTimeLimits" class="flex items-center gap-2 p-2 mt-2 border border-[var(--border-color)] rounded-lg text-[var(--text-color)]">
+                <span class="text-sm">⏱️ Time limit:</span>
+                <input 
+                  [(ngModel)]="question.timeLimit" 
+                  (ngModelChange)="setQuestionTimeLimit(question, $event)"
+                  type="number" 
+                  min="5" 
+                  max="600" 
+                  class="w-16 p-1 text-sm border rounded" 
+                  placeholder="60" />
+                <span class="text-sm">seconds</span>
+                <button 
+                  (click)="question.timeLimit = null" 
+                  class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600">
+                  Remove
+                </button>
+              </div>
+              <!-- Second Row in Question Section (Multiple Choice, True/False) -->
+              <div *ngIf="question.type == '1' || question.type =='0'" class="flex flex-col w-full gap-2">
+                <textarea
+                  class="mt-2 rounded-lg border-2 border-solid p-2 flex-[2_2_1%]" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+                  [(ngModel)]="question.question.value" name="question_{{i}}" id="question_{{i}}" cols="30" rows="4"
+                  placeholder="Enter Question"></textarea>
+                <div class="flex flex-col items-center justify-center gap-2 px-2 py-2 border-2 rounded border-slate-500">
+                  <div class="flex flex-col" *ngFor="let file of question.question.attachments; let j = index">
+                    <img [src]="file" class="w-auto max-h-36">
+                    <button (click)="removeQuestionAttachment(question.question, j)" class="px-3 py-1 text-xs text-white bg-red-500 hover:bg-red-400">Remove</button>
+                  </div>
+                  <input (change)="questionOnFileSelected($event, question.question)" class="hidden" type="file" accept="image/*" #questionUpload>
+                  <button class="px-6 py-2 text-white rounded-md bg-[var(--primary-color)]" (click)="questionUpload.click()">Add Image</button>
+                </div>
+              </div>
+              <!-- Identification -->
+              <div *ngIf="question.type == '2'" class="flex w-full gap-2 mt-2">
+                <div class="flex flex-col flex-1 gap-2">
+                  <div class="flex items-center justify-between mb-2">
+                    <h1 class="poppins-b text-[var(--text-color)]">Question</h1>
+                    
+                  </div>
+                  <textarea
+                    class="flex-1 p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+                    [(ngModel)]="question.question.value" name="question_{{i}}" id="question_{{i}}" rows="4"
+                    placeholder="Enter Question :"></textarea>
+                  <div class="flex flex-col items-center justify-center gap-2 px-2 py-2 border-2 rounded border-slate-500">
+                    <div class="flex flex-col" *ngFor="let file of question.question.attachments; let j = index">
+                      <img [src]="file" class="w-auto max-h-36">
+                      <button (click)="removeQuestionAttachment(question.question, j)" class="px-3 py-1 text-xs text-white bg-red-500 hover:bg-red-400">Remove</button>
+                    </div>
+                    <input (change)="questionOnFileSelected($event, question.question)" class="hidden" type="file" accept="image/*" #question2Upload>
+                    <button class="px-6 py-2 text-white rounded-md bg-[var(--primary-color)]" (click)="question2Upload.click()">Add Image</button>
+                  </div>
+                </div>
+                <div class="flex flex-col flex-1 gap-2">
+                  <div class="flex items-center justify-between mb-2">
+                    <h1 class="poppins-b text-[var(--text-color)]">Answer</h1>
+                    <button 
+                      (click)="saveQuestionToBank(question)" 
+                      class="px-3 py-2 text-xs text-white bg-green-600 rounded-md hover:bg-green-700">
+                      Save to Bank
+                    </button>
+                  </div>
+                  <textarea
+                    class="flex-1 p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+                    [(ngModel)]="question.answer" name="answer_{{i}}" id="answer_{{i}}" rows="4" placeholder="Enter Answer ">
+                  </textarea>
+                </div>
+              </div>
+              <!-- Essay -->
+              <div *ngIf="question.type == '3'" class="flex w-full gap-2 mt-2">
+                <div class="flex flex-col flex-1 gap-2">
+                  <div class="flex items-center justify-between mb-2">
+                    <h1 class="poppins-b text-[var(--text-color)]">Question</h1>
+
+                  </div>
+                  <textarea
+                    class="flex-1 p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-border); outline-color: var(--input-focus-border);"
+                    [(ngModel)]="question.question.value" name="question_{{i}}" id="question_{{i}}" rows="4"
+                    placeholder="Enter Question :"></textarea>
+                  <div class="flex flex-col items-center justify-center gap-2 px-2 py-2 border-2 rounded border-slate-500">
+                    <div class="flex flex-col" *ngFor="let file of question.question.attachments; let j = index">
+                      <img [src]="file" class="w-auto max-h-36">
+                      <button (click)="removeQuestionAttachment(question.question, j)" class="px-3 py-1 text-xs text-white bg-red-500 hover:bg-red-400">Remove</button>
+                    </div>
+                    <input (change)="questionOnFileSelected($event, question.question)" class="hidden" type="file" accept="image/*" #question2Upload>
+                    <button class="px-6 py-2 text-white rounded-md bg-[var(--primary-color)]" (click)="question2Upload.click()">Add Image</button>
+                  </div>
+                </div>
+                <div class="flex flex-col flex-1 gap-2">
+                  <div class="flex items-center justify-between mb-2">
+                    <h1 class="poppins-b text-[var(--text-color)]">Answer</h1>
+                    <button 
+                      (click)="saveQuestionToBank(question)" 
+                      class="px-3 py-2 text-xs text-white bg-green-600 rounded-md hover:bg-green-700">
+                      Save to Bank
+                    </button>
+                  </div>
+                  <div class="flex items-center justify-center flex-1 p-2 border-2 border-dashed rounded-lg" style="background-color: var(--input-bg); border-color: var(--input-focus-border); outline-color: var(--input-focus-border);">
+                    Answers will automatically be analyzed and checked
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Multiple Choice Options -->
+            <div *ngIf="question.type == '0'" class="options flex-[3_3_1%] mt-3 w-full">
+              <div class="flex items-center justify-between mb-2">
+                <h1 class="poppins-b text-[var(--text-color)]">Options</h1>
+                <button 
+                  (click)="saveQuestionToBank(question)" 
+                  class="px-3 py-2 text-xs text-white bg-green-600 rounded-md hover:bg-green-700">
+                  Save to Bank
+                </button>
+              </div>
+              <div class="flex w-full gap-3 mt-2">
+                <!-- First Column -->
+                <div class="flex flex-col flex-1 w-full gap-3">
+                  <!-- Option 1 -->
+                  <div class="flex flex-col w-full gap-2">
+                    <div class="flex flex-row items-center w-full gap-2">
+                      <input
+                        class="flex-1 w-full p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--btn-success-bg); outline-color: var(--btn-success-hover);"
+                        [(ngModel)]="question.options[0].value" type="text" placeholder="Option #1" name="option_{{i}}_0" id="option_{{i}}_0" />
+                      <input
+                        [value]="'0'"
+                        [(ngModel)]="question.answer"
+                        (ngModelChange)="updateActiveState(question)"
+                        class="w-5 h-5"
+                        type="radio"
+                        name="answer_{{i}}" />
+                    </div>
+                    <div class="flex flex-col items-center justify-center w-full gap-2 px-1 py-1 mr-6 border-2 rounded border-slate-500">
+                      <div class="flex flex-col" *ngIf="question.options[0].attachment">
+                        <img [src]="question.options[0].attachment" class="w-auto max-h-36">
+                        <button (click)="removeOptionAttachment(question.options[0])" class="px-3 py-1 text-xs text-white bg-red-500 hover:bg-red-400">Remove</button>
+                      </div>
+                      <input (change)="optionOnFileSelected($event, question.options[0])" class="hidden" type="file" accept="image/*" #item1Upload>
+                      <button class="px-6 py-2 text-xs text-white rounded-md bg-[var(--primary-color)]" (click)="item1Upload.click()">Upload Image</button>
+                    </div>
+                  </div>
+                  <!-- Option 2 -->
+                  <div class="flex flex-col w-full gap-2">
+                    <div class="flex items-center w-full gap-2">
+                      <input
+                        class="flex-1 w-full p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--btn-success-bg); outline-color: var(--btn-success-hover);"
+                        [(ngModel)]="question.options[1].value" type="text" placeholder="Option #2" name="option_{{i}}_1" id="option_{{i}}_1" />
+                      <input
+                        [value]="'1'"
+                        [(ngModel)]="question.answer"
+                        (ngModelChange)="updateActiveState(question)"
+                        class="w-5 h-5"
+                        type="radio"
+                        name="answer_{{i}}" />
+                    </div>
+                    <div class="flex flex-col items-center justify-center w-full gap-2 px-1 py-1 mr-6 border-2 rounded border-slate-500">
+                      <div class="flex flex-col w-full" *ngIf="question.options[1].attachment">
+                        <img [src]="question.options[1].attachment" class="w-auto max-h-36">
+                        <button (click)="removeOptionAttachment(question.options[1])" class="px-3 py-1 text-xs text-white bg-red-500 hover:bg-red-400">Remove</button>
+                      </div>
+                      <input (change)="optionOnFileSelected($event, question.options[1])" class="hidden" type="file" accept="image/*" #item2Upload>
+                      <button class="px-6 py-2 text-xs text-white rounded-md bg-[var(--primary-color)]" (click)="item2Upload.click()">Upload Image</button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Second Column -->
+                <div class="flex flex-col flex-1 w-full gap-3">
+                  <!-- Option 3 -->
+                  <div class="flex flex-col w-full gap-2">
+                    <div class="flex items-center w-full gap-2">
+                      <input
+                        class="flex-1 w-full p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--btn-success-bg); outline-color: var(--btn-success-hover);"
+                        [(ngModel)]="question.options[2].value" type="text" placeholder="Option #3" name="option_{{i}}_2" id="option_{{i}}_2" />
+                      <input
+                        [value]="'2'"
+                        [(ngModel)]="question.answer"
+                        (ngModelChange)="updateActiveState(question)"
+                        class="w-5 h-5"
+                        type="radio"
+                        name="answer_{{i}}" />
+                    </div>
+                    <div class="flex flex-col items-center justify-center w-full gap-2 px-1 py-1 mr-6 border-2 rounded border-slate-500">
+                      <div class="flex flex-col w-full" *ngIf="question.options[2].attachment">
+                        <img [src]="question.options[2].attachment" class="w-auto max-h-36">
+                        <button (click)="removeOptionAttachment(question.options[2])" class="px-3 py-1 text-xs text-white bg-red-500 hover:bg-red-400">Remove</button>
+                      </div>
+                      <input (change)="optionOnFileSelected($event, question.options[2])" class="hidden" type="file" accept="image/*" #item3Upload>
+                      <button class="px-6 py-2 text-xs text-white rounded-md bg-[var(--primary-color)]" (click)="item3Upload.click()">Upload Image</button>
+                    </div>
+                  </div>
+                  <!-- Option 4 -->
+                  <div class="flex flex-col w-full gap-2">
+                    <div class="flex items-center w-full gap-2">
+                      <input
+                        class="flex-1 w-full p-2 border-2 border-solid rounded-lg" style="background-color: var(--input-bg); border-color: var(--btn-success-bg); outline-color: var(--btn-success-hover);"
+                        [(ngModel)]="question.options[3].value" type="text" placeholder="Option #4" name="option_{{i}}_3" id="option_{{i}}_3" />
+                      <input
+                        [value]="'3'"
+                        [(ngModel)]="question.answer"
+                        (ngModelChange)="updateActiveState(question)"
+                        class="w-5 h-5"
+                        type="radio"
+                        name="answer_{{i}}" />
+                    </div>
+                    <div class="flex flex-col items-center justify-center w-full gap-2 px-1 py-1 mr-6 border-2 rounded border-slate-500">
+                      <div class="flex flex-col w-full" *ngIf="question.options[3].attachment">
+                        <img [src]="question.options[3].attachment" class="w-auto max-h-36">
+                        <button (click)="removeOptionAttachment(question.options[3])" class="px-3 py-1 text-xs text-white bg-red-500 hover:bg-red-400">Remove</button>
+                      </div>
+                      <input (change)="optionOnFileSelected($event, question.options[3])" class="hidden" type="file" accept="image/*" #item4Upload>
+                      <button class="px-6 py-2 text-xs text-white rounded-md bg-[var(--primary-color)]" (click)="item4Upload.click()">Upload Image</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- True/False Options -->
+            <div *ngIf="question.type == '1'" class="options flex-[2_2_1%] flex justify-center flex-col">
+              <div class="type2">
+                <div class="mt-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <h1 class="poppins-b text-[var(--text-color)]">TRUE/FALSE</h1>
+                    <button 
+                      (click)="saveQuestionToBank(question)" 
+                      class="px-3 py-2 text-xs text-white bg-green-600 rounded-md hover:bg-green-700">
+                      Save to Bank
+                    </button>
+                  </div>
+                  <div class="flex gap-2 mt-2">
+                    <button
+                      class="border-solid border-2 hover:text-white flex-1 rounded-lg h-24 font-bold text-lg transition-colors" 
+                      [style.border-color]="'var(--btn-primary-bg)'"
+                      [style.background-color]="question.answer == 'T' ? 'var(--btn-primary-bg)' : 'var(--input-bg)'"
+                      [style.color]="question.answer == 'T' ? 'var(--btn-primary-text)' : 'var(--text-color)'"
+                      (click)="setTFAnswer('T', question)" [ngClass]="{ active: question.answer == 'T' }">
+                      TRUE
+                    </button>
+                    <button
+                      class="border-solid border-2 hover:text-white flex-1 rounded-lg h-24 font-bold text-lg transition-colors" 
+                      [style.border-color]="'var(--btn-primary-bg)'"
+                      [style.background-color]="question.answer == 'F' ? 'var(--btn-primary-bg)' : 'var(--input-bg)'"
+                      [style.color]="question.answer == 'F' ? 'var(--btn-primary-text)' : 'var(--text-color)'"
+                      (click)="setTFAnswer('F', question)" [ngClass]="{ active: question.answer == 'F' }">
+                      FALSE
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="flex flex-row items-center justify-between w-full">
+      <!-- Left Side Buttons -->
+      <div class="flex items-center gap-4">
+        <button (click)="addNewItem()" class="add hover:scale-105  text-xs futuristic-black text-white py-2 rounded-md w-full max-w-40">
+          ADD NEW QUESTION
+        </button>
+      </div>
+      <!-- Right Side Buttons -->
+      <div class="flex items-center gap-2">
+        <button (click)="submit()" class="w-20 py-2 text-sm font-medium rounded-md save hover:scale-105" [disabled]="loading" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+          Save
+        </button>
+        <button class="w-20 py-2 text-sm font-medium rounded-md cancel hover:scale-105" (click)="closeModal()" style="background-color: var(--btn-danger-bg); color: var(--btn-primary-text);">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Modal -->
+<div *ngIf="showAIModal" class="fixed inset-0 z-[1500] flex items-center justify-center bg-gray-900 bg-opacity-70">
+  <div class="bg-white p-6 rounded-xl shadow-lg relative w-[450px] max-w-full">
+    <!-- Close Button -->
+    <button type="button" (click)="showAIModal = false" class="absolute text-gray-400 top-2 right-2 hover:text-gray-600">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Modal Title -->
+    <h2 class="mb-4 text-xl font-semibold text-center text-gray-800">AI-Powered Question Generator</h2>
+
+    <!-- Number of Questions Input -->
+    <label class="block text-sm font-semibold text-gray-700 mb-1">Number of Questions:</label>
+    <input type="number" [(ngModel)]="aiQuestionCount" min="1"
+      class="w-full p-3 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+      placeholder="Enter number of questions" />
+
+    <!-- Loading Indicator -->
+    <div *ngIf="loading" class="flex items-center justify-center py-4">
+      <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="ml-3 text-gray-700">Generating questions, please wait...</p>
+    </div>
+
+    <!-- Generated Questions List -->
+    <div *ngIf="generatedQuestions.length > 0 && !loading" class="mt-4 max-h-[300px] overflow-y-auto">
+      <h3 class="text-gray-700 font-semibold">Generated Questions:</h3>
+      <div *ngFor="let question of generatedQuestions; let i = index" class="mt-2">
+        <div class="p-3 text-gray-700 border border-gray-300 rounded-md bg-gray-50">
+          <span class="font-semibold">Question {{ i + 1 }}:</span> {{ question.question.value }}
+        </div>
+        <!-- Choices for Multiple Choice -->
+        <div *ngIf="question.type === '0'" class="mt-2">
+          <ul class="space-y-1">
+            <li *ngFor="let option of question.options; let j = index"
+                class="p-2 border border-gray-300 rounded-md bg-gray-50 flex items-center"
+                [ngClass]="{ 'bg-green-200': option.active }">
+              <span class="font-semibold text-gray-800 mr-2">({{ ['A', 'B', 'C', 'D'][j] }})</span>
+              <span>{{ option.value }}</span>
+            </li>
+          </ul>
+        </div>
+        <!-- Answer for True/False and Identification -->
+        <div *ngIf="question.type === '1' || question.type === '2'" class="mt-2">
+          <div class="p-2 text-gray-700 border border-gray-300 rounded-md bg-green-50">
+            <span class="font-semibold">Correct Answer:</span> {{ question.type === '1' ? (question.answer === 'T' ? 'True' : 'False') : question.answer }}
+          </div>
+        </div>
+        <!-- Note for Essay -->
+        <div *ngIf="question.type === '3'" class="mt-2">
+          <div class="p-2 text-gray-700 border border-gray-300 rounded-md bg-gray-50">
+            <span class="font-semibold">Note:</span> Essay questions will be auto-checked.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-end mt-6 space-x-4">
+      <button type="button" (click)="generateAIQuestions()" class="px-4 py-2 rounded-md futuristic-btn-blue">
+        Generate All
+      </button>
+      <button type="button" *ngIf="generatedQuestions.length > 0" (click)="useAllGeneratedQuestions()" class="px-4 py-2 rounded-lg futuristic-btn-violet">
+        Use All Questions
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Selection Modal -->
+<div *ngIf="showCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 w-96 max-w-md">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Choose Category</h3>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Select or create a category:</label>
+      
+      <!-- Existing categories dropdown -->
+      <select 
+        [(ngModel)]="selectedCategoryForBank" 
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3">
+        <option value="">-- Select Category --</option>
+        <option value="new">+ Create New Category</option>
+        <option *ngFor="let category of questionBankCategories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+      
+      <!-- New category input (shown when "Create New Category" is selected) -->
+      <div *ngIf="selectedCategoryForBank === 'new'" class="mb-3">
+        <input 
+          type="text" 
+          [(ngModel)]="newCategoryName"
+          placeholder="Enter new category name"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+    
+    <div class="flex justify-end space-x-3">
+      <button 
+        (click)="cancelSaveToBank()"
+        class="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+        Cancel
+      </button>
+      <button 
+        (click)="confirmSaveToBank()"
+        [disabled]="!canSaveToBank()"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+        Save to Bank
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Question Bank Modal -->
+<div *ngIf="showQuestionBankModal" class="fixed inset-0 z-[1500] flex items-center justify-center bg-gray-900 bg-opacity-70">
+  <div class="bg-white p-6 rounded-xl shadow-lg relative w-[90%] max-w-6xl max-h-[90vh] overflow-hidden">
+    <!-- Close Button -->
+    <button type="button" (click)="showQuestionBankModal = false" class="absolute text-gray-400 top-2 right-2 hover:text-gray-600">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Modal Title -->
+    <h2 class="mb-4 text-xl font-semibold text-center text-gray-800">Question Bank</h2>
+    <p class="mb-4 text-sm text-center text-gray-600">Select questions to add to your quiz</p>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+        <select 
+          [(ngModel)]="selectedCategory" 
+          (change)="onCategoryChange()"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="all">All Categories</option>
+          <option *ngFor="let category of questionBankCategories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Question Type</label>
+        <select 
+          [(ngModel)]="selectedType" 
+          (change)="onTypeChange()"
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="all">All Types</option>
+          <option value="0">Multiple Choice</option>
+          <option value="1">True/False</option>
+          <option value="2">Identification</option>
+          <option value="3">Essay</option>
+        </select>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (input)="onSearch()"
+          placeholder="Search questions..."
+          class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+
+    <!-- Questions List -->
+    <div class="max-h-[400px] overflow-y-auto border border-gray-200 rounded-lg">
+      <div *ngIf="loadingQuestions" class="p-8 text-center">
+        <div class="inline-flex items-center justify-center w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+        <p class="mt-2 text-gray-600">Loading questions...</p>
+      </div>
+
+      <div *ngIf="!loadingQuestions && questionBankQuestions.length === 0" class="p-8 text-center">
+        <p class="text-gray-500">No questions found. Try adjusting your filters.</p>
+      </div>
+
+      <div *ngIf="!loadingQuestions && questionBankQuestions.length > 0" class="divide-y divide-gray-200">
+        <div 
+          *ngFor="let question of questionBankQuestions" 
+          class="p-4 hover:bg-gray-50 transition-colors duration-200">
+          
+          <div class="flex items-start gap-3">
+            <input 
+              type="checkbox" 
+              [checked]="isQuestionSelected(question.id)"
+              (change)="toggleQuestionSelection(question.id)"
+              class="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+            
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {{ getQuestionTypeLabel(question.type) }}
+                </span>
+                <span *ngIf="question.category" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  {{ question.category }}
+                </span>
+              </div>
+              
+              <h5 class="text-sm font-medium text-gray-900 mb-1">
+                {{ getQuestionPreview(question.question) }}
+              </h5>
+              
+              <div class="text-sm text-gray-600 mb-1">
+                <strong>Answer:</strong> {{ getAnswerPreview(question.answer) }}
+              </div>
+              
+              <div *ngIf="question.options" class="text-sm text-gray-600">
+                <strong>Options:</strong> {{ question.options }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-200">
+      <div class="text-sm text-gray-600">
+        {{ selectedQuestions.size }} question(s) selected
+      </div>
+      <div class="flex gap-3">
+        <button 
+          type="button" 
+          (click)="showQuestionBankModal = false" 
+          class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          (click)="useSelectedQuestions()"
+          [disabled]="selectedQuestions.size === 0"
+          class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
+          Use Selected Questions ({{ selectedQuestions.size }})
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+  <div class="bg-white rounded-lg p-6 w-96 max-w-md">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Choose Category</h3>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Select or create a category:</label>
+      
+      <!-- Existing categories dropdown -->
+      <select 
+        [(ngModel)]="selectedCategoryForBank" 
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3">
+        <option value="">-- Select Category --</option>
+        <option value="new">+ Create New Category</option>
+        <option *ngFor="let category of questionBankCategories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+      
+      <!-- New category input (shown when "Create New Category" is selected) -->
+      <div *ngIf="selectedCategoryForBank === 'new'" class="mb-3">
+        <input 
+          type="text" 
+          [(ngModel)]="newCategoryName"
+          placeholder="Enter new category name"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+    
+    <div class="flex justify-end space-x-3">
+      <button 
+        (click)="cancelSaveToBank()"
+        class="px-4 py-2 text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+        Cancel
+      </button>
+      <button 
+        (click)="confirmSaveToBank()"
+        [disabled]="!canSaveToBank()"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+        Save to Bank
+      </button>
+    </div>
+  </div>
+</div>

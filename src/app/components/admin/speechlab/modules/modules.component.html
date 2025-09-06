@@ -1,0 +1,77 @@
+<div class="main-container pb-[5dvh]">
+    <div class="button-container">
+        <button class="" (click)="openModal()">
+            <img src="assets/add.png" alt="Add Icon" />
+            <span>Add Lesson</span>
+          </button>
+<div>
+<button class="" (click)="addModule()">
+
+    <span>Add Module</span>
+</button>
+
+
+</div>
+    </div>
+    <div class="flex items-center justify-center w-full h-20 text-2xl font-bold text-white bg-[--secondary-color]">
+      MODULES
+    </div>
+    <div class="table-container">
+      <table>
+        <thead class="">
+          <tr>
+            <th>ID</th>
+            <th>Module Name</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody class="">
+          <ng-container>
+            <tr *ngFor="let module of modules">
+                <td>{{module.id}}</td>
+                <td>{{module.name}}</td>
+                <td>{{module.timestamp}}</td>
+                <td><button class="border border-2-[black] p-2 rounded-md hover:bg-[skyblue]" (click)="deleteModule(module.id)">DELETE</button></td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex items-center justify-center w-full h-20 text-2xl font-bold text-white bg-[--secondary-color]">
+      LESSONS
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead class="">
+          <tr>
+            <th>ID</th>
+            <th> Module </th>
+            <th> Lesson </th>
+            <th>Lesson File Name</th>
+            <th>Quiz File Name</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody class="">
+          <ng-container>
+            <tr *ngFor="let lesson of lessons">
+                <td>{{lesson.id}}</td>
+                <td>{{lesson.module}}</td>
+                <td>{{lesson.description}}</td>
+                <td>{{lesson.lessonfile.split('>')[1]}}</td>
+                <td>{{lesson.quizfile.split('>')[1]}}</td>
+                <td>{{lesson.timestamp}}</td>
+                <td>
+                  <button class="border border-2-[black] p-2 rounded-md hover:bg-[skyblue]" (click)="deleteLesson(lesson)">DELETE</button>
+                  <button class="border border-2-[black] p-2 rounded-md hover:bg-[#ebe487]" (click)="editLesson(lesson)" >EDIT</button>
+                </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>

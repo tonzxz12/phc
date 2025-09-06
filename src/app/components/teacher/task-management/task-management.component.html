@@ -1,0 +1,192 @@
+<body class="flex flex-col p-4" style="background-color: var(--body-color);">
+  <p-card class="rounded-xl" [style]="{'box-shadow': 'var(--card-shadow)', 'background-color': 'var(--card-bg)'}">
+    <div class="flex flex-col sm:flex-row justify-between items-center py-2 mb-2">
+      <div>
+        <h1 class="text-2xl font-bold" style="color: var(--text-color);">Task Management</h1>
+        <p class="text-sm" style="color: var(--input-placeholder);">Manage and track your tasks efficiently.</p>
+      </div>
+      <div>
+        <button (click)="taskCreation()"
+           class="flex items-center px-6 py-2 space-x-2 font-semibold text-white transition-transform duration-300 transform rounded-xl shadow-lg hover:scale-105"
+           style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); transition: var(--tran-03);">
+          <span class="text-2xl material-icons">add_circle_outline</span>
+          <span class="text-lg">New Task</span>
+        </button>
+      </div>
+    </div>
+    
+    <app-custom-tabs>
+      <app-custom-tab-panel title="Tasks">
+        <!-- Content for Tasks tab -->
+        <div class="w-full p-6" style="background-color: var(--card-bg);">
+          <div class="flex space-x-4 mb-5">
+            <!-- Course Dropdown -->
+            <p-dropdown *ngIf="coursesArray.length > 0" [options]="coursesArray" [(ngModel)]="filterCourse" optionLabel="course" optionValue="id" placeholder="Filter by Course"
+              (onChange)="selectCourse($event.value)" class="w-1/4" 
+              [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"></p-dropdown>
+            
+            <!-- Class Dropdown -->
+            <p-dropdown *ngIf="filterCourse" [options]="classes" [(ngModel)]="filterClass" optionLabel="name" optionValue="id" placeholder="Filter by Class"
+              (onChange)="selectClass($event.value)" class="w-1/4" 
+              [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+              [disabled]="loadingClasses || classes.length === 0"
+              [showClear]="true"></p-dropdown>
+              
+            <!-- Debug info (remove after testing) -->
+            <div *ngIf="filterCourse" class="text-xs" style="color: var(--input-placeholder);">
+              Classes: {{classes.length}}, All: {{allClasses.length}}
+            </div>
+            
+            <!-- Clear Filters Button -->
+            <button *ngIf="filterCourse || filterClass" (click)="clearFilters()" 
+              class="px-4 py-2 text-sm rounded-lg transition-colors duration-200" 
+              style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1px solid var(--input-border);">
+              Clear Filters
+            </button>
+          </div>
+
+          <!-- Task List Table -->
+          <app-custom-table 
+            [data]="getTaskTableData()" 
+            [columns]="taskTableColumns"
+            [paginator]="true"
+            [rows]="10"
+            (rowClick)="selectTask($event)"
+            (actionClick)="handleTaskAction($event)">
+          </app-custom-table>
+          
+          <!-- Empty State -->
+          <div *ngIf="filteredTasks().length === 0" class="text-center py-8" style="color: var(--input-placeholder);">
+            <div class="flex flex-col items-center justify-center" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+              <svg class="w-12 h-12 mb-2" style="color: var(--input-placeholder);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m6-10V7a4 4 0 00-4-4H9a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2" />
+              </svg>
+              <span class="text-lg font-medium" style="color: var(--text-color);">No tasks found</span>
+              <span class="text-sm" style="color: var(--input-placeholder);">Create a new task to get started.</span>
+            </div>
+          </div>
+        </div>
+      </app-custom-tab-panel>
+      
+      <app-custom-tab-panel title="Student Submission Inbox">
+        <!-- Content for Student Submission Inbox tab -->
+        <div class="w-full p-6 rounded-lg" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+          <!-- Submission Count Badge -->
+          <div class="mb-6 p-4 rounded-lg" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+            <h3 class="text-lg font-semibold mb-3" style="color: var(--text-color);">
+              Student Submission Inbox
+              <span *ngIf="newSubmissionsCount > 0" class="ml-2 px-3 py-1 text-sm rounded-full" style="background-color: var(--btn-danger-bg); color: var(--btn-primary-text);">
+                {{ newSubmissionsCount }} new
+              </span>
+            </h3>
+          </div>
+          
+          <!-- Student Submissions Table -->
+          <div class="p-4 rounded-lg mb-6" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+            <h3 class="text-lg font-semibold mb-4" style="color: var(--text-color);">Recent Submissions</h3>
+            
+            <!-- Submission Filters -->
+            <div class="flex flex-wrap gap-4 mb-5">
+              <!-- First Row of Filters -->
+              <div class="flex space-x-4 w-full">
+                <!-- Course Filter for Submissions -->
+                <p-dropdown *ngIf="coursesArray.length > 0" 
+                  [options]="coursesArray" 
+                  [(ngModel)]="filterSubmissionCourse" 
+                  optionLabel="course" 
+                  optionValue="id" 
+                  placeholder="Filter by Course"
+                  (onChange)="selectSubmissionCourse($event.value)" 
+                  class="flex-1" 
+                  [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+                  [showClear]="true">
+                </p-dropdown>
+                
+                <!-- Class Filter for Submissions -->
+                <p-dropdown *ngIf="filterSubmissionCourse" 
+                  [options]="classes" 
+                  [(ngModel)]="filterSubmissionClass" 
+                  optionLabel="name" 
+                  optionValue="id" 
+                  placeholder="Filter by Class"
+                  (onChange)="selectSubmissionClass($event.value)" 
+                  class="flex-1" 
+                  [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+                  [disabled]="loadingClasses || classes.length === 0"
+                  [showClear]="true">
+                </p-dropdown>
+              </div>
+              
+              <!-- Second Row of Filters -->
+              <div class="flex space-x-4 w-full">
+                <!-- Assignment Title Filter -->
+                <p-dropdown *ngIf="getUniqueAssignmentTitles().length > 0"
+                  [options]="getUniqueAssignmentTitles()" 
+                  [(ngModel)]="filterAssignmentTitle" 
+                  optionLabel="label" 
+                  optionValue="value" 
+                  placeholder="Filter by Assignment Title"
+                  class="flex-1" 
+                  [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+                  [showClear]="true">
+                </p-dropdown>
+                
+                <!-- Student Name Filter -->
+                <p-dropdown *ngIf="getUniqueStudentNames().length > 0"
+                  [options]="getUniqueStudentNames()" 
+                  [(ngModel)]="filterStudentName" 
+                  optionLabel="label" 
+                  optionValue="value" 
+                  placeholder="Filter by Student Name"
+                  class="flex-1" 
+                  [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+                  [showClear]="true">
+                </p-dropdown>
+              </div>
+              
+              <!-- Action Buttons and Debug Info -->
+              <div class="flex items-center space-x-4 w-full">
+                <!-- Clear All Filters Button -->
+                <button *ngIf="filterSubmissionCourse || filterSubmissionClass || filterAssignmentTitle || filterStudentName" 
+                  (click)="clearSubmissionFilters()" 
+                  class="px-4 py-2 text-sm rounded-lg transition-colors duration-200" 
+                  style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1px solid var(--input-border);">
+                  Clear All Filters
+                </button>
+                
+                <!-- Debug info for submissions -->
+                <div *ngIf="filterSubmissionCourse || filterSubmissionClass || filterAssignmentTitle || filterStudentName" 
+                  class="text-xs" style="color: var(--input-placeholder);">
+                  Showing: {{getFilteredSubmissions().length}}/{{submissions.length}} submissions
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="getFilteredSubmissions().length === 0" class="text-center py-4" style="color: var(--input-placeholder);">
+              <div class="flex flex-col items-center justify-center" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+                <svg class="w-12 h-12 mb-2" style="color: var(--input-placeholder);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m6-10V7a4 4 0 00-4-4H9a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2" />
+                </svg>
+                <span class="text-lg font-medium" style="color: var(--text-color);">
+                  {{submissions.length === 0 ? 'No submissions found' : 'No submissions match the selected filters'}}
+                </span>
+                <span class="text-sm" style="color: var(--input-placeholder);">
+                  {{submissions.length === 0 ? 'Student submissions will appear here.' : 'Try adjusting your filter criteria.'}}
+                </span>
+              </div>
+            </div>
+            
+            <app-custom-table 
+              *ngIf="getFilteredSubmissions().length > 0" 
+              [data]="getSubmissionTableData()" 
+              [columns]="submissionTableColumns"
+              [paginator]="true"
+              [rows]="10"
+              (actionClick)="handleSubmissionAction($event)">
+            </app-custom-table>
+          </div>
+        </div>
+      </app-custom-tab-panel>
+    </app-custom-tabs>
+  </p-card>
+</body>

@@ -1,0 +1,229 @@
+/* Manage Censored Words Modal Styles */
+.censored-words-modal {
+  min-width: 650px;
+  max-width: 700px;
+}
+
+.modal-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.header-content i {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.add-word-section {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  transition: var(--tran-02);
+}
+
+.add-word-section:hover {
+  border-color: var(--primary-color);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group input,
+.form-group select {
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.words-list {
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.word-item {
+  transition: var(--tran-02);
+}
+
+.word-item:hover {
+  background: var(--card-hover-bg) !important;
+}
+
+.word-item:last-child {
+  border-bottom: none;
+}
+
+.word-item.inactive {
+  opacity: 0.6;
+}
+
+.severity {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+.remove-btn:hover {
+  background: var(--danger-color) !important;
+  color: white !important;
+}
+
+.cancel-btn:hover:not([disabled]) {
+  background: var(--card-hover-bg);
+  border-color: var(--primary-color);
+}
+
+.save-btn:hover:not([disabled]) {
+  background: var(--secondary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.loading-state {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Custom scrollbar for words list */
+.words-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.words-list::-webkit-scrollbar-track {
+  background: var(--input-bg);
+  border-radius: 3px;
+}
+
+.words-list::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 3px;
+}
+
+.words-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Dark mode adjustments */
+:host-context(.dark) .censored-words-modal {
+  background: var(--p-primary-900);
+  color: var(--text-color-light);
+}
+
+:host-context(.dark) .add-word-section {
+  background: var(--p-primary-800);
+  border-color: var(--p-primary-700);
+}
+
+:host-context(.dark) .words-list {
+  border-color: var(--p-primary-700);
+}
+
+:host-context(.dark) .word-item {
+  background: var(--p-primary-800);
+  border-color: var(--p-primary-700);
+}
+
+:host-context(.dark) .word-item:hover {
+  background: var(--p-primary-700) !important;
+}
+
+:host-context(.dark) .form-group input,
+:host-context(.dark) .form-group select {
+  background: var(--p-primary-800);
+  border-color: var(--p-primary-700);
+  color: var(--text-color-light);
+}
+
+:host-context(.dark) .cancel-btn:hover:not([disabled]) {
+  background: var(--p-primary-700);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .censored-words-modal {
+    min-width: 90vw;
+    max-width: 90vw;
+    margin: 1rem;
+    max-height: 90vh;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-header {
+    padding: 1rem 1.5rem 0.75rem 1.5rem;
+  }
+
+  .modal-body {
+    padding: 1rem 1.5rem;
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1.5rem 1rem 1.5rem;
+    flex-direction: column;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.5rem;
+  }
+
+  .summary-stats {
+    font-size: 0.75rem !important;
+  }
+
+  .word-content {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.5rem;
+  }
+
+  .word-actions {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .add-word-section {
+    padding: 1rem !important;
+  }
+
+  .word-item {
+    padding: 0.625rem 0.75rem !important;
+  }
+
+  .word-meta {
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+  }
+
+  .modal-header h3 {
+    font-size: 1.125rem !important;
+  }
+}

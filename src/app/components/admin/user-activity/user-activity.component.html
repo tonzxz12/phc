@@ -1,0 +1,305 @@
+<div class="user-activity-container" [style]="{'background': 'var(--body-color)', 'color': 'var(--text-color)', 'min-height': '100vh'}">
+  <!-- Header Section -->
+  <div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 [style]="{'color': 'var(--text-color)'}">User Activity Log</h1>
+        <p [style]="{'color': 'var(--text-muted)'}">Monitor and track user activities across the platform</p>
+      </div>
+      
+      <!-- Export Buttons -->
+      <div class="export-buttons">
+        <button class="export-btn excel-btn" [style]="{'background': 'var(--success-color)', 'color': 'white'}" (click)="exportToExcel()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+          </svg>
+          Export to Excel
+        </button>
+        <button class="export-btn pdf-btn" [style]="{'background': 'var(--danger-color)', 'color': 'white'}" (click)="exportToPDF()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+          </svg>
+          Export to PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filters-section" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+    <div class="filters-header" [style]="{'border-bottom': '1px solid var(--border-color)'}">
+      <h3 [style]="{'color': 'var(--text-color)'}">Activity Filters</h3>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" [style]="{'color': 'var(--text-muted)'}">
+        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"/>
+      </svg>
+    </div>
+    
+    <div class="filters-content">
+      <form [formGroup]="filterForm">
+        <div class="filters-grid">
+          <!-- User Type Filter -->
+          <div class="filter-item">
+            <label [style]="{'color': 'var(--text-color)'}">User Type</label>
+            <select formControlName="userType" class="filter-select" [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+              <option value="all">All Users</option>
+              <option value="teacher">Teachers Only</option>
+              <option value="student">Students Only</option>
+            </select>
+          </div>
+
+          <!-- User Filter -->
+          <div class="filter-item">
+            <label [style]="{'color': 'var(--text-color)'}">Search User</label>
+            <div class="input-with-icon">
+              <input type="text" 
+                     formControlName="userId" 
+                     placeholder="Enter user name or ID"
+                     class="filter-input" 
+                     [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+              <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" [style]="{'color': 'var(--input-placeholder)'}">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Activity Type Filter -->
+          <div class="filter-item">
+            <label [style]="{'color': 'var(--text-color)'}">Activity Type</label>
+            <select formControlName="activityType" class="filter-select" [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+              <option value="all">All Activities</option>
+              <option value="login">Login</option>
+              <option value="logout">Logout</option>
+              <option value="course_access">Course Access</option>
+              <option value="quiz_taken">Quiz Taken</option>
+              <option value="assignment_submitted">Assignment Submitted</option>
+              <option value="file_upload">File Upload</option>
+            </select>
+          </div>
+
+          <!-- Date Range Filters -->
+          <div class="filter-item">
+            <label [style]="{'color': 'var(--text-color)'}">From Date</label>
+            <input type="date" 
+                   formControlName="dateFrom"
+                   class="filter-input" 
+                   [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+          </div>
+
+          <div class="filter-item">
+            <label [style]="{'color': 'var(--text-color)'}">To Date</label>
+            <input type="date" 
+                   formControlName="dateTo"
+                   class="filter-input" 
+                   [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+          </div>
+
+          <!-- Search Term -->
+          <div class="filter-item">
+            <label [style]="{'color': 'var(--text-color)'}">Search Term</label>
+            <div class="input-with-icon">
+              <input type="text" 
+                     formControlName="searchTerm" 
+                     placeholder="Search in descriptions..."
+                     class="filter-input" 
+                     [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+              <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" [style]="{'color': 'var(--input-placeholder)'}">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="filter-actions">
+          <button type="button" 
+                  (click)="clearFilters()"
+                  class="clear-filters-btn" 
+                  [style]="{'background': 'var(--danger-color)', 'color': 'white'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+            </svg>
+            Clear Filters
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+        <div class="stat-header">
+          <div class="stat-icon" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+            </svg>
+          </div>
+          <h3 [style]="{'color': 'var(--text-color)'}">Total Activities</h3>
+        </div>
+        <div class="stat-metrics">
+          <div class="metric-value" [style]="{'color': 'var(--primary-color)'}">{{totalItems}}</div>
+          <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">All Activities</div>
+        </div>
+      </div>
+
+      <div class="stat-card" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+        <div class="stat-header">
+          <div class="stat-icon" [style]="{'background': 'var(--success-color)', 'color': 'white'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <h3 [style]="{'color': 'var(--text-color)'}">Teacher Activities</h3>
+        </div>
+        <div class="stat-metrics">
+          <div class="metric-value" [style]="{'color': 'var(--success-color)'}">{{teacherActivityCount}}</div>
+          <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Teacher Actions</div>
+        </div>
+      </div>
+
+      <div class="stat-card" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+        <div class="stat-header">
+          <div class="stat-icon" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+          <h3 [style]="{'color': 'var(--text-color)'}">Student Activities</h3>
+        </div>
+        <div class="stat-metrics">
+          <div class="metric-value" [style]="{'color': 'var(--secondary-color)'}">{{studentActivityCount}}</div>
+          <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Student Actions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Table -->
+  <div class="table-section">
+    <div class="table-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="table-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+        <div class="table-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+          </svg>
+          <span>Activity Log</span>
+        </div>
+      </div>
+      
+      <div class="table-content">
+        <!-- Loading Spinner -->
+        <div *ngIf="isLoading" class="loading-state">
+          <div class="loading-spinner" [style]="{'border-color': 'var(--border-color)', 'border-top-color': 'var(--primary-color)'}"></div>
+          <p [style]="{'color': 'var(--text-muted)'}">Loading activities...</p>
+        </div>
+
+        <!-- Activity Table -->
+        <div *ngIf="!isLoading" class="table-wrapper">
+          <table class="activity-table">
+            <thead [style]="{'background': 'var(--table-header-bg)', 'color': 'var(--text-color)'}">
+              <tr>
+                <th [style]="{'color': 'var(--text-color)'}">User Name</th>
+                <th [style]="{'color': 'var(--text-color)'}">User Type</th>
+                <th [style]="{'color': 'var(--text-color)'}">Activity Type</th>
+                <th [style]="{'color': 'var(--text-color)'}">Description</th>
+                <th [style]="{'color': 'var(--text-color)'}">Timestamp</th>
+                <th [style]="{'color': 'var(--text-color)'}">IP Address</th>
+                <th [style]="{'color': 'var(--text-color)'}">User Agent</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let activity of filteredActivities; let i = index" 
+                  [style]="i % 2 === 0 ? {'background': 'var(--card-bg)'} : {'background': 'var(--body-color)'}"
+                  class="table-row">
+                <!-- User Name -->
+                <td class="user-cell">
+                  <div class="user-info">
+                    <div class="user-avatar" 
+                         [style]="activity.user_type === 'teacher' 
+                           ? {'background': 'var(--success-color)', 'color': 'white'} 
+                           : {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path *ngIf="activity.user_type === 'teacher'" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        <path *ngIf="activity.user_type === 'student'" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                      </svg>
+                    </div>
+                    <span class="user-name" [style]="{'color': 'var(--text-color)'}">{{activity.user_name}}</span>
+                  </div>
+                </td>
+
+                <!-- User Type -->
+                <td>
+                  <span class="type-badge"
+                        [style]="activity.user_type === 'teacher' 
+                          ? {'background': 'var(--success-color)', 'color': 'white'} 
+                          : {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                    {{activity.user_type | titlecase}}
+                  </span>
+                </td>
+
+                <!-- Activity Type -->
+                <td>
+                  <span class="activity-badge" [ngClass]="getActivityTypeColorClass(activity.activity_type)">
+                    {{activity.activity_type.replace('_', ' ') | titlecase}}
+                  </span>
+                </td>
+
+                <!-- Description -->
+                <td class="description-cell" [title]="activity.description" [style]="{'color': 'var(--text-color)'}">{{activity.description}}</td>
+
+                <!-- Timestamp -->
+                <td class="timestamp-cell">
+                  <div class="timestamp-info">
+                    <div class="date" [style]="{'color': 'var(--text-color)'}">{{activity.timestamp | date:'MMM dd, yyyy'}}</div>
+                    <div class="time" [style]="{'color': 'var(--text-muted)'}">{{activity.timestamp | date:'HH:mm:ss'}}</div>
+                  </div>
+                </td>
+
+                <!-- IP Address -->
+                <td>
+                  <code class="ip-code" [style]="{'background': 'var(--primary-color-light)', 'color': 'var(--text-color)'}">{{activity.ip_address}}</code>
+                </td>
+
+                <!-- User Agent -->
+                <td class="user-agent-cell" [title]="activity.user_agent" [style]="{'color': 'var(--text-muted)'}">{{activity.user_agent.length > 50 ? (activity.user_agent | slice:0:50) + '...' : activity.user_agent}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No Data Message -->
+        <div *ngIf="!isLoading && filteredActivities.length === 0" class="no-data-message">
+          <div class="no-data-icon" [style]="{'color': 'var(--text-muted)'}">📊</div>
+          <h3 [style]="{'color': 'var(--text-color)'}">No activities found</h3>
+          <p [style]="{'color': 'var(--text-muted)'}">Try adjusting your filters or search criteria</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-section" [style]="{'border-top': '1px solid var(--border-color)'}">
+        <div class="pagination-info" [style]="{'color': 'var(--text-color)'}">Showing {{currentPage * pageSize + 1}} to {{Math.min((currentPage + 1) * pageSize, totalItems)}} of {{totalItems}} results</div>
+        
+        <div class="pagination-controls">
+          <button 
+            (click)="onPageChange(Math.max(0, currentPage - 1))"
+            [disabled]="currentPage === 0"
+            class="pagination-btn" 
+            [style]="{'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)', 'border': '1px solid var(--border-color)'}">
+            Previous
+          </button>
+          
+          <span class="pagination-text" [style]="{'color': 'var(--text-color)'}">Page {{currentPage + 1}} of {{Math.ceil(totalItems / pageSize)}}</span>
+          
+          <button 
+            (click)="onPageChange(Math.min(Math.ceil(totalItems / pageSize) - 1, currentPage + 1))"
+            [disabled]="currentPage >= Math.ceil(totalItems / pageSize) - 1"
+            class="pagination-btn" 
+            [style]="{'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)', 'border': '1px solid var(--border-color)'}">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

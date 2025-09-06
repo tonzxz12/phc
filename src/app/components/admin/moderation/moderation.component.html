@@ -1,0 +1,245 @@
+<!-- Admin Moderation Page -->
+<div class="moderation-page" [style]="{'background-color': 'var(--body-color)', 'min-height': '100vh', 'padding': '2rem'}">
+  
+  <!-- Page Header -->
+  <div class="page-header" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)', 'border-radius': '20px', 'padding': '1.5rem 2rem', 'margin-bottom': '2rem'}">
+    <div class="header-content">
+      <div class="header-title" [style]="{'color': 'var(--primary-color)', 'display': 'flex', 'align-items': 'center', 'gap': '1rem'}">
+        <i class="pi pi-shield" [style]="{'font-size': '2rem'}"></i>
+        <h1 [style]="{'margin': '0', 'font-size': '1.8rem', 'font-weight': '700'}">Content Moderation</h1>
+      </div>
+      <div class="header-subtitle">
+        <p [style]="{'color': 'var(--text-color)', 'margin': '0.5rem 0 0 0', 'font-size': '0.95rem'}">Monitor and moderate user-generated content across the platform</p>
+      </div>
+    </div>
+    
+    <!-- Moderation Stats -->
+    <div class="moderation-overview" [style]="{'display': 'flex', 'gap': '1rem', 'margin-top': '1.5rem', 'flex-wrap': 'wrap'}">
+      <div class="stat-chip" [style]="{'padding': '0.75rem 1.25rem', 'background': 'var(--alert-info-bg)', 'border': '1px solid var(--alert-info-border)', 'border-radius': '50px', 'font-size': '0.875rem', 'font-weight': '600', 'color': 'var(--primary-color)'}">
+        <i class="pi pi-comments" [style]="{'margin-right': '0.5rem'}"></i>
+        Total Messages: {{totalMessages}}
+      </div>
+      <div class="stat-chip" [class]="reportedMessagesCount > 0 ? 'warning' : 'success'" [style]="reportedMessagesCount > 0 ? {'padding': '0.75rem 1.25rem', 'background': 'var(--alert-warning-bg)', 'border': '1px solid var(--alert-warning-border)', 'border-radius': '50px', 'font-size': '0.875rem', 'font-weight': '600', 'color': 'var(--warning-color)'} : {'padding': '0.75rem 1.25rem', 'background': 'var(--alert-success-bg)', 'border': '1px solid var(--alert-success-border)', 'border-radius': '50px', 'font-size': '0.875rem', 'font-weight': '600', 'color': '#059669'}">
+        <i class="pi" [class]="reportedMessagesCount > 0 ? 'pi-exclamation-triangle' : 'pi-check-circle'" [style]="{'margin-right': '0.5rem'}"></i>
+        Reported: {{reportedMessagesCount}}
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="page-actions" [style]="{'display': 'flex', 'gap': '1rem', 'margin-top': '1.5rem', 'flex-wrap': 'wrap'}">
+      <button class="action-button primary" (click)="refreshModerationData()" [style]="{'display': 'flex', 'align-items': 'center', 'gap': '0.5rem', 'padding': '0.75rem 1.5rem', 'background': 'var(--btn-primary-bg)', 'color': 'var(--btn-primary-text)', 'border': 'none', 'border-radius': '8px', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)'}">
+        <i class="pi pi-refresh"></i>
+        <span>Refresh Data</span>
+      </button>
+      <button class="action-button secondary" (click)="openCensorWordsModal()" [style]="{'display': 'flex', 'align-items': 'center', 'gap': '0.5rem', 'padding': '0.75rem 1.5rem', 'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)', 'border': 'none', 'border-radius': '8px', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)'}">
+        <i class="pi pi-cog"></i>
+        <span>Manage Censor Words</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Moderation Content Panel -->
+  <div class="moderation-panel" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)', 'border-radius': '20px', 'overflow': 'hidden'}">
+    
+    <!-- Moderation Tabs -->
+    <div class="moderation-tabs" [style]="{'display': 'flex', 'background': 'var(--card-bg)', 'border-bottom': '1px solid var(--card-border)', 'overflow-x': 'auto'}">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'reported'"
+        (click)="setActiveTab('reported')"
+        [style]="{'flex': '1', 'padding': '1rem 1.5rem', 'background': 'none', 'border': 'none', 'font-size': '0.95rem', 'font-weight': '500', 'color': activeTab === 'reported' ? 'var(--primary-color)' : 'var(--text-color)', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'position': 'relative', 'white-space': 'nowrap'}">
+        <i class="pi pi-exclamation-triangle" [style]="{'margin-right': '0.5rem'}"></i>
+        <span>Reported Messages ({{reportedMessages.length}})</span>
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'conversations'"
+        (click)="setActiveTab('conversations')"
+        [style]="{'flex': '1', 'padding': '1rem 1.5rem', 'background': 'none', 'border': 'none', 'font-size': '0.95rem', 'font-weight': '500', 'color': activeTab === 'conversations' ? 'var(--primary-color)' : 'var(--text-color)', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'position': 'relative', 'white-space': 'nowrap'}">
+        <i class="pi pi-comments" [style]="{'margin-right': '0.5rem'}"></i>
+        <span>Conversations</span>
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'forums'"
+        (click)="setActiveTab('forums')"
+        [style]="{'flex': '1', 'padding': '1rem 1.5rem', 'background': 'none', 'border': 'none', 'font-size': '0.95rem', 'font-weight': '500', 'color': activeTab === 'forums' ? 'var(--primary-color)' : 'var(--text-color)', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'position': 'relative', 'white-space': 'nowrap'}">
+        <i class="pi pi-users" [style]="{'margin-right': '0.5rem'}"></i>
+        <span>Forums</span>
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content" [style]="{'padding': '2rem', 'min-height': '400px'}">
+      
+      <!-- Reported Messages Tab -->
+      <div *ngIf="activeTab === 'reported'" class="reported-messages-tab">
+        <div *ngIf="reportedMessages.length === 0" class="empty-state" [style]="{'text-align': 'center', 'padding': '3rem 2rem', 'color': 'var(--text-color)', 'opacity': '0.6'}">
+          <i class="pi pi-check-circle" [style]="{'font-size': '4rem', 'color': 'var(--success-color)', 'margin-bottom': '1rem', 'opacity': '0.3'}"></i>
+          <h4 [style]="{'font-size': '1.1rem', 'margin-bottom': '0.5rem', 'color': 'var(--text-color)'}">No Reported Messages</h4>
+          <p [style]="{'font-size': '0.9rem', 'margin': '0'}">All messages are clean and following community guidelines.</p>
+        </div>
+
+        <div *ngIf="reportedMessages.length > 0" class="messages-list">
+          <div *ngFor="let message of reportedMessages" class="message-item" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--card-border)', 'border-radius': '12px', 'padding': '1.5rem', 'margin-bottom': '1rem', 'transition': 'var(--tran-02)'}">
+            
+            <div class="item-header" [style]="{'display': 'flex', 'justify-content': 'space-between', 'align-items': 'flex-start', 'margin-bottom': '1rem'}">
+              <div class="item-meta" [style]="{'display': 'flex', 'flex-direction': 'column', 'gap': '0.25rem'}">
+                <div class="author-name" [style]="{'font-weight': '600', 'color': 'var(--text-color)', 'font-size': '0.95rem'}">{{message.author}}</div>
+                <div class="timestamp" [style]="{'font-size': '0.8rem', 'color': 'var(--text-color)', 'opacity': '0.7'}">{{message.timestamp | date:'medium'}}</div>
+              </div>
+              <div class="report-badge" [style]="{'padding': '0.375rem 0.75rem', 'background': 'var(--alert-warning-bg)', 'border': '1px solid var(--alert-warning-border)', 'border-radius': '20px', 'font-size': '0.75rem', 'font-weight': '600', 'color': 'var(--warning-color)', 'white-space': 'nowrap'}">
+                <i class="pi pi-exclamation-triangle" [style]="{'margin-right': '0.25rem'}"></i>
+                <span>{{message.reportCount}} reports</span>
+              </div>
+            </div>
+
+            <div class="item-content" [style]="{'margin-bottom': '1rem'}">
+              <div class="content-text" [style]="{'color': 'var(--text-color)', 'font-size': '0.875rem', 'line-height': '1.5', 'margin-bottom': '0.75rem'}">{{message.content}}</div>
+              <div class="report-reasons" [style]="{'display': 'flex', 'gap': '0.5rem', 'flex-wrap': 'wrap'}">
+                <span *ngFor="let reason of message.reportReasons" class="reason-tag" [style]="{'padding': '0.25rem 0.625rem', 'background': 'var(--alert-error-bg)', 'border': '1px solid var(--alert-error-border)', 'border-radius': '12px', 'font-size': '0.7rem', 'font-weight': '500', 'color': 'var(--danger-color)'}">
+                  {{reason}}
+                </span>
+              </div>
+            </div>
+
+            <div class="item-actions" [style]="{'display': 'flex', 'gap': '0.75rem', 'flex-wrap': 'wrap'}">
+              <button class="quick-action delete" (click)="deleteMessage(message.id)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--danger-color)', 'color': 'white'}">
+                <i class="pi pi-trash" [style]="{'margin-right': '0.25rem'}"></i>
+                Delete
+              </button>
+              <button class="quick-action dismiss" (click)="dismissReports(message.id)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--success-color)', 'color': 'white'}">
+                <i class="pi pi-times" [style]="{'margin-right': '0.25rem'}"></i>
+                Dismiss
+              </button>
+              <button class="quick-action warn" (click)="warnUser(message.userId)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--warning-color)', 'color': 'white'}">
+                <i class="pi pi-exclamation-triangle" [style]="{'margin-right': '0.25rem'}"></i>
+                Warn User
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversations Tab -->
+      <div *ngIf="activeTab === 'conversations'" class="conversations-tab">
+        <div class="search-container" [style]="{'margin-bottom': '1.5rem', 'position': 'relative'}">
+          <i class="pi pi-search search-icon" [style]="{'position': 'absolute', 'left': '0.75rem', 'top': '50%', 'transform': 'translateY(-50%)', 'color': 'var(--input-placeholder)', 'pointer-events': 'none'}"></i>
+          <input 
+            type="text" 
+            class="search-input" 
+            [(ngModel)]="conversationSearchTerm"
+            placeholder="Search conversations..."
+            (keyup.enter)="searchConversations()"
+            [style]="{'width': '100%', 'padding': '0.75rem 1rem 0.75rem 2.5rem', 'border': '1px solid var(--input-border)', 'border-radius': '12px', 'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'font-size': '0.875rem', 'transition': 'var(--tran-02)'}">
+          <button class="search-btn" (click)="searchConversations()" [style]="{'position': 'absolute', 'right': '0.5rem', 'top': '50%', 'transform': 'translateY(-50%)', 'background': 'var(--btn-primary-bg)', 'color': 'var(--btn-primary-text)', 'border': 'none', 'border-radius': '6px', 'padding': '0.5rem', 'cursor': 'pointer'}">
+            <i class="pi pi-search"></i>
+          </button>
+        </div>
+
+        <div *ngIf="filteredConversations.length === 0" class="empty-state" [style]="{'text-align': 'center', 'padding': '3rem 2rem', 'color': 'var(--text-color)', 'opacity': '0.6'}">
+          <i class="pi pi-comments" [style]="{'font-size': '4rem', 'color': 'var(--primary-color)', 'margin-bottom': '1rem', 'opacity': '0.3'}"></i>
+          <h4 [style]="{'font-size': '1.1rem', 'margin-bottom': '0.5rem', 'color': 'var(--text-color)'}">No Conversations Found</h4>
+          <p [style]="{'font-size': '0.9rem', 'margin': '0'}">Conversation moderation features will be available when implemented.</p>
+        </div>
+
+        <div class="conversations-list">
+          <div *ngFor="let conversation of filteredConversations" class="conversation-item" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--card-border)', 'border-radius': '12px', 'padding': '1.5rem', 'margin-bottom': '1rem', 'transition': 'var(--tran-02)'}">
+            
+            <div class="item-header" [style]="{'display': 'flex', 'justify-content': 'space-between', 'align-items': 'flex-start', 'margin-bottom': '1rem'}">
+              <div class="participants-list" [style]="{'display': 'flex', 'gap': '0.5rem', 'flex-wrap': 'wrap'}">
+                <span *ngFor="let participant of conversation.participants" class="participant-tag" [style]="{'padding': '0.25rem 0.625rem', 'background': 'var(--alert-info-bg)', 'border': '1px solid var(--alert-info-border)', 'border-radius': '12px', 'font-size': '0.75rem', 'font-weight': '500', 'color': 'var(--primary-color)'}">
+                  {{participant}}
+                </span>
+              </div>
+              <div class="item-stats" [style]="{'font-size': '0.8rem', 'color': 'var(--text-color)', 'opacity': '0.8', 'text-align': 'right'}">
+                <div>{{conversation.messageCount}} messages</div>
+                <div>{{conversation.lastActivity | date:'short'}}</div>
+              </div>
+            </div>
+
+            <div class="item-content" [style]="{'margin-bottom': '1rem'}">
+              <div class="content-text" [style]="{'color': 'var(--text-color)', 'font-size': '0.875rem', 'line-height': '1.5'}">{{conversation.lastMessage}}</div>
+            </div>
+
+            <div class="item-actions" [style]="{'display': 'flex', 'gap': '0.75rem', 'flex-wrap': 'wrap'}">
+              <button class="quick-action view" (click)="viewConversation(conversation.id)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)'}">
+                <i class="pi pi-eye" [style]="{'margin-right': '0.25rem'}"></i>
+                View
+              </button>
+              <button class="quick-action delete" (click)="deleteConversation(conversation.id)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--danger-color)', 'color': 'white'}">
+                <i class="pi pi-trash" [style]="{'margin-right': '0.25rem'}"></i>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forums Tab -->
+      <div *ngIf="activeTab === 'forums'" class="forums-tab">
+        <div class="search-container" [style]="{'margin-bottom': '1.5rem', 'position': 'relative'}">
+          <i class="pi pi-search search-icon" [style]="{'position': 'absolute', 'left': '0.75rem', 'top': '50%', 'transform': 'translateY(-50%)', 'color': 'var(--input-placeholder)', 'pointer-events': 'none'}"></i>
+          <input 
+            type="text" 
+            class="search-input" 
+            [(ngModel)]="forumSearchTerm"
+            placeholder="Search forum posts..."
+            (keyup.enter)="searchForums()"
+            [style]="{'width': '100%', 'padding': '0.75rem 1rem 0.75rem 2.5rem', 'border': '1px solid var(--input-border)', 'border-radius': '12px', 'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'font-size': '0.875rem', 'transition': 'var(--tran-02)'}">
+          <button class="search-btn" (click)="searchForums()" [style]="{'position': 'absolute', 'right': '0.5rem', 'top': '50%', 'transform': 'translateY(-50%)', 'background': 'var(--btn-primary-bg)', 'color': 'var(--btn-primary-text)', 'border': 'none', 'border-radius': '6px', 'padding': '0.5rem', 'cursor': 'pointer'}">
+            <i class="pi pi-search"></i>
+          </button>
+        </div>
+
+        <div *ngIf="filteredForumPosts.length === 0" class="empty-state" [style]="{'text-align': 'center', 'padding': '3rem 2rem', 'color': 'var(--text-color)', 'opacity': '0.6'}">
+          <i class="pi pi-check-circle" [style]="{'font-size': '4rem', 'color': 'var(--success-color)', 'margin-bottom': '1rem', 'opacity': '0.3'}"></i>
+          <h4 [style]="{'font-size': '1.1rem', 'margin-bottom': '0.5rem', 'color': 'var(--text-color)'}">No Reported Forum Posts</h4>
+          <p [style]="{'font-size': '0.9rem', 'margin': '0'}">All forum posts are following community guidelines.</p>
+        </div>
+
+        <div class="forums-list">
+          <div *ngFor="let post of filteredForumPosts" class="forum-item" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--card-border)', 'border-radius': '12px', 'padding': '1.5rem', 'margin-bottom': '1rem', 'transition': 'var(--tran-02)'}">
+            
+            <div class="item-header" [style]="{'display': 'flex', 'justify-content': 'space-between', 'align-items': 'flex-start', 'margin-bottom': '1rem'}">
+              <div class="item-meta" [style]="{'display': 'flex', 'flex-direction': 'column', 'gap': '0.25rem'}">
+                <div class="author-name" [style]="{'font-weight': '600', 'color': 'var(--text-color)', 'font-size': '1rem'}">{{post.title}}</div>
+                <div class="timestamp" [style]="{'font-size': '0.8rem', 'color': 'var(--text-color)', 'opacity': '0.7'}">by {{post.author}} • {{post.timestamp | date:'short'}}</div>
+              </div>
+              <div class="post-badges" [style]="{'display': 'flex', 'gap': '0.5rem', 'flex-wrap': 'wrap'}">
+                <span *ngIf="post.reported" class="status-badge reported" [style]="{'padding': '0.25rem 0.625rem', 'background': 'var(--alert-warning-bg)', 'border': '1px solid var(--alert-warning-border)', 'border-radius': '12px', 'font-size': '0.7rem', 'font-weight': '500', 'color': 'var(--warning-color)'}">
+                  <i class="pi pi-exclamation-triangle" [style]="{'margin-right': '0.25rem'}"></i>
+                  Reported
+                </span>
+                <span *ngIf="post.pinned" class="status-badge pinned" [style]="{'padding': '0.25rem 0.625rem', 'background': 'var(--alert-info-bg)', 'border': '1px solid var(--alert-info-border)', 'border-radius': '12px', 'font-size': '0.7rem', 'font-weight': '500', 'color': 'var(--primary-color)'}">
+                  <i class="pi pi-bookmark" [style]="{'margin-right': '0.25rem'}"></i>
+                  Pinned
+                </span>
+              </div>
+            </div>
+
+            <div class="item-content" [style]="{'margin-bottom': '1rem'}">
+              <div class="content-text" [style]="{'color': 'var(--text-color)', 'font-size': '0.875rem', 'line-height': '1.5', 'margin-bottom': '0.75rem'}">{{post.content | slice:0:200}}{{post.content.length > 200 ? '...' : ''}}</div>
+              <div class="item-stats" [style]="{'font-size': '0.8rem', 'color': 'var(--text-color)', 'opacity': '0.8'}">{{post.replyCount}} replies</div>
+            </div>
+
+            <div class="item-actions" [style]="{'display': 'flex', 'gap': '0.75rem', 'flex-wrap': 'wrap'}">
+              <button class="quick-action view" (click)="viewForumPost(post.id)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)'}">
+                <i class="pi pi-eye" [style]="{'margin-right': '0.25rem'}"></i>
+                View
+              </button>
+              <button class="quick-action pin" (click)="togglePinPost(post.id, post.pinned)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--primary-color)', 'color': 'white'}">
+                <i class="pi pi-bookmark" [style]="{'margin-right': '0.25rem'}"></i>
+                {{post.pinned ? 'Unpin' : 'Pin'}}
+              </button>
+              <button class="quick-action delete" (click)="deleteForumPost(post.id)" [style]="{'padding': '0.5rem 1rem', 'border': 'none', 'border-radius': '6px', 'font-size': '0.8rem', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'background': 'var(--danger-color)', 'color': 'white'}">
+                <i class="pi pi-trash" [style]="{'margin-right': '0.25rem'}"></i>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

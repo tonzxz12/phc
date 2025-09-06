@@ -1,0 +1,67 @@
+<app-speech-analyzer></app-speech-analyzer>
+<!-- 
+<section class="flex flex-col items-center justify-center mt-14">
+  <main class="w-full max-w-2xl overflow-hidden bg-white shadow-lg rounded-3xl">
+    <div class="p-6 text-white bg-gradient-to-r from-amber-500 to-amber-600">
+      <h2 class="text-3xl font-bold">
+        {{ currentPhase === 'register' ? 'Register your voice' :
+           currentPhase === 'question' ? 'Answer the question' : 'Your Transcript' }}
+      </h2>
+      <time class="text-sm opacity-80">Wednesday, August 6, 2024 - 12:00 PM</time>
+    </div>
+
+    <div class="p-8">
+      <section class="text-center">
+        <ng-container *ngIf="currentPhase === 'register'">
+          <p class="mb-4 text-gray-600">Click the mic and read the following quote by Steve Jobs:</p>
+          <blockquote class="py-2 pl-4 mb-8 text-xl italic font-semibold text-gray-800 border-l-4 border-amber-500">
+            "Your time is limited, so don't waste it living someone else's life. Don't be trapped by dogma — which is living with the results of other people's thinking."
+          </blockquote>
+        </ng-container>
+
+        <ng-container *ngIf="currentPhase === 'question'">
+          <p class="mb-4 text-gray-600">Answer the following question by speaking for at least 20 seconds:</p>
+          <blockquote class="py-2 pl-4 mb-8 text-xl italic font-semibold text-gray-800 border-l-4 border-gray-500">
+            Why is learning a new language important to you?
+          </blockquote>
+        </ng-container>
+
+        <ng-container *ngIf="currentPhase === 'transcript'">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">Your Transcript</h3>
+            <span class="text-sm font-medium text-gray-500">Duration: {{ recordingDuration }}</span>
+          </div>
+          <p class="leading-relaxed text-left text-gray-600">
+            Learning a new language is important to me because it opens doors to new cultures and perspectives, enhances communication skills, and boosts career opportunities. It also helps me connect with people from different backgrounds and broadens my understanding of the world.
+          </p>
+        </ng-container>
+
+        <div class="mt-8">
+          <ng-container *ngIf="currentPhase !== 'transcript' && !recordingComplete">
+            <button
+              (click)="toggleRecording()"
+              class="w-24 h-24 transition-all duration-300 ease-in-out transform rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-offset-2 hover:scale-105"
+              [ngClass]="{'bg-green-500 hover:bg-green-600 focus:ring-green-400': isRecording, 'bg-blue-500 hover:bg-blue-600 focus:ring-blue-400': !isRecording}"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            </button>
+            <p class="mt-4 text-sm text-gray-600">
+              {{ isRecording ? 'Recording... click to stop' : 'Click the microphone when you\'re ready to speak!' }}
+            </p>
+          </ng-container>
+
+          <div *ngIf="recordingComplete || currentPhase === 'transcript'" class="flex justify-center mt-8 space-x-4">
+            <button (click)="redo()" class="px-6 py-3 text-white transition-colors duration-300 bg-gray-500 rounded-full hover:bg-gray-600">
+              Redo
+            </button>
+            <button (click)="next()" class="px-6 py-3 text-white transition-colors duration-300 bg-blue-500 rounded-full hover:bg-blue-600">
+              {{ currentPhase === 'transcript' ? 'View Report' : 'Next' }}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</section> -->

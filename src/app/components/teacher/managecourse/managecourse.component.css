@@ -1,0 +1,107 @@
+/* styles.css */
+.backgroundLesson {
+  background: linear-gradient(
+    to right,
+    var(--secondary-color) 0%,
+    var(--secondary-color) 100%
+  );
+}
+
+.wide-popup {
+  width: 800px;
+}
+
+.course-card img {
+  border-bottom: 4px solid;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.certificate-btn {
+  position: relative;
+  padding: 8px 12px;
+  display: inline-block;
+  text-decoration: none;
+  text-transform: uppercase;
+  width: 120px;
+  overflow: hidden;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.certificate-btn span {
+  position: relative;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.5px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.certificate-btn .liquid {
+  position: absolute;
+  top: -80px;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+  transition: 0.5s;
+}
+
+.certificate-btn .liquid::after,
+.certificate-btn .liquid::before {
+  content: "";
+  width: 200%;
+  height: 200%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -75%);
+}
+
+.certificate-btn .liquid::before {
+  border-radius: 45%;
+  animation: animate 5s linear infinite;
+}
+
+.certificate-btn .liquid::after {
+  border-radius: 40%;
+  background: rgba(20, 20, 20, 0.5);
+  animation: animate 10s linear infinite;
+}
+
+.certificate-btn:hover .liquid {
+  top: -90px;
+}
+
+@keyframes animate {
+  0% {
+    transform: translate(-50%, -75%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -75%) rotate(360deg);
+  }
+}
+
+.sparkling {
+  position: relative;
+  animation: sparkle 2s infinite;
+}
+
+@keyframes sparkle {
+  0% {
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.5);
+  }
+}

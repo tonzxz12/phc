@@ -1,0 +1,31 @@
+{
+    "verbs": ["loved", "knew", "come", "stopped"],
+    "story": [
+        {
+            "id": 1,
+            "questionText": "What are the stages involved in the process of speech delivery according to the PDF?",
+            "options": [
+                "Stage One: Thinking, Stage Two: Symbolizing, Stage Three: Expressing, Stage Four: Transmitting",
+                "Stage One: Planning, Stage Two: Rehearsing, Stage Three: Performing, Stage Four: Evaluating",
+                "Stage One: Introduction, Stage Two: Body, Stage Three: Conclusion",
+                "Stage One: Research, Stage Two: Writing, Stage Three: Editing, Stage Four: Presenting"
+            ],
+            "correctOption": "Stage One: Thinking, Stage Two: Symbolizing, Stage Three: Expressing, Stage Four: Transmitting",
+            "selectedOption": null,
+            "quiztype": "multiple"
+        },
+        {
+            "id": 2,
+            "questionText": "Which stage of listening involves sorting fact from opinion?",
+            "options": [
+                "Stage One: Thinking",
+                "Stage Two: Symbolizing",
+                "Stage Three: Expressing",
+                "Stage Four: Transmitting"
+            ],
+            "correctOption": "Stage Six: Decoding",
+            "selectedOption": null,
+            "quiztype": "multiple"
+        }
+    ]
+}

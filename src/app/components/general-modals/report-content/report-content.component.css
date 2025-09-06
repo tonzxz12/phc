@@ -1,0 +1,214 @@
+/* Report Content Modal Styles */
+.report-modal {
+  min-width: 450px;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  max-height: 70vh;
+}
+
+/* Custom scrollbar styling */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: var(--input-bg);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 3px;
+  transition: var(--tran-02);
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Firefox scrollbar */
+.modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--input-border) var(--input-bg);
+}
+
+.modal-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.header-content i {
+  background: linear-gradient(135deg, var(--warning-color), #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.content-preview {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  transition: var(--tran-02);
+}
+
+.content-preview:hover {
+  border-color: var(--primary-color);
+}
+
+.reason-option {
+  transition: all var(--tran-02);
+  cursor: pointer;
+}
+
+.reason-option:hover {
+  border-color: var(--primary-color) !important;
+  background: var(--card-hover-bg) !important;
+}
+
+.reason-option.selected {
+  border-color: var(--primary-color) !important;
+  background: var(--alert-info-bg) !important;
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.radio-indicator {
+  transition: var(--tran-02);
+  flex-shrink: 0;
+}
+
+textarea {
+  font-family: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+}
+
+.modal-footer button {
+  min-width: 100px;
+}
+
+.cancel-btn:hover:not([disabled]) {
+  background: var(--card-hover-bg);
+  border-color: var(--primary-color);
+}
+
+.submit-btn:hover:not([disabled]) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.submit-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading-state {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Dark mode adjustments */
+:host-context(.dark) .report-modal {
+  background: var(--p-primary-900);
+  color: var(--text-color-light);
+}
+
+:host-context(.dark) .content-preview {
+  background: var(--p-primary-800);
+  border-color: var(--p-primary-700);
+}
+
+:host-context(.dark) .reason-option {
+  background: var(--p-primary-800);
+  border-color: var(--p-primary-700);
+}
+
+:host-context(.dark) .reason-option:hover {
+  background: var(--p-primary-700) !important;
+}
+
+:host-context(.dark) .reason-option.selected {
+  background: var(--p-primary-700) !important;
+  border-color: var(--primary-color) !important;
+}
+
+:host-context(.dark) textarea {
+  background: var(--p-primary-800);
+  border-color: var(--p-primary-700);
+  color: var(--text-color-light);
+}
+
+:host-context(.dark) .cancel-btn:hover:not([disabled]) {
+  background: var(--p-primary-700);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .report-modal {
+    min-width: 90vw;
+    max-width: 90vw;
+    max-height: 85vh;
+    margin: 1rem;
+  }
+
+  .modal-body {
+    max-height: 60vh;
+    padding: 1rem 1.5rem;
+  }
+
+  .modal-header {
+    padding: 1rem 1.5rem 0.75rem 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .modal-footer {
+    padding: 0.75rem 1.5rem 1rem 1.5rem;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .header-content i {
+    font-size: 1.25rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .reason-option {
+    padding: 0.625rem 0.75rem !important;
+  }
+
+  .reason-header {
+    margin-bottom: 0.125rem !important;
+  }
+
+  .modal-header h3 {
+    font-size: 1.125rem !important;
+  }
+}

@@ -1,0 +1,240 @@
+<div class="student-dashboard-container" [style]="{'background': 'var(--body-color)', 'color': 'var(--text-color)', 'min-height': '100vh'}">
+  <!-- Header Section -->
+  <div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 [style]="{'color': 'var(--text-color)'}">Student Dashboard</h1>
+        <p [style]="{'color': 'var(--text-muted)'}">Track your progress and manage your courses</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Section -->
+  <div class="progress-section">
+    <div class="progress-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="progress-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+        <div class="progress-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+          <span>Courses Progress</span>
+        </div>
+      </div>
+      
+      <div class="progress-content">
+        <div class="progress-list">
+          <div *ngFor="let course of courses | keyvalue" class="progress-item">
+            <p class="course-name" [style]="{'color': 'var(--text-color)'}">{{ course.value.course }}</p>
+            <div class="progress-bar-container">
+              <div class="progress-bar-track" [style]="{'background': 'var(--border-color)'}">
+                <div class="progress-bar-fill" [style]="{'background': 'var(--primary-color)', 'width': course.value.progress + '%'}"></div>
+              </div>
+              <span class="progress-text" [style]="{'color': 'var(--text-muted)'}">{{ course.value.progress }}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="progress-image">
+          <img [src]="'assets/flag.jpg'" alt="Progress illustration">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Section -->
+  <div class="main-content">
+    <div class="content-grid">
+      <!-- Courses Section -->
+      <div class="courses-section">
+        <div class="section-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+          <div class="section-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+            <div class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <span>Enrolled Courses</span>
+            </div>
+          </div>
+          
+          <div class="section-content">
+            <div class="courses-grid">
+              <div *ngFor="let course of courses | keyvalue" (click)="openCourse(course.value.id)" class="course-card" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+                <img class="course-image" [src]="getUrl(course.value.image)" alt="Course Image">
+                <div class="course-info">
+                  <h3 class="course-title" [style]="{'color': 'var(--text-color)'}">{{ course.value.course }}</h3>
+                  <div class="course-details">
+                    <p class="teacher-name" [style]="{'color': 'var(--text-muted)'}">{{ course.value.firstname + " " + course.value.lastname }}</p>
+                    <p class="class-name" [style]="{'color': 'var(--text-muted)'}">{{ course.value.class}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Announcements Section -->
+      <div class="announcements-section" *ngIf="getNotifications().length">
+        <div class="section-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+          <div class="section-header" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+            <div class="section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span>Announcements</span>
+            </div>
+          </div>
+          
+          <div class="section-content">
+            <ng-container *ngFor="let notification of getNotifications()">
+              <div *ngIf="isBroadcastAlert(notification.title)" class="announcement-item" [style]="{'border-bottom': '1px solid var(--border-color)'}">
+                <div class="announcement-icon" [style]="{'background': 'var(--warning-color)', 'color': 'white'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </div>
+                <div class="announcement-content">
+                  <div [innerHTML]="notification.message" class="announcement-message" [style]="{'color': 'var(--text-color)'}"></div>
+                  <div *ngIf="isUrgent(notification.title)" class="urgent-badge" [style]="{'background': 'var(--danger-color)', 'color': 'white'}">
+                    URGENT!
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Button -->
+<button (click)="openModal()" class="chat-fab" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+  </svg>
+</button>
+
+<!-- Messages Modal -->
+<div *ngIf="showModal" [@fadeInOut] class="modal-overlay">
+  <div class="modal-content" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+    <div class="modal-header" [style]="{'border-bottom': '1px solid var(--border-color)'}">
+      <h1 [style]="{'color': 'var(--text-color)'}">Messages</h1>
+      <button (click)="closeModal()" class="close-btn" [style]="{'color': 'var(--text-muted)'}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="search-section">
+        <label [style]="{'color': 'var(--text-color)'}">Search {{interests.length? 'Interest':'People'}}: </label>
+        <div *ngIf="interests.length" class="interests-list">
+          <span *ngFor="let interest of interests; let i = index" (click)="deleteInterst(i)" class="interest-tag" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+            {{interest}}
+          </span>
+        </div>
+        <input [disabled]="listen" [(ngModel)]="search" (keyup)="searchPeople($event)" type="text" placeholder="Type someone..." class="search-input" [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+      </div>
+
+      <div class="conversations-list">
+        <ng-container *ngIf="!searching; else searchingPeople">
+          <ng-container *ngIf="people.length && !interests.length; else showConvos">
+            <button *ngFor="let person of people" (click)="openChatModal(person)" class="person-item" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+              <img [src]="getUrl(person.profile)" alt="Profile" class="person-avatar">
+              <div class="person-info">
+                <p class="person-name">{{person.firstname + ' '+ person.lastname}}</p>
+                <p class="person-status">{{person.lastseen == 'Just now' ? 'Online' : 'Last seen ' + person.lastseen}}</p>
+              </div>
+            </button>
+          </ng-container>
+          <ng-template #showConvos>
+            <ng-container *ngIf="interests.length; else justConvos">
+              <ng-container *ngIf="!listen; else listening">
+                <button (click)="searchByInterest()" class="action-btn" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                  Start Conversation
+                </button>
+              </ng-container>
+              <ng-template #listening>
+                <div class="loading-state">
+                  <span [style]="{'color': 'var(--text-muted)'}">Searching for people with same interest...</span>
+                </div>
+                <button (click)="cancelListen()" class="action-btn" [style]="{'background': 'var(--danger-color)', 'color': 'white'}">
+                  Cancel
+                </button>
+              </ng-template>
+            </ng-container>
+            <ng-template #justConvos>
+              <ng-container *ngIf="getConvos().length; else empty">
+                <button *ngFor="let person of getConvos()" (click)="openChatModal(person)" class="conversation-item" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+                  <img [src]="getUrl(person.profile)" alt="Profile" class="person-avatar">
+                  <div class="person-info">
+                    <p class="person-name" [style]="{'color': 'var(--text-color)'}">{{person.firstname + ' '+ person.lastname}}</p>
+                    <p class="last-message" [style]="{'color': 'var(--text-muted)'}">{{person.lastmessage}}</p>
+                  </div>
+                </button>
+              </ng-container>
+              <ng-template #empty>
+                <div class="empty-state" [style]="{'border': '2px dashed var(--border-color)', 'color': 'var(--text-muted)'}">
+                  <span>No Inbox</span>
+                  <span>Start a conversation!</span>
+                </div>
+              </ng-template>
+            </ng-template>
+          </ng-template>
+        </ng-container>
+        <ng-template #searchingPeople>
+          <div class="loading-state">
+            <span [style]="{'color': 'var(--text-muted)'}">Searching for people...</span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Modal -->
+<div *ngIf="checkOpenModal()" [@fadeInOut] class="modal-overlay">
+  <div class="modal-content" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+    <div class="modal-header" [style]="{'border-bottom': '1px solid var(--border-color)'}">
+      <button (click)="closeChatModal()" class="back-btn" [style]="{'color': 'var(--text-muted)'}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+      </button>
+      <h1 [style]="{'color': 'var(--text-color)'}">{{chat.firstname +' '+ chat.lastname}}</h1>
+      <button (click)="closeModals()" class="close-btn" [style]="{'color': 'var(--text-muted)'}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="chat-messages" #scrollMessages>
+      <div *ngIf="chat?.anonymous" class="chat-info" [style]="{'color': 'var(--text-muted)'}">
+        Both of you like<b *ngFor="let interest of chat.interests">&nbsp;&nbsp;{{interest}}</b>
+      </div>
+      <ng-container *ngFor="let message of getMessages()">
+        <div *ngIf="user.id == message.senderid; else notMe" class="message sent" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+          {{message.message}}
+        </div>
+        <ng-template #notMe>
+          <div class="message received" [style]="{'background': 'var(--secondary-color-light)', 'color': 'var(--text-color)'}">
+            {{message.message}}
+          </div>
+        </ng-template>
+      </ng-container>
+    </div>
+
+    <div class="chat-input-section" [style]="{'border-top': '1px solid var(--border-color)'}">
+      <div class="input-container">
+        <input (keyup.enter)="chat.anonymous? sendMessageAnonymous() : sendMessage()" type="text" [(ngModel)]="message" placeholder="Type your message..." class="message-input" [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+        <button (click)="chat.anonymous? sendMessageAnonymous() : sendMessage()" class="send-btn" [style]="{'color': 'var(--primary-color)'}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

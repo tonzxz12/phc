@@ -1,0 +1,232 @@
+<div class="individual-progress-dashboard dark:!bg-[#021526] container mx-auto px-4 py-6 max-w-6xl dark:border-none">
+  <!-- Main Heading -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-center text-transparent dark:!text-white bg-clip-text gradient-color">Individual Student Progress</h1>
+    <button 
+      (click)="goBack()" 
+      class="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Dashboard
+    </button>
+  </div>
+
+  <!-- Search Student Section -->
+  <div class="bg-white dark:!bg-[#071e3d] rounded-lg !shadow-blue-xl p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Search Student</h2>
+    
+    <div class="search-container relative mb-4">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery"
+        (input)="searchStudents()"
+        placeholder="Search by student name or email..."
+        class="w-full bg-gray-50 dark:!bg-[#021526] border border-gray-300 text-gray-900 dark:text-white px-4 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+      />
+      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div *ngIf="searchQuery && filteredStudents.length > 0" class="search-results max-h-60 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg">
+      <div 
+        *ngFor="let student of filteredStudents" 
+        (click)="selectStudent(student)"
+        class="p-3 hover:bg-gray-100 dark:hover:bg-[#021526] cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-medium text-gray-900 dark:text-white">{{ student.name }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ student.email }}</p>
+          </div>
+          <div class="text-sm text-indigo-600 dark:text-indigo-400">
+            Click to view
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="searchQuery && filteredStudents.length === 0" class="text-gray-500 dark:text-gray-400 text-center py-4">
+      No students found matching "{{ searchQuery }}"
+    </div>
+  </div>
+
+  <!-- No Student Selected State -->
+  <div *ngIf="!selectedStudent" class="text-center py-12">
+    <div class="text-gray-400 dark:text-gray-600 text-6xl mb-4">🔍</div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Select a Student</h3>
+    <p class="text-gray-500 dark:text-gray-400">Search and select a student to view their individual progress report.</p>
+  </div>
+
+  <!-- Selected Student Progress Report -->
+  <div *ngIf="selectedStudent" class="bg-white dark:!bg-[#071e3d] rounded-lg !shadow-blue-xl p-6">
+    <!-- Student Info Header -->
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-600">
+      <div class="student-info">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">{{ selectedStudent.name }}</h2>
+        <p class="text-gray-600 dark:text-gray-400">{{ selectedStudent.email }}</p>
+        <p class="text-sm text-gray-500 dark:text-gray-500">Student ID: {{ selectedStudent.id }}</p>
+      </div>
+      <button 
+        (click)="exportProgressReport()"
+        class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Export Report
+      </button>
+    </div>
+
+    <!-- Progress Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="summary-card bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Quiz Average</h3>
+        <p class="text-3xl font-bold">{{ getQuizAverage() }}%</p>
+        <p class="text-sm opacity-90">{{ getTotalQuizzes() }} quizzes completed</p>
+      </div>
+      <div class="summary-card bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Assignment Average</h3>
+        <p class="text-3xl font-bold">{{ getAssignmentAverage() }}%</p>
+        <p class="text-sm opacity-90">{{ getTotalAssignments() }} assignments completed</p>
+      </div>
+      <div class="summary-card bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Overall Performance</h3>
+        <p class="text-3xl font-bold">{{ getOverallGrade() }}%</p>
+        <p class="text-sm opacity-90">{{ getPerformanceLevel() }}</p>
+      </div>
+    </div>
+
+    <!-- Detailed Progress Tabs -->
+    <div class="tabs-container mb-6">
+      <div class="flex border-b border-gray-200 dark:border-gray-600">
+        <button
+          (click)="activeTab = 'quizzes'"
+          [ngClass]="{
+            'border-indigo-500 text-indigo-600 dark:text-indigo-400': activeTab === 'quizzes',
+            'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400': activeTab !== 'quizzes'
+          }"
+          class="px-6 py-3 border-b-2 font-medium text-sm transition-colors duration-200"
+        >
+          Quiz Results
+        </button>
+        <button
+          (click)="activeTab = 'assignments'"
+          [ngClass]="{
+            'border-indigo-500 text-indigo-600 dark:text-indigo-400': activeTab === 'assignments',
+            'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400': activeTab !== 'assignments'
+          }"
+          class="px-6 py-3 border-b-2 font-medium text-sm transition-colors duration-200"
+        >
+          Assignment Results
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Quiz Results Tab -->
+      <div *ngIf="activeTab === 'quizzes'" class="animate-fadeIn">
+        <div *ngIf="studentQuizzes.length > 0; else noQuizzes" class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-gray-600">
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Quiz Name</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Score</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Percentage</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Date Taken</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let quiz of studentQuizzes" class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#021526]">
+                <td class="py-3 px-4 text-gray-900 dark:text-white">{{ quiz.name }}</td>
+                <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{{ quiz.score }}</td>
+                <td class="py-3 px-4">
+                  <span [ngClass]="{
+                    'text-green-600 dark:text-green-400': quiz.percentage >= 80,
+                    'text-yellow-600 dark:text-yellow-400': quiz.percentage >= 60 && quiz.percentage < 80,
+                    'text-red-600 dark:text-red-400': quiz.percentage < 60
+                  }" class="font-semibold">
+                    {{ quiz.percentage }}%
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{{ quiz.dateTaken | date:'short' }}</td>
+                <td class="py-3 px-4">
+                  <span [ngClass]="{
+                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': quiz.percentage >= 80,
+                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': quiz.percentage >= 60 && quiz.percentage < 80,
+                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': quiz.percentage < 60
+                  }" class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{ quiz.percentage >= 80 ? 'Excellent' : quiz.percentage >= 60 ? 'Good' : 'Needs Improvement' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noQuizzes>
+          <div class="text-center py-12">
+            <div class="text-gray-400 dark:text-gray-600 text-6xl mb-4">📊</div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Quiz Results</h3>
+            <p class="text-gray-500 dark:text-gray-400">This student hasn't completed any quizzes yet.</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Assignment Results Tab -->
+      <div *ngIf="activeTab === 'assignments'" class="animate-fadeIn">
+        <div *ngIf="studentAssignments.length > 0; else noAssignments" class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-gray-600">
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Assignment Name</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Score</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Percentage</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Date Submitted</th>
+                <th class="py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let assignment of studentAssignments" class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#021526]">
+                <td class="py-3 px-4 text-gray-900 dark:text-white">{{ assignment.name }}</td>
+                <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{{ assignment.score }}</td>
+                <td class="py-3 px-4">
+                  <span [ngClass]="{
+                    'text-green-600 dark:text-green-400': assignment.percentage >= 80,
+                    'text-yellow-600 dark:text-yellow-400': assignment.percentage >= 60 && assignment.percentage < 80,
+                    'text-red-600 dark:text-red-400': assignment.percentage < 60
+                  }" class="font-semibold">
+                    {{ assignment.percentage }}%
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-gray-700 dark:text-gray-300">{{ assignment.dateSubmitted | date:'short' }}</td>
+                <td class="py-3 px-4">
+                  <span [ngClass]="{
+                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': assignment.percentage >= 80,
+                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': assignment.percentage >= 60 && assignment.percentage < 80,
+                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': assignment.percentage < 60
+                  }" class="px-2 py-1 rounded-full text-xs font-medium">
+                    {{ assignment.percentage >= 80 ? 'Excellent' : assignment.percentage >= 60 ? 'Good' : 'Needs Improvement' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noAssignments>
+          <div class="text-center py-12">
+            <div class="text-gray-400 dark:text-gray-600 text-6xl mb-4">📝</div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Assignment Results</h3>
+            <p class="text-gray-500 dark:text-gray-400">This student hasn't completed any assignments yet.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

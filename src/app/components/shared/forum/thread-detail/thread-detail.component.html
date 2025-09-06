@@ -1,0 +1,200 @@
+<div class="thread-detail-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Thread Detail View -->
+  <div *ngIf="!loading && thread" class="thread-view">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="breadcrumb">
+        <button class="btn btn-link p-0" (click)="goBack()">
+          <i class="fas fa-arrow-left"></i> Back to Forum
+        </button>
+        <span class="breadcrumb-separator">/</span>
+        <span class="current-page">Thread Discussion</span>
+      </div>
+      
+      <div class="thread-header">
+        <div class="thread-title-section">
+          <h1 class="thread-title">
+            <i *ngIf="thread.islocked" class="fas fa-lock lock-icon"></i>
+            {{ thread.title }}
+          </h1>
+          <div class="thread-meta">
+            <span class="meta-item">
+              <i class="fas fa-calendar"></i>
+              Created {{ formatDate(thread.createdat) }}
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-comments"></i>
+              {{ posts.length }} {{ posts.length === 1 ? 'post' : 'posts' }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="thread-actions" *ngIf="canManageThread()">
+          <button 
+            class="btn btn-outline-warning btn-sm"
+            [class.active]="thread.islocked"
+            (click)="toggleLock()"
+            title="{{ thread.islocked ? 'Unlock' : 'Lock' }} thread"
+          >
+            <i class="fas fa-lock"></i>
+            {{ thread.islocked ? 'Unlock' : 'Lock' }}
+          </button>
+          <button 
+            class="btn btn-outline-danger btn-sm"
+            (click)="deleteThread()"
+            title="Delete thread"
+          >
+            <i class="fas fa-trash"></i>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Original Thread Post -->
+    <div class="original-post">
+      <div class="post-content">
+        <div class="post-body">
+          {{ thread.body }}
+        </div>
+        <div class="post-footer">
+          <span class="post-author">Started by {{ getAuthorName(thread) }}</span>
+          <span class="post-date">{{ formatDate(thread.createdat) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts List -->
+    <div class="posts-section">
+      <h3 class="section-title" *ngIf="posts.length > 0">
+        <i class="fas fa-comments"></i>
+        Replies ({{ posts.length }})
+      </h3>
+
+      <div class="posts-list" *ngIf="posts.length > 0">
+        <div 
+          *ngFor="let post of posts; let i = index" 
+          class="post-card"
+          [class.deleted]="post.isdeleted"
+        >
+          <div class="post-header">
+            <div class="author-info">
+              <div class="author-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="author-details">
+                <span class="author-name">{{ getPostAuthorName(post) }}</span>
+                <span class="author-role">{{ getAuthorRole(post) }}</span>
+              </div>
+            </div>
+            <div class="post-meta">
+              <span class="post-number">#{{ i + 1 }}</span>
+              <span class="post-date">{{ formatDate(post.createdat) }}</span>
+            </div>
+          </div>
+          
+          <div class="post-content">
+            <div class="post-body" [innerHTML]="formatPostBody(post.body)"></div>
+            
+            <div class="post-actions" *ngIf="canManagePost(post)">
+              <button 
+                class="btn btn-sm btn-outline-secondary"
+                (click)="editPost(post)"
+                title="Edit post"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+              <button 
+                class="btn btn-sm btn-outline-danger"
+                (click)="deletePost(post)"
+                title="Delete post"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="posts.length === 0" class="empty-posts">
+        <i class="fas fa-comment-slash empty-icon"></i>
+        <h4>No replies yet</h4>
+        <p>Be the first to reply to this thread!</p>
+      </div>
+    </div>
+
+    <!-- Reply Form -->
+    <div class="reply-section" *ngIf="canReply()">
+      <h3 class="section-title">
+        <i class="fas fa-reply"></i>
+        Post a Reply
+      </h3>
+      
+      <form [formGroup]="replyForm" (ngSubmit)="submitReply()" class="reply-form">
+        <div class="form-group">
+          <label for="replyBody" class="sr-only">Your reply</label>
+          <textarea
+            id="replyBody"
+            class="form-control"
+            formControlName="body"
+            rows="4"
+            placeholder="Write your reply here..."
+            [class.is-invalid]="replyForm.get('body')?.invalid && replyForm.get('body')?.touched"
+          ></textarea>
+          <div class="invalid-feedback" *ngIf="replyForm.get('body')?.invalid && replyForm.get('body')?.touched">
+            <small *ngIf="replyForm.get('body')?.errors?.['required']">Reply content is required</small>
+            <small *ngIf="replyForm.get('body')?.errors?.['minlength']">Reply must be at least 5 characters long</small>
+          </div>
+          <small class="form-text text-muted">
+            {{ replyForm.get('body')?.value?.length || 0 }} characters
+          </small>
+        </div>
+        
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="replyForm.invalid || isSubmittingReply"
+          >
+            <span *ngIf="isSubmittingReply" class="spinner-border spinner-border-sm mr-2" role="status"></span>
+            <i *ngIf="!isSubmittingReply" class="fas fa-paper-plane"></i>
+            {{ isSubmittingReply ? 'Posting...' : 'Post Reply' }}
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="resetReplyForm()"
+            [disabled]="isSubmittingReply"
+          >
+            <i class="fas fa-times"></i>
+            Clear
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Locked Message -->
+    <div *ngIf="!canReply() && thread.islocked" class="locked-message">
+      <i class="fas fa-lock"></i>
+      <span>This thread is locked. No new replies can be posted.</span>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !thread" class="error-state">
+    <i class="fas fa-exclamation-triangle error-icon"></i>
+    <h3>Thread Not Found</h3>
+    <p>The thread you're looking for doesn't exist or has been deleted.</p>
+    <button class="btn btn-primary" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Go Back
+    </button>
+  </div>
+</div>

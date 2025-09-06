@@ -1,0 +1,336 @@
+<section class="min-h-screen p-8" style="background-color: var(--body-color);">
+<div class="mx-10">
+    
+    <!-- Main Layout Container -->
+    <div class="mt-4 flex lg:flex-row flex-col gap-8 w-full min-h-[600px]">
+        
+        <!-- Left Side: Chat Container -->
+        <div class="lg:w-1/2 w-full rounded-2xl flex flex-col gradient-color relative" style="box-shadow: var(--card-shadow);">
+            <div class="flex justify-center">
+                <p class="mt-3.5 ml-7 mr-8 text-[var(--text-color-light)] text-xl">Chat</p>
+            </div>
+            
+            <div class="page1 h-full bg-[var(--body-color)] p-2 mt-2" *ngIf="!showPage1">
+                <div class="directmisij flex justify-between items-center">
+                    <button (click)="togglePages()">
+                        <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 6L5 16L15 26" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 16H27" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div>
+                        <div class="ml-8 text-sm" style="color: var(--text-color);">Boss Ken</div>
+                        <div class="text-[var(--text-color)] text-center text-xs ml-8">online</div>
+                    </div>
+                    <div>
+                        <svg class="piktur" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="var(--btn-secondary-bg)" stroke="var(--input-border)" stroke-width="1"/>
+                            <circle cx="12" cy="9" r="3" fill="var(--primary-color)"/>
+                            <path d="M7 20C7 16.5 9.5 14 12 14S17 16.5 17 20" stroke="var(--primary-color)" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>              
+                    </div>
+                </div>
+                <hr class="mt-1">
+                <div class="h-96 bg-[var(--body-color)] flex flex-col justify-between p-4">
+                    <div class="p-2 rounded-bl-none rounded-lg" style="background-color: var(--alert-info-bg); color: var(--text-color); box-shadow: var(--card-shadow);">
+                        Chat Bubble 1
+                    </div>
+                    <div class="gradient-color text-[var(--text-color-light)] p-2 rounded-br-none rounded-lg ml-auto" style="box-shadow: var(--card-shadow);">
+                        Chat Bubble 2
+                    </div>
+                </div>
+                
+                <div class="search-box-container flex items-center p-0.5 max-w-md w-11/12 h-7 bg-[var(--body-color)] border-gradient1 rounded-xl mt-12 ml-auto mr-auto" style="box-shadow: var(--card-shadow);">
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.8125 11.25V16.875C17.8125 18.4283 16.5533 19.6875 15 19.6875C13.4467 19.6875 12.1875 18.4283 12.1875 16.875V9.375C12.1875 6.78617 14.2862 4.6875 16.875 4.6875C19.4638 4.6875 21.5625 6.78617 21.5625 9.375V18.75C21.5625 22.3744 18.6244 25.3125 15 25.3125C11.3756 25.3125 8.4375 22.3744 8.4375 18.75L8.4375 11.25V11.25" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input class="appearance-none bg-transparent border-none w-full  ml-2 mr-3 py-1 px-2 leading-tight focus:outline-none text-[var(--input-text)] text-xs" type="text" placeholder="Write Something..." aria-label="Search" />
+                    <button class="search-button -mr-0.5 borderborder-white border-solid rounded-md gradient-color  w-20 h-7 flex items-center justify-center">
+                        <p class=" text-xs text-white">Send</p>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="page2 overflow-hidden rounded-b bg-[var(--body-color)] p-2 mt-2" *ngIf="showPage1" style="height: 550px;">
+                <div class="directmisij flex justify-between items-center">
+                    <div class="search-box-container flex items-center p-0.5 max-w-md w-11/12 h-6 bg-[var(--body-color)] border-gradient1 rounded-xl mt-2 ml-auto mr-auto" style="box-shadow: var(--card-shadow);">
+                        <input [disabled]="listen" [(ngModel)]="search" (keyup)="searchPeople($event)" id="person_search" class="appearance-none bg-transparent border-none w-full  ml-2 mr-3 py-1 px-2 leading-tight focus:outline-none text-[var(--input-text)] text-xs" type="text" placeholder="Search" aria-label="Search" />
+                        <button class="search-button -mr-0.5 borderborder-white border-solid rounded-r-md search-color w-11 h-6 flex items-center justify-center">
+                            <svg class="search-icon w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        </button>
+                    </div>    
+                </div>
+                <div class="directmisij"></div>
+
+                <ng-container *ngIf="!searching; else searchingPeople " >
+                    <ng-container *ngIf="people.length; else showConvos" >
+                        <button (click)="openChatModal(person)" *ngFor="let person of people"   class="propayl flex flex-col " >
+                            <div class="loobpropayl" >
+                                <div class="ayuspropayl">
+                                    <svg class="border-gradient piktur" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" *ngIf="!getUrl(person.profile) || getUrl(person.profile).includes('default')">
+                                        <circle cx="12" cy="12" r="10" fill="var(--btn-secondary-bg)" stroke="var(--input-border)" stroke-width="1"/>
+                                        <circle cx="12" cy="9" r="3" fill="var(--primary-color)"/>
+                                        <path d="M7 20C7 16.5 9.5 14 12 14S17 16.5 17 20" stroke="var(--primary-color)" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                    <img src="{{getUrl(person.profile)}}" alt="Profile Picture" class="border-gradient piktur" *ngIf="getUrl(person.profile) && !getUrl(person.profile).includes('default')">
+                                    <div>
+                                        <p class=" ngaran">{{person.firstname + ' '+ person.lastname}}</p>
+                                        <p class=" directmessage text-left">{{person.lastseen == 'Just now' ? 'Online' : 'Last seen ' + person.lastseen}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                    </ng-container>
+                    <ng-template #showConvos>
+                        <ng-container *ngIf="getConvos().length; else empty" >
+                            <button (click)="openChatModal(person)"  *ngFor="let person of getConvos()" class="propayl flex flex-col">
+                                <div class="loobpropayl" >
+                                    <div class="ayuspropayl">
+                                        <svg class="border-gradient piktur" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" *ngIf="!getUrl(person.profile) || getUrl(person.profile).includes('default')">
+                                            <circle cx="12" cy="12" r="10" fill="var(--btn-secondary-bg)" stroke="var(--input-border)" stroke-width="1"/>
+                                            <circle cx="12" cy="9" r="3" fill="var(--primary-color)"/>
+                                            <path d="M7 20C7 16.5 9.5 14 12 14S17 16.5 17 20" stroke="var(--primary-color)" stroke-width="1.5" stroke-linecap="round"/>
+                                        </svg>
+                                        <img class="border-gradient piktur" src="{{getUrl(person.profile)}}" alt="Profile Image" *ngIf="getUrl(person.profile) && !getUrl(person.profile).includes('default')">
+                                        <div>
+                                            <p class="ngaran text-[var(--text-color)]">{{person.firstname + ' '+ person.lastname}}</p>
+                                            <p class="directmessage text-left text-[var(--text-color)]">{{person.lastmessage}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        </ng-container>
+                        <ng-template #empty>
+                            <div class="mt-2 border-dashed border-2 border-slate-300 rounded-md h-32 w-full flex flex-col justify-center items-center">
+                                <span>No Inbox</span>
+                                <span>Start a conversation!</span>
+                            </div>
+                        </ng-template>
+                    </ng-template>
+                </ng-container>
+                <ng-template #searchingPeople >
+                    <div class="mt- rounded-md h-32 w-full flex flex-col justify-center items-center">
+                        <span>Searching for people ... </span>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+
+        <!-- Right Side: Two Containers Stacked -->
+        <div class="lg:w-1/2 w-full flex flex-col gap-8">
+            
+            <!-- Upper Right: Broadcast Container -->
+            <div class="bg-[var(--body-color)] rounded-2xl relative" style="box-shadow: var(--card-shadow); min-height: 280px;">
+                <!-- Broadcast Header Badge -->
+                <div class="rounded-xl bg-[var(--body-color)]" style="position:absolute; top: -20px; left: 31px; width: 290px; height: 50px; box-shadow: var(--card-shadow);">   
+                    <div class="ml-4 mt-2.5 animate-wave text-center text-[var(--text-color)] text-2xl" style="display: flex; align-items: center;">
+                        <svg viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" width="25" height="25" style="margin-right: 8px;">
+                            <defs>
+                                <radialGradient id="redGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                                    <stop offset="0%" style="stop-color: var(--tertiary-color); stop-opacity: 1" />
+                                    <stop offset="100%" style="stop-color: var(--tertiary-color); stop-opacity: 0" />
+                                </radialGradient>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color: var(--secondary-color); stop-opacity: 1" />
+                                    <stop offset="100%" style="stop-color: var(--secondary-color); stop-opacity: 1" />
+                                </linearGradient>
+                            </defs>
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <title>broadcast</title>
+                                <desc>Created with Sketch.</desc>
+                                <g id="broadcast" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linejoin="round">
+                                    <g id="编组" transform="translate(4.000000, 10.000000)">
+                                        <rect width="48" height="48" fill="white" fill-opacity="0.01"></rect>
+                                        <ellipse id="Oval" fill="var(--primary-color)" fill-rule="nonzero" cx="20" cy="14.0979414" rx="4.54545455" ry="4.53125" stroke="none"></ellipse>
+                                        <path d="M12,5 C6.66666667,9.97056275 6.66666667,18.0294373 12,23 M28,23 C33.3333333,18.0294373 33.3333333,9.97056275 28,5" id="Oval-2" stroke-linecap="round" stroke="var(--primary-color)" stroke-width="4"></path>
+                                        <path d="M5.85786438,1.59872116e-14 C-1.95262146,7.78607807 -1.95262146,20.4098048 5.85786438,28.1958829 M34.1421356,28.1958829 C41.9526215,20.4098048 41.9526215,7.78607807 34.1421356,1.24344979e-14" id="Oval-3" stroke-linecap="round" stroke="var(--primary-color)" stroke-width="4"></path>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <span>BROADCAST NOW!</span>
+                    </div>
+                </div>
+                
+                <!-- Broadcast Form Content -->
+                <div class="p-6 mt-8">
+                    <div class="flex flex-col gap-4">
+                        <!-- Dropdown Row -->
+                        <div class="flex flex-row gap-4">
+                            <!-- Class Selection Dropdown -->
+                            <div (click)="checkDropdown(classes, 'Currently you have no class to alert')" ngbDropdown class="ghover w-1/2 h-8 rounded-lg flex items-center justify-center px-3 boxkolor transition-all duration-300" style="box-shadow: var(--card-shadow);">
+                                <div ngbDropdownToggle class="btntop text-[var(--text-color)] text-sm" style="font-size: 8px;">
+                                    Class:
+                                </div>
+                                <div ngbDropdownToggle class="btntop hide-toggle-icon text-[var(--text-color)] text-sm ml-1" style="color: var(--input-placeholder); font-size: 8px;">
+                                    {{classToBroadcast==null? 'Select Class': classToBroadcast.class}}
+                                </div>
+                                <svg ngbDropdownToggle class="btntop ml-2" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7 10L12 15L17 10" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <div *ngIf="classes.length" ngbDropdownMenu aria-labelledby="dropdownBasic1" class="toggle">
+                                    <button (click)="setBroadcastClass(class)" *ngFor="let class of classes" ngbDropdownItem>
+                                        <b>{{class.course}}</b> {{class.class}}
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Type Selection Dropdown -->
+                            <div ngbDropdown class="ghover w-1/2 h-8 rounded-lg flex items-center justify-center px-3 boxkolor transition-all duration-300" style="box-shadow: var(--card-shadow);">
+                                <div ngbDropdownToggle class="btntop text-[var(--text-color)] text-sm" style="font-size: 8px;">
+                                    Type:
+                                </div>
+                                <div ngbDropdownToggle class="btntop hide-toggle-icon text-[var(--text-color)] text-sm ml-1" style="color: var(--input-placeholder); font-size: 8px;">
+                                    {{broadcastType}}
+                                </div>
+                                <svg ngbDropdownToggle class="btntop ml-2" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7 10L12 15L17 10" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <div *ngIf="comtypes.length" ngbDropdownMenu aria-labelledby="dropdownBasic1" class="toggle">
+                                    <button (click)="setBroadcastType(type)" *ngFor="let type of comtypes" ngbDropdownItem>
+                                        {{type}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Broadcast Description Input -->
+                        <input [(ngModel)]="broadcast" type="text" class="boxkolor h-8 rounded-lg pl-3 outline-none font-bold" placeholder="Broadcast Description" style="font-size: 12px; box-shadow: var(--card-shadow);">
+                        
+                        <!-- File Upload -->
+                        <label class="boxkolor cursor-pointer h-20 rounded-lg flex items-center justify-center" style="display: block; position: relative; overflow: hidden; box-shadow: var(--card-shadow);">
+                            <span class="text-[var(--text-color)]" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px;">
+                                {{broadcastContent==null?'Click to browse audio files':getBroadcastFilename() }}
+                            </span>
+                            <input class="cursor-pointer" type="file" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0;" accept="audio/*" (change)="handleFileSelect($event)">
+                        </label>
+                        
+                        <!-- Broadcast Button -->
+                        <button (click)="sendBroadcast()" class="ml-auto mr-auto h-8 w-24 rounded-lg flex items-center justify-center transition-all duration-300" style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text); box-shadow: var(--card-shadow);" onmouseover="this.style.backgroundColor='var(--btn-primary-hover)'; this.style.boxShadow='var(--card-hover-shadow)'" onmouseout="this.style.backgroundColor='var(--btn-primary-bg)'; this.style.boxShadow='var(--card-shadow)'">
+                            <p class="text-xs font-medium">Broadcast</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lower Right: Alert Container -->
+            <div class="bg-[var(--body-color)] rounded-2xl relative" style="box-shadow: var(--card-shadow); min-height: 280px;">
+                <!-- Alert Header Badge -->
+                <div class="rounded-xl bg-[var(--body-color)]" style="position:absolute; top: -20px; left: 31px; width: 290px; height: 50px; box-shadow: var(--card-shadow);"> 
+                    <div class="ml-4 mt-2.5 animate-wave text-center text-[var(--text-color)] text-2xl" style="display: flex; align-items: center;">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="25" height="25" style="margin-right: 8px;">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11 13C11 13.5523 11.4477 14 12 14C12.5523 14 13 13.5523 13 13V8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8V13ZM13 15.9888C13 15.4365 12.5523 14.9888 12 14.9888C11.4477 14.9888 11 15.4365 11 15.9888V16C11 16.5523 11.4477 17 12 17C12.5523 17 13 16.5523 13 16V15.9888Z" fill="var(--primary-color)"></path>
+                        </svg>
+                        <span>Send Alert!</span>
+                    </div>
+                </div>
+                
+                <!-- Alert Form Content -->
+                <div class="p-6 mt-8">
+                    <div class="flex flex-col gap-4">
+                        <!-- Dropdown Row -->
+                        <div class="flex flex-row gap-4">
+                            <!-- Class Selection Dropdown -->
+                            <div (click)="checkDropdown(classes, 'Currently you have no class to alert')" ngbDropdown class="ghover w-1/2 h-8 rounded-lg flex items-center justify-center px-3 boxkolor transition-all duration-300" style="box-shadow: var(--card-shadow);">
+                                <div ngbDropdownToggle class="btntop text-[var(--text-color)] text-sm" style="font-size: 8px;">
+                                    Class:
+                                </div>
+                                <div ngbDropdownToggle class="btntop hide-toggle-icon text-[var(--text-color)] text-sm ml-1" style="color: var(--input-placeholder); font-size: 8px;">
+                                    {{classToAlert==null? 'Select Class': classToAlert.class}}
+                                </div>
+                                <svg ngbDropdownToggle class="btntop ml-2" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7 10L12 15L17 10" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <div *ngIf="classes.length" ngbDropdownMenu aria-labelledby="dropdownBasic1" class="toggle">
+                                    <button (click)="setAlertClass(class)" *ngFor="let class of classes" ngbDropdownItem>
+                                        <b>{{class.course}}</b> {{class.class}}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Type Selection Dropdown -->
+                            <div ngbDropdown class="ghover w-1/2 h-8 rounded-lg flex items-center justify-center px-3 boxkolor transition-all duration-300" style="box-shadow: var(--card-shadow);">
+                                <div ngbDropdownToggle class="btntop text-[var(--text-color)] text-sm" style="font-size: 8px;">
+                                    Type:
+                                </div>
+                                <div ngbDropdownToggle class="btntop hide-toggle-icon text-[var(--text-color)] text-sm ml-1" style="color: var(--input-placeholder); font-size: 8px;">
+                                    {{alertType}}
+                                </div>
+                                <svg ngbDropdownToggle class="btntop ml-2" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7 10L12 15L17 10" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <div *ngIf="comtypes.length" ngbDropdownMenu aria-labelledby="dropdownBasic1" class="toggle">
+                                    <button (click)="setAlertType(type)" *ngFor="let type of comtypes" ngbDropdownItem>
+                                        {{type}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Alert Description Input -->
+                        <input [(ngModel)]="alertDesc" type="text" class="boxkolor h-8 rounded-lg pl-3 outline-none font-bold" placeholder="Alert Description" style="font-size: 12px; box-shadow: var(--card-shadow);">
+                        
+                        <!-- Alert Message Input -->
+                        <textarea [(ngModel)]="alertMessage" class="boxkolor h-20 rounded-lg p-3 outline-none font-bold resize-none" placeholder="Alert Message" style="font-size: 12px; box-shadow: var(--card-shadow);"></textarea>
+                        
+                        <!-- Send Alert Button -->
+                        <button (click)="sendAlert()" class="ml-auto mr-auto h-8 w-24 rounded-lg flex items-center justify-center transition-all duration-300" style="background-color: var(--btn-danger-bg); color: var(--text-color-light); box-shadow: var(--card-shadow);" onmouseover="this.style.backgroundColor='var(--btn-danger-hover)'; this.style.boxShadow='var(--card-hover-shadow)'" onmouseout="this.style.backgroundColor='var(--btn-danger-bg)'; this.style.boxShadow='var(--card-shadow)'">
+                            <p class="text-xs font-medium">Send Alert</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div *ngIf="chatShowModal" [@fadeInOut] class="modal-overlayzz">
+        <div class="modal-contentzz flex flex-col h-3/4 w-4/5 lg:w-1/4">
+            <header class="px-4 py-3 lg:py-4 text-[var(--text-color)] bg-[var(--body-color)] flex justify-between items-center">
+                <button (click)="closeChatModal()" class="text-blue-500 focus:outline-none">
+                    <i class=" fas fa-arrow-left text-[var(--text-color)]"></i>
+                </button>
+                <h1 class="text-xl text-center font-semibold text-[var(--text-color)] flex-1">{{chat.firstname +' '+ chat.lastname}}</h1>
+                <button (click)="closeModals()" class="text-blue-500 focus:outline-none">
+                    <i class="fas fa-close text-[var(--text-color)]"></i> 
+                </button>
+            </header>
+            
+            <div class="linya"> </div>
+            
+            <main class="flex-1 overflow-y-scroll p-4 bg-[var(--body-color)]">
+                <div class="flex flex-col ">
+                    <ng-container *ngFor="let message of getMessages()" >
+                        <div *ngIf="user.id == message.senderid; else notMe" class="bg-blue-500 mb-2 rounded-xl text-right p-2 max-w-64 self-end">
+                            <h1 class="text-white">{{message.message}}</h1>
+                        </div>
+                        <ng-template #notMe>
+                            <div class="bg-gray-500 bg-gray-800 p-2 pr-4 mb-2 rounded-xl text-left max-w-64 self-start">
+                                <h1 class="text-white">{{message.message}}</h1>
+                            </div>
+                        </ng-template>
+                    </ng-container>
+                </div>
+            </main>
+            
+            <footer class="bg-[var(--body-color)]">
+                <div class="bg-transparent">
+                    <div class="flex items-center mx-1 my-3">
+                        <div class="relative flex items-center w-full rounded-xl mx-3" style="box-shadow: var(--card-shadow);">
+                            <input #messageInput type="text" [(ngModel)]="message" placeholder="Type your message..." class="flex-1 py-2 px-3 rounded-lg border border-[var(--input-border)] focus:outline-none focus:ring-black focus:border-[var(--input-focus-border)] text-[var(--input-text)] font-normal" style="background-color: var(--input-bg);">
+                            <button (click)="chat.anonymous? sendMessageAnonymous() : sendMessage()" class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer pr-3">
+                                <i class="fa-solid fa-paper-plane text-[var(--text-color)] text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>  
+    </div>
+    
+</div>    
+</section>

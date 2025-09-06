@@ -1,0 +1,63 @@
+<!-- Sidebar -->
+<nav class="sidebar " [class.close]="!isOpen">
+  <header>
+    <div class="image-text mt-2">
+      <span class="image">
+        <img class="w-14 h-14" src="assets/login/geria.png" alt="QLab Logo" />
+      </span>
+
+      <div class="text logo-text  items-center">
+        <span class="name font-sans !font-bold text-primary-950">Geria Drive</span>
+        <span class="profession">for LMS</span>
+      </div>
+    </div>
+
+    <i class="bx bx-chevron-left !z-50 toggle" (click)="toggleSidebar()"></i>
+  </header>
+
+  <div class="menu-bar">
+    <div class="menu">
+      <ul class="menu-links">
+        <li class="nav-link cursor-pointer select-none" 
+            [class.active]="currentView === 'my-files'"
+            (click)="setCurrentView('my-files')"
+            data-tooltip="My Files">
+          <a>
+            <i class="bx bx-folder icon"></i>
+            <span class="text nav-text">MY FILES</span>
+          </a>
+        </li>
+        <li class="nav-link cursor-pointer select-none"
+            [class.active]="currentView === 'recent'"
+            (click)="setCurrentView('recent')"
+            data-tooltip="Recent">
+          <a>
+            <i class="bx bx-time icon"></i>
+            <span class="text nav-text">RECENT</span>
+          </a>
+        </li>
+        <li class="nav-link cursor-pointer select-none"
+            [class.active]="currentView === 'trash'"
+            (click)="setCurrentView('trash')"
+            data-tooltip="Trash">
+          <a>
+            <i class="bx bx-trash icon"></i>
+            <span class="text nav-text">TRASH</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Bottom Content - Logout Button -->
+    <div class="bottom-content">
+      <ul>
+        <li class="cursor-pointer select-none" data-tooltip="Logout">
+          <a (click)="logout()">
+            <i class="bx bx-log-out icon"></i>
+            <span class="text nav-text">Logout</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

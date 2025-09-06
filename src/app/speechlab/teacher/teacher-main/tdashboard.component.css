@@ -1,0 +1,33 @@
+
+
+/* Styling for the links */
+.nav-link {
+  font-size: 1.25rem; /* Default text-lg */
+  color: rgba(0, 0, 0, 0.25); /* Equivalent to text-black/25 */
+  transition: color 0.3s ease;
+}
+
+/* Responsive font sizes */
+@media (min-width: 640px) {
+  .nav-link {
+    font-size: 1.5rem; /* Equivalent to sm:text-xl */
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-link {
+    font-size: 2rem; /* Equivalent to lg:text-2xl */
+  }
+}
+
+/* Active state styling */
+.active-link {
+  font-weight: bold;
+  background: linear-gradient(
+    to bottom right,
+    var(--primary),
+    var(--secondary)
+  );
+  background-clip: text;
+  color: transparent;
+}

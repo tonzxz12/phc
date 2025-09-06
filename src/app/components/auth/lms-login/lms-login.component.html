@@ -1,0 +1,105 @@
+<div id="login-page" class="absolute top-0 right-0 p-2 z-10">
+  <button
+  class="ml-2  flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 "
+    (click)="toggleDarkMode()"
+  >
+    <i class="fa-solid {{isDarkModeEnabled() ? 'fa-moon':'fa-sun'}} text-yellow-500 text-lg"></i>
+  </button>
+</div>
+
+
+
+<div class="flex flex-col h-screen content gradint animate-wave relative lg:flex-row">
+  <!-- Left section (Image and text) -->
+ <div class="box-border flex-1 hidden p-8 bg-cover custom:hidden lg:block lg:w-3/5 my-div lg:p-20">
+    <div class="text">
+      <!-- Main title -->
+      <div class="mx-auto mt-6 ml-4 text-2xl text-white  title lg:text-5xl lg:mt-20 lg:ml-10">
+        <h2>{{ pageTitle }}</h2>
+        <h2 *ngFor="let subtitle of pageSubtitles">{{ subtitle }}</h2>
+      </div>
+
+      <!-- Training program title -->
+      <div class="mx-auto mt-6 ml-4 text-4xl text-white title lg:text-3xl lg:mt-20 lg:ml-10">
+        <h4 class="titleB">{{ trainingProgramTitle }}</h4>
+      </div>
+
+      <!-- Subtitle description -->
+      <div class="pt-3 mx-auto mt-20 ml-4 text-white desc lg:ml-10 lg:pt-5 lg:w-70">
+        <p class="text-lg lg:text-sm">
+          {{ trainingDescription }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right section (Login form) -->
+  <div class="flex items-center justify-center flex-1 p-4 lg:bg-primary-50 lg:mt-0 lg:p-8 z-2">
+    <div class="flex items-center justify-center flex-1 w-full mt-4 lg:w-2/5 lg:mt-0 lg:p-8 z-2">
+      <div class="block lg:hidden absolute inset-0 w-full h-full z-0">
+          <video #bgVideo autoplay muted loop playsinline class="w-full h-full object-cover">
+            <source src="assets/login/Geria.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div class="absolute inset-0 bg-black bg-opacity-10 pointer-events-none"></div>
+        </div>
+      <div class="h-auto p-4 bg-primary-100 rounded-3xl lg:p-4 shadow-lg lg:w-3/4 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-5">
+        </div>
+        
+
+        <div class="relative z-10">
+          <!-- Logo (Dynamic) -->
+          <div class="relative flex items-center justify-center qlab">
+            <img [src]="imageSrc" [alt]="imageAlt" [ngClass]="imageClass" />
+          </div>
+
+          <!-- Login form -->
+          <form class="pt-2 qlab-desc lg:pt-4">
+            <p class=" !text-sm text-center !font-sans lg:text-xl text-primary-900">{{ welcomeText }}</p>
+
+            <!-- Input fields -->
+            <div class="mt-2 input-div lg:mt-4 ">
+              <input name="email" type="email" [(ngModel)]="username" class="w-full p-2 mb-2 border rounded text-primary-900"
+                [placeholder]="emailPlaceholder" />
+              <div class="relative">
+                <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password"
+                  class="relative w-full p-2 border rounded  text-primary-900" [placeholder]="passwordPlaceholder" />
+                <i (click)="toggleShowPassword()"
+                  class="text-primary-700 absolute right-2.5 top-3 cursor-pointer password-icon fas "
+                  [ngClass]="{ 'fa-eye': showPassword, 'fa-eye-slash': !showPassword }" aria-hidden="true"></i>
+              </div>
+            </div>
+
+            <!-- Remember me checkbox -->
+            <div class="flex items-center mt-2 checkbox-div lg:mt-4">
+              <input type="checkbox" [(ngModel)]="rememberMe" />
+              <p class="ml-2 text-xs rmb lg:text-xs text-primary-900">{{ rememberMeText }}</p>
+            </div>
+
+            <!-- Submit button -->
+            <div class="mt-4 shadow-lg submit-btn lg:mt-6">
+              <button type="submit" (click)="login()"
+                class="w-full p-2 text-white border rounded-xl lg:p-3 bg-[var(--secondary-color)] uppercase">
+                {{ loginButtonText }}
+              </button>
+            </div>
+
+            <!-- Register link and Drive link -->
+            <div class="mt-2 text-xs text-center register lg:mt-6  lg:text-xs text-primary-900">
+              Register
+              <a class="underline cursor-pointer" (click)="openModal()">
+                here
+              </a>
+            </div>
+            
+          
+            
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+

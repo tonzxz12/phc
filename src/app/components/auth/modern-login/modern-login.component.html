@@ -1,0 +1,225 @@
+<!-- Hospital Modern Login Container -->
+<div class="hospital-login-container">
+  <!-- Medical Background Pattern -->
+  <div class="medical-bg-pattern">
+    <div class="medical-cross medical-cross-1"></div>
+    <div class="medical-cross medical-cross-2"></div>
+    <div class="medical-cross medical-cross-3"></div>
+    <div class="pulse-ring pulse-ring-1"></div>
+    <div class="pulse-ring pulse-ring-2"></div>
+    <div class="dna-helix"></div>
+  </div>
+
+  <!-- Dark Mode Toggle -->
+  <button 
+    class="theme-toggle"
+    (click)="toggleDarkMode()"
+    [attr.aria-label]="isDarkModeEnabled() ? 'Switch to light mode' : 'Switch to dark mode'">
+    <i [class]="isDarkModeEnabled() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+  </button>
+
+  <!-- Main Content Grid -->
+  <div class="login-grid">
+    
+    <!-- Left Side - Medical Branding & Info -->
+    <div class="medical-brand-section">
+      <div class="medical-overlay"></div>
+      <div class="brand-content">
+        <!-- Logo & Hospital Identity -->
+        <div class="hospital-identity">
+          <div class="logo-container">
+            <div class="medical-logo-bg">
+              <img 
+                [src]="imageSrc" 
+                [alt]="imageAlt" 
+                class="hospital-logo"
+                loading="lazy">
+            </div>
+          </div>
+          <div class="hospital-info">
+            <h1 class="hospital-name">{{ trainingProgramTitle }}</h1>
+            <p class="hospital-tagline">Healthcare Excellence Through Learning</p>
+          </div>
+        </div>
+
+        <!-- Medical Stats Cards -->
+        <div class="medical-stats">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="pi pi-heart"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">24/7</div>
+              <div class="stat-label">Patient Care</div>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="pi pi-users"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">500+</div>
+              <div class="stat-label">Medical Staff</div>
+            </div>
+          </div>
+        
+        </div>
+
+        <!-- Medical Services -->
+        <div class="medical-services">
+          <h3 class="services-title">Our Healthcare Services</h3>
+          <div class="service-list">
+            <div class="service-item">
+              <i class="pi pi-plus-circle"></i>
+              <span>Emergency Care</span>
+            </div>
+            <div class="service-item">
+              <i class="pi pi-heart"></i>
+              <span>Cardiology</span>
+            </div>
+            <div class="service-item">
+              <i class="pi pi-eye"></i>
+              <span>Diagnostics</span>
+            </div>
+            <div class="service-item">
+              <i class="pi pi-users"></i>
+              <span>General Medicine</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Secure Login Form -->
+    <div class="secure-form-section">
+      <div class="form-container">
+        
+        <!-- Security Header -->
+        <div class="security-header">
+          <div class="security-badge">
+            <i class="pi pi-shield"></i>
+            <span>Login Portal</span>
+          </div>
+          <h2 class="form-title">{{ pageTitle }}</h2>
+          <p class="form-subtitle">{{ pageSubtitles[0] }}</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="medical-login-form" (ngSubmit)="login()" #loginForm="ngForm">
+          
+          <!-- Email Input -->
+          <div class="medical-input-group">
+            <label for="email" class="medical-label">Medical ID / Email</label>
+            <div class="medical-input-wrapper">
+              <div class="input-icon">
+                <i class="pi pi-user"></i>
+              </div>
+              <input
+                id="email"
+                type="email"
+                class="medical-input"
+                [placeholder]="emailPlaceholder"
+                [value]="username"
+                (input)="usernameHandler($event)"
+                (keypress)="onKeyPress($event)"
+                autocomplete="email"
+                required>
+              <div class="input-border"></div>
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="medical-input-group">
+            <label for="password" class="medical-label">Secure Password</label>
+            <div class="medical-input-wrapper">
+              <div class="input-icon">
+                <i class="pi pi-lock"></i>
+              </div>
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                class="medical-input"
+                [placeholder]="passwordPlaceholder"
+                [value]="password"
+                (input)="passwordHandler($event)"
+                (keypress)="onKeyPress($event)"
+                autocomplete="current-password"
+                required>
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="toggleShowPassword()"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+              <div class="input-border"></div>
+            </div>
+          </div>
+
+          <!-- Security Options -->
+          <div class="security-options">
+            <label class="medical-checkbox">
+              <input
+                type="checkbox"
+                [checked]="rememberMe"
+                (change)="rememberMe = !rememberMe"
+                name="rememberMe"
+                class="checkbox-input">
+              <span class="checkbox-mark">
+                <i class="pi pi-check"></i>
+              </span>
+              <span class="checkbox-text">{{ rememberMeText }}</span>
+            </label>
+
+            <button 
+              type="button" 
+              class="security-link"
+              (click)="openModal()">
+              <i class="pi pi-question-circle"></i>
+              Need Help?
+            </button>
+          </div>
+
+          <!-- Secure Login Button -->
+          <button
+            type="submit"
+            class="secure-login-btn"
+            [disabled]="!username || !password">
+            <span class="btn-content">
+              <i class="pi pi-shield"></i>
+              {{ loginButtonText }}
+            </span>
+          </button>
+
+        </form>
+
+        <!-- Security Notice -->
+        <div class="security-notice">
+          <div class="notice-icon">
+            <i class="pi pi-info-circle"></i>
+          </div>
+          <div class="notice-content">
+            <strong>Security Notice:</strong> This system contains confidential medical information. 
+            Unauthorized access is strictly prohibited and monitored.
+          </div>
+        </div>
+
+
+        <!-- Support Contact -->
+        <!-- <div class="support-contact">
+          <span class="support-text">Need technical support?</span>
+          <button 
+            type="button" 
+            class="support-btn"
+            (click)="openModal()">
+            Contact IT Department
+          </button>
+        </div> -->
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

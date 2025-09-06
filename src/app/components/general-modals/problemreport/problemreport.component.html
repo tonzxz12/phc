@@ -1,0 +1,79 @@
+<div class="fixed inset-0 flex items-center justify-center z-50" style="background-color: var(--modal-overlay);">
+  <div class="rounded-lg w-full max-w-md mx-4" style="background-color: var(--modal-bg); box-shadow: var(--card-hover-shadow); border: 1px solid var(--modal-border);">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold" style="color: var(--text-color);">Report a Bug</h2>
+        <button (click)="closeModal()" class="transition-colors duration-200 focus:outline-none"
+                style="color: var(--input-placeholder);"
+                onmouseover="this.style.color='var(--primary-color)'"
+                onmouseout="this.style.color='var(--input-placeholder)'">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1" style="color: var(--text-color);">I have a problem with</label>
+          <div class="relative">
+            <select
+              [(ngModel)]="option"
+              (change)="selectOption($event)"
+              class="block appearance-none w-full py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2"
+              style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); color: var(--btn-primary-text); border: 1px solid var(--input-border);"
+            >
+              <option value="" disabled selected hidden>SELECT OPTION</option>
+              <option value="Security">Security</option>
+              <option value="Feature">Feature</option>
+              <option value="Technical">Technical</option>
+              <option value="Account">Account</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2" style="color: var(--btn-primary-text);">
+              <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="title" class="block text-sm font-medium mb-1" style="color: var(--text-color);">Title</label>
+          <input
+            id="title"
+            [(ngModel)]="title"
+            type="text"
+            placeholder="Enter a title"
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all"
+            style="background-color: var(--input-bg); color: var(--input-text); border-color: var(--input-border); box-shadow: var(--card-shadow);"
+          />
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium mb-1" style="color: var(--text-color);">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="description"
+            rows="5"
+            placeholder="Describe the bug in detail"
+            class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all"
+            style="background-color: var(--input-bg); color: var(--input-text); border-color: var(--input-border); box-shadow: var(--card-shadow);"
+          ></textarea>
+        </div>
+
+        <div class="pt-4">
+          <button
+            (click)="submit()"
+            class="w-full py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 hover:transform hover:-translate-y-1"
+            style="background: linear-gradient(135deg, var(--btn-primary-bg), var(--btn-primary-hover)); color: var(--btn-primary-text); box-shadow: var(--card-shadow);"
+            onmouseover="this.style.boxShadow='var(--card-hover-shadow)'"
+            onmouseout="this.style.boxShadow='var(--card-shadow)'"
+          >
+            SUBMIT
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

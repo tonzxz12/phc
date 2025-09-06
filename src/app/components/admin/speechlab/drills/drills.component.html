@@ -1,0 +1,168 @@
+<div class="main-container pb-[5dvh] flex flex-col">
+
+  <!-- Practice Table -->
+  <div class="table-container">
+    <div class="rounded-t-lg bg-primary-2 p-4  flex justify-between items-center">
+      <h1 class="text-xl font-semibold text-white ">Practice</h1>
+      <button class="flex items-center px-4 py-2 font-bold text-white rounded-lg transition duration-300 bg-[#4e75c1]"
+        (click)="addModule()">
+        <!-- Plus SVG Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Add Practice</span>
+      </button>
+    </div>
+    <table>
+      <thead class="">
+        <tr>
+          <th>ID</th>
+          <th>Practice Name</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody class="">
+        <ng-container>
+          <tr class="relative" *ngFor="let t of paginatedPractices">
+            <td>{{t.id}}</td>
+            <td>{{t.name}}</td>
+            <td>{{t.timestamp}}</td>
+            <td>
+              <button class="btn-delete" (click)="deleteModal(t.id)">DELETE</button>
+              <button class="btn-edit" (click)="openEdit(content)">EDIT</button>
+            </td>
+            <!-- Edit Modal -->
+            <ng-template #content let-modal>
+              <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h4 class="modal-title" id="modal-basic-title">Edit Practice</h4>
+                  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="feather feather-x">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                  <label for="practice-name" class="form-label">Practice Name</label>
+                  <input id="practice-name" type="text" [(ngModel)]="t.name" class="form-control"
+                    placeholder="Enter practice name">
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                  <button type="button" class="btn-secondary" (click)="modal.dismiss('Cross click')">Cancel</button>
+                  <button type="button" class="btn-primary"
+                    (click)="savePractice(t); modal.dismiss('Cross click')">Save</button>
+                </div>
+              </div>
+            </ng-template>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <!-- Pagination Controls for Practices -->
+    <div class="w-full flex justify-end items-center p-4 gap-4">
+      <button class=" w-32 py-2 rounded-lg bg-primary-2 text-white " (click)="prevPagePractices()"
+        [disabled]="practicePage === 1">Previous</button>
+      <span>Page {{practicePage}}</span>
+      <button class=" w-32 py-2 rounded-lg bg-primary-2 text-white" (click)="nextPagePractices()"
+        [disabled]="(practicePage * practicePageSize) >= practices.length">Next</button>
+    </div>
+  </div>
+
+
+
+
+  <!-- Drills Table -->
+  <div class="table-container mt-[10dvh]">
+    <div class="bg-primary-2 p-4 flex justify-between items-center">
+      <h1 class="text-xl font-semibold text-white ">Drills</h1>
+      <button class="flex items-center px-4 py-2 font-bold text-white rounded-lg transition duration-300 bg-[#4e75c1]"
+        (click)="openModal()">
+        <!-- Plus SVG Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Add Drill</span>
+      </button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Practice</th>
+          <th>Drill Name</th>
+          <th>Drill File Name</th>
+          <th>Audio File Name</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of paginatedDrills">
+          <td>{{item.id}}</td>
+          <td>{{item.practice}}</td>
+          <td>{{item.description}}</td>
+          <td>{{item.drillfile.split('>')[1]}}</td>
+          <td>{{item.audiofile.split('>')[1]}}</td>
+          <td>{{item.timestamp | date:'mediumDate'}}</td>
+          <td>
+            <button class="btn-delete" (click)="deleteModalDrill(item)">DELETE</button>
+            <button class="btn-edit" (click)="editLesson(item)">EDIT</button>
+          </td>
+        </tr>
+        
+      </tbody>
+    </table>
+    <div class="w-full flex justify-end items-center p-4 gap-4">
+      <button class="w-32 py-2 rounded-lg bg-primary-2 text-white" (click)="prevPageDrills()"
+        [disabled]="drillPage === 1">Previous</button>
+      <span>Page {{drillPage}}</span>
+      <button class="w-32 py-2 rounded-lg bg-primary-2 text-white" (click)="nextPageDrills()"
+        [disabled]="(drillPage * drillPageSize) >= drills.length">Next</button>
+    </div>
+  </div>
+
+</div>
+
+
+<div [@openClose] *ngIf="modalPractice[practiceUid]" class="fixed inset-0 z-[1000] w-screen h-screen ">
+  <div class="w-full h-full bg-black/50 flex justify-center items-center">
+    <div class="w-full max-w-lg h-fit flex flex-col justify-center items-center gap-6 bg-white p-4 rounded-lg relative">
+      <i class="fas fa-times absolute top-2 right-2 text-xl cursor-pointer hover:text-red-500 flex items-center justify-center"
+        (click)="modalClose()"></i>
+      <h1 class="text-center w-full max-w-[70%] text-2xl">Are you sure you want to delete this practice?</h1>
+      <i class="fas fa-question text-9xl text-red-500 w-full text-center"></i>
+      <div class="flex justify-center items-center w-full gap-6 pb-4">
+        <button class="bg-red-500 text-white w-32 py-2 rounded-lg" (click)="deleteModule(practiceUid)">Yes</button>
+        <button class="bg-primary-2 text-white w-32 py-2 rounded-lg" (click)="modalClose()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div [@openClose] *ngIf="modalDrill[drillUid]" class="fixed inset-0 z-[1000] w-screen h-screen">
+  <div class="w-full h-full bg-black/50 flex justify-center items-center">
+    <div class="w-full max-w-lg h-fit flex flex-col justify-center items-center gap-6 bg-white p-4 rounded-lg relative">
+      <i class="fas fa-times absolute top-2 right-2 text-xl cursor-pointer hover:text-red-500 flex items-center justify-center"
+        (click)="modalCloseDrill()"></i>
+      <h1 class="text-center w-full max-w-[70%] text-2xl">Are you sure you want to delete this drill?</h1>
+      <i class="fas fa-question text-9xl text-red-500 w-full text-center"></i>
+      <div class="flex justify-center items-center w-full gap-6 pb-4">
+        <!-- Trigger the delete operation with the current selectedDrill -->
+        <button class="bg-red-500 text-white w-32 py-2 rounded-lg" (click)="deleteLesson()">Yes</button>
+        <button class="bg-primary-2 text-white w-32 py-2 rounded-lg" (click)="modalCloseDrill()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

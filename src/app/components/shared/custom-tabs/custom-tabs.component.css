@@ -1,0 +1,32 @@
+.custom-tabs-container {
+  width: 100%;
+}
+
+.tab-headers {
+  display: flex;
+  border-bottom: 2px solid var(--card-border);
+}
+
+.tab-headers button {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-color);
+  transition: var(--tran-03);
+}
+
+.tab-headers button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.tab-headers button:hover {
+  color: var(--primary-color);
+}
+
+.tab-content {
+  padding: 20px;
+  background-color: var(--body-color);
+}

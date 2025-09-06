@@ -1,0 +1,265 @@
+<div class="fixed inset-0 flex items-center justify-center z-50" style="background-color: var(--modal-overlay);">
+  <div class="rounded-lg flex flex-col w-[1000px] h-[80dvh] relative shadow-lg" style="background-color: var(--modal-bg);">
+    <i class="absolute text-xl cursor-pointer fa-solid fa-xmark top-2 right-2 transition-transform hover:scale-110"
+        style="color: var(--input-placeholder);"
+        (click)="closeModal()"></i>
+    <div class="flex flex-col w-full overflow-hidden h-fit">
+
+      <!-- Header -->
+      <div class="flex items-center justify-center p-8">
+        <h1 class="text-2xl font-bold text-center text-transparent bg-gradient-to-r bg-clip-text"
+            style="background-image: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+          CREATE COURSE</h1>
+      </div>
+
+      <div class="w-full px-4 overflow-y-auto h-fit">
+        <!-- Image Upload Section -->
+        <div class="w-full h-64 mb-6">
+          <div class="flex items-center justify-center h-full">
+            <img *ngIf="courseImagePreview; else noImage" [src]="courseImagePreview" alt="Course Image"
+              class="object-cover w-full h-full rounded-lg shadow-md" />
+            <ng-template #noImage>
+              <button (click)="uploadCourseImage()"
+                class="flex items-center justify-center w-full h-full border-dashed rounded-lg transition-transform hover:scale-105"
+                style="background-color: var(--btn-secondary-bg); border: 2px dashed var(--card-border);">
+                <span style="color: var(--input-placeholder);">Please upload a Course Photo / Background</span>
+              </button>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="grid grid-cols-3 gap-4 mb-8">
+          <input type="text" [(ngModel)]="courseTitle" placeholder="Course Title"
+            class="w-full col-span-3 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2"
+            style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);" />
+          <textarea [(ngModel)]="courseDesc" placeholder="Description"
+            class="w-full h-24 col-span-3 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2"
+            style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);"></textarea>
+
+          <textarea [(ngModel)]="courseObjective" placeholder="Objectives"
+            class="w-full h-24 col-span-3 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2"
+            style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);"></textarea>
+
+          <div class="relative">
+            <button (click)="toggleDropdown('test'); $event.stopPropagation()"
+              class="flex items-center justify-between w-full p-3 text-left rounded-lg shadow-sm focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+              style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+              <span *ngIf="!selectedTest">Will have Pre-Test and Post-Test?</span>
+              <span *ngIf="selectedTest">Pre-Test and Post-Test: {{ selectedTest || 'Not Selected' }}</span>
+
+              <svg class="w-5 h-5" style="color: var(--input-placeholder);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div *ngIf="showTestDropdown"
+              class="absolute z-10 w-full mt-1 rounded-lg shadow-lg"
+              style="background-color: var(--modal-bg); border: 1px solid var(--card-border);"
+              (clickOutside)="showTestDropdown = false">
+              <label *ngFor="let option of testOptions" class="block px-4 py-2 transition-transform hover:scale-105"
+                     style="color: var(--text-color);">
+                <input type="checkbox" [checked]="selectedTest === option" (change)="onSelectTest(option)"
+                  class="mr-2" />
+                {{ option }}
+              </label>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button (click)="toggleDropdown('audience'); $event.stopPropagation()"
+              class="flex items-center justify-between w-full p-3 text-left rounded-lg shadow-sm focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+              style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+              <span>Select Target Audience</span>
+
+              <svg class="w-5 h-5" style="color: var(--input-placeholder);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div *ngIf="showAudienceDropdown"
+              class="absolute z-10 w-full mt-1 rounded-lg shadow-lg"
+              style="background-color: var(--modal-bg); border: 1px solid var(--card-border);"
+              (clickOutside)="showAudienceDropdown = false">
+              <label *ngFor="let option of audienceOptions" class="block px-4 py-2 transition-transform hover:scale-105"
+                     style="color: var(--text-color);">
+                <input type="checkbox" [checked]="selectedAudience.includes(option)" (change)="onSelectAudience(option)"
+                  class="mr-2" />
+                {{ option }}
+              </label>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button (click)="toggleDropdown('requirements'); $event.stopPropagation()"
+              class="flex items-center justify-between w-full p-3 text-left rounded-lg shadow-sm focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+              style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+              <span>Define Technical Requirements</span>
+              <svg class="w-5 h-5" style="color: var(--input-placeholder);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div *ngIf="showRequirementsDropdown"
+              class="absolute z-10 w-full mt-1 rounded-lg shadow-lg"
+              style="background-color: var(--modal-bg); border: 1px solid var(--card-border);"
+              (clickOutside)="showRequirementsDropdown = false">
+              <label *ngFor="let option of requirementsOptions" class="block px-4 py-2 transition-transform hover:scale-105"
+                     style="color: var(--text-color);">
+                <input type="checkbox" [checked]="selectedRequirements.includes(option)"
+                  (change)="onSelectRequirement(option)" class="mr-2" />
+                {{ option }}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lessons Section -->
+        <div class="overflow-y-auto max-h-[430px] space-y-6 mb-8">
+          <div *ngFor="let lesson of lessons; let i = index"
+            class="w-full p-4 border rounded-lg"
+            style="background-color: var(--card-bg); border-color: var(--card-border);">
+            <div class="flex items-center justify-between py-2 mb-4 text-white rounded-t-lg"
+                 style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+              <h1 class="ml-4 text-lg font-bold">LESSON {{ i + 1 }}</h1>
+              <button *ngIf="i > 0" (click)="deleteLesson(i)" class="mr-4 text-white transition-transform hover:scale-110">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <input type="text" [(ngModel)]="lesson.lessonName" placeholder="Lesson Name"
+                class="w-full col-span-1 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2"
+                style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);" />
+              <select [(ngModel)]="lesson.complexity" (change)="setComplexity(lesson.complexity, lesson)"
+                class="w-full col-span-1 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2"
+                style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+                <option value="" disabled selected hidden>Complexity: Beginner</option>
+                <option *ngFor="let complex of complexityOptions; let j = index" [value]="j">
+                  {{ complex }}
+                </option>
+              </select>
+              <textarea [(ngModel)]="lesson.description" placeholder="Description"
+                class="w-full h-24 col-span-2 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2"
+                style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Lesson Button -->
+        <div class="flex justify-end pb-8">
+          <button
+            class="px-4 py-2 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+            style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));"
+            (click)="thisLesson()">ADD LESSON</button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-center w-full gap-4 p-4 space-x-4">
+        <button
+          class="w-full py-2.5 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+          style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));"
+          (click)="submit()">PUBLISH COURSE</button>
+        <button
+          class="w-full py-2.5 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+          style="background-color: var(--btn-danger-bg);"
+          (click)="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Modal for Video Options -->
+<div *ngIf="showVideoModal" class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: var(--modal-overlay);">
+  <div class="p-6 rounded-xl shadow-lg relative w-[400px]" style="background-color: var(--modal-bg);">
+    <!-- Close Button -->
+    <button (click)="showVideoModal = false" class="absolute top-2 right-2 transition-transform hover:scale-110" style="color: var(--input-placeholder);">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Modal Title -->
+    <h2 *ngIf="!isInteractiveVideoMode" class="mb-4 text-lg font-semibold text-center" style="color: var(--text-color);">Upload Video</h2>
+
+    <!-- Buttons for Video Options -->
+    <div *ngIf="!isInteractiveVideoMode" class="flex justify-between space-x-4">
+      <button (click)="handleVideoOption('video')"
+        class="w-full px-4 py-1 transition-transform hover:scale-105 rounded-md text-white"
+        style="background-color: var(--btn-primary-bg);">
+        Video Only
+      </button>
+      <button
+        class="w-full px-4 py-1 transition-transform rounded-md opacity-75 cursor-not-allowed text-white"
+        style="background-color: var(--btn-secondary-bg);"
+        [innerHTML]="hovering ? 'Publish this Course First' : 'Interactive Video'" 
+        (mouseenter)="hovering = true"
+        (mouseleave)="hovering = false">
+      </button>
+    </div>
+
+    <!-- Content for Interactive Video -->
+    <div *ngIf="isInteractiveVideoMode">
+      <!-- Title -->
+      <h2 class="mb-4 text-lg font-semibold text-center" style="color: var(--text-color);">Interactive Video</h2>
+
+      <!-- Video Attachment Section -->
+      <div class="mb-4">
+        <label class="block mb-2 font-medium" style="color: var(--text-color);">
+          Video Attachment: <span class="font-bold">{{ interactiveVideoFileName || 'No video uploaded' }}</span>
+        </label>
+
+        <!-- Conditional Buttons: Upload or Preview -->
+        <div *ngIf="interactiveVideoFile; else uploadButtonTemplate">
+          <!-- Preview Button -->
+          <button (click)="previewVideo()"
+            class="w-full px-6 py-1 transition-transform hover:scale-105 rounded-md text-white"
+            style="background-color: var(--btn-primary-bg);">
+            Preview Video
+          </button>
+        </div>
+        <!-- Upload Button Template -->
+        <ng-template #uploadButtonTemplate>
+          <!-- Upload Video Button -->
+          <button (click)="openFileSelector(currentLesson!, 'mp4', true)"
+            class="w-full px-6 py-1 transition-transform hover:scale-105 rounded-md text-white"
+            style="background-color: var(--btn-primary-bg);">
+            Upload Video
+          </button>
+        </ng-template>
+      </div>
+
+      <!-- Select Quiz Dropdown -->
+      <div class="mb-4">
+        <label class="block mb-2 font-medium" style="color: var(--text-color);">Select a quiz to display:</label>
+        <select [(ngModel)]="selectedQuiz" class="w-full p-2 rounded-lg focus:outline-none"
+                style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+          <option *ngFor="let quiz of quizOptions" [value]="quiz">{{ quiz }}</option>
+        </select>
+      </div>
+
+      <!-- Video Timestamp Input -->
+      <div class="mb-4">
+        <label class="block mb-2 font-medium" style="color: var(--text-color);">Video Timestamp for Popup Quiz (in seconds):</label>
+        <input type="number" [(ngModel)]="videoTimestamp"
+          class="w-full p-2 rounded-lg focus:outline-none" placeholder="Input seconds"
+          style="background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--input-text);">
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-between">
+        <button (click)="handleVideoOption('video')"
+          class="w-[140px] py-1 px-6 rounded-md transition-transform hover:scale-105 text-white"
+          style="background-color: var(--btn-secondary-bg);">
+          Back
+        </button>
+        <button (click)="saveInteractiveVideoSettings()"
+          class="w-[140px] py-1 px-6 rounded-md transition-transform hover:scale-105 text-white"
+          style="background-color: var(--btn-primary-bg);">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

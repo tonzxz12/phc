@@ -1,0 +1,42 @@
+<button
+  class="ml-6 mt-6 flex items-center  shadow-md text-xl rounded-lg px-5 py-2.5 bg-[var(--primary-color)] text-white hover:bg-primary-3  hover:scale-105 hover:shadow-lg transform transition-transform duration-300 ease-out"
+  (click)="goBack()">
+  Back
+</button>
+
+<div class="flex items-center justify-start mt-4 top-container">
+  <div class="flex flex-col items-start">
+    <p class="instruction  mx-8 text-[var(--secondary-color)] text-2xl">
+      Select
+      <a class=" text-transparent bg-clip-text text-primbg-primary-3 ">
+        Language:
+      </a>
+    </p>
+    <p class="description my-2 mx-12 text-[var(--primary-color)] text-lg ">
+      Select Japanese, English, or French, and let the language lab be your gateway to a world of words.
+    </p>
+  </div>
+</div>
+
+<div class="w-full lg:max-w-[95%] max-w-[90%] flex lg:flex-row flex-col flex-wrap justify-center gap-6 p-4 mx-auto">
+  <!-- Card 1 - English -->
+  <div (click)="goToPractice('English')"
+    class="h-44 w-full lg:h-56 lg:w-[30%] rounded-xl overflow-hidden shadow-lg bg-primary-2 flex items-center justify-center 
+      duration-300 ease-in-out hover:shadow-2xl hover:bg-primary-3 hover:scale-105">
+    <div class="text-3xl font-bold text-white opacity-90">ENGLISH</div>
+  </div>
+
+  <!-- Card 2 - French -->
+  <div (click)="goToPractice('French')"
+    class="h-44 w-full lg:h-56 lg:w-[30%] rounded-xl overflow-hidden shadow-lg bg-primary-2 flex items-center justify-center 
+      duration-300 ease-in-out hover:shadow-2xl hover:bg-primary-3 hover:scale-105">
+    <div class="text-3xl font-bold text-white opacity-90">FRENCH</div>
+  </div>
+
+  <!-- Card 3 - Japanese -->
+  <div (click)="goToPractice('Japanese')"
+    class="h-44 w-full lg:h-56 lg:w-[30%] rounded-xl overflow-hidden shadow-lg bg-primary-2 flex items-center justify-center 
+      duration-300 ease-in-out hover:shadow-2xl hover:bg-primary-3 hover:scale-105">
+    <div class="text-3xl font-bold text-white opacity-90">JAPANESE</div>
+  </div>
+</div>

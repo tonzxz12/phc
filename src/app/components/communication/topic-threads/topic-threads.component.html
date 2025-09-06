@@ -1,0 +1,148 @@
+<div class="topic-threads-container p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-primary-theme">Discussion Threads</h2>
+      <p class="text-secondary-theme mt-1">Topic: {{ topicTitle }}</p>
+    </div>
+    
+    <button 
+      class="btn btn-primary flex items-center gap-2"
+      (click)="showCreateThread = true">
+      <i class="pi pi-plus"></i>
+      New Thread
+    </button>
+  </div>
+
+  <!-- Create Thread Form -->
+  <div *ngIf="showCreateThread" class="topic-create-form mb-6">
+    <h3 class="text-lg font-semibold text-primary-theme mb-4">Create New Discussion Thread</h3>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-primary-theme mb-2">Title</label>
+      <input 
+        type="text" 
+        [(ngModel)]="newThreadTitle"
+        class="topic-input w-full"
+        placeholder="Enter thread title..."
+        maxlength="255">
+    </div>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-primary-theme mb-2">Description (Optional)</label>
+      <textarea 
+        [(ngModel)]="newThreadBody"
+        rows="3"
+        class="topic-textarea w-full"
+        placeholder="Enter thread description..."></textarea>
+    </div>
+    
+    <div class="flex justify-end gap-2">
+      <button 
+        class="btn btn-secondary"
+        (click)="cancelCreateThread()">
+        Cancel
+      </button>
+      <button 
+        class="btn btn-primary"
+        (click)="createThread()"
+        [disabled]="!newThreadTitle.trim()">
+        Create Thread
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="topic-loading-card">
+    <i class="pi pi-spin pi-spinner text-2xl text-accent-theme"></i>
+    <p class="mt-2 text-secondary-theme">Loading threads...</p>
+  </div>
+
+  <!-- Threads List -->
+  <div *ngIf="!isLoading" class="space-y-4">
+    <div 
+      *ngFor="let thread of threads" 
+      class="topic-thread-item"
+      (click)="openThread(thread)">
+      
+      <div class="flex justify-between items-start">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <!-- Pinned Badge -->
+            <span *ngIf="thread.isPinned" 
+                  class="topic-badge-pinned inline-flex items-center">
+              <i class="pi pi-thumbtack mr-1"></i>
+              Pinned
+            </span>
+            
+            <!-- Locked Badge -->
+            <span *ngIf="thread.isLocked" 
+                  class="topic-badge-locked inline-flex items-center">
+              <i class="pi pi-lock mr-1"></i>
+              Locked
+            </span>
+          </div>
+          
+          <h3 class="text-lg font-semibold text-primary-theme mb-2">{{ thread.title }}</h3>
+          
+          <p *ngIf="thread.body" class="text-secondary-theme text-sm mb-3 line-clamp-2">
+            {{ thread.body }}
+          </p>
+          
+          <div class="flex items-center justify-between text-sm text-secondary-theme">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
+                <img 
+                  [src]="getAuthorProfile(thread)"
+                  [alt]="getAuthorName(thread)"
+                  class="w-6 h-6 rounded-full object-cover" style="border: 1px solid var(--card-border);">
+                <span>{{ getAuthorName(thread) }}</span>
+              </div>
+              
+              <span>•</span>
+              <span>{{ API.parseDateFromNow(thread.createdAt) }}</span>
+            </div>
+            
+            <div class="flex items-center gap-1">
+              <i class="pi pi-comment"></i>
+              <span>{{ thread.post_count || 0 }} posts</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Teacher Actions -->
+        <div *ngIf="isTeacher" class="flex gap-2 ml-4" (click)="$event.stopPropagation()">
+          <button 
+            class="btn btn-sm"
+            [class.btn-warning]="!thread.isPinned"
+            [class.btn-secondary]="thread.isPinned"
+            (click)="pinThread(thread)"
+            [title]="thread.isPinned ? 'Unpin Thread' : 'Pin Thread'">
+            <i class="pi pi-thumbtack"></i>
+          </button>
+          
+          <button 
+            class="btn btn-sm"
+            [class.btn-danger]="!thread.isLocked"
+            [class.btn-secondary]="thread.isLocked"
+            (click)="lockThread(thread)"
+            [title]="thread.isLocked ? 'Unlock Thread' : 'Lock Thread'">
+            <i class="pi pi-lock"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="threads.length === 0" class="topic-empty-state">
+      <i class="pi pi-comments text-4xl text-secondary-theme mb-4"></i>
+      <h3 class="text-lg font-medium text-primary-theme mb-2">No discussions yet</h3>
+      <p class="text-secondary-theme mb-4">Be the first to start a discussion thread for this topic.</p>
+      <button 
+        class="btn btn-primary"
+        (click)="showCreateThread = true">
+        Start Discussion
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="drive-container">
+  <div class="main-layout" [class.sidebar-collapsed]="!sidebarOpen">
+    <!-- Sidebar Component -->
+    <app-drive-sidebar 
+      [isOpen]="sidebarOpen"
+      (sidebarToggle)="onSidebarToggle($event)"
+      (viewChange)="onViewChange($event)">
+    </app-drive-sidebar>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <!-- Header Component -->
+      <app-drive-header></app-drive-header>
+
+      <!-- Main Content (Body) -->
+      <div class="body-content">
+        <app-drive-body [currentView]="currentView"></app-drive-body>
+      </div>
+    </div>
+  </div>
+</div>

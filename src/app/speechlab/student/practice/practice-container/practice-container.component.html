@@ -1,0 +1,28 @@
+<div class="px-4 md:px-8 w-full h-full mx-auto">
+  <div class="flex items-center justify-start sm:p-8 mt-4">
+    <!-- Back Button Container -->
+    <div (click)="goBack()" class="p-3 bg-gray-200 rounded-xl cursor-pointer">
+      <!-- Add Back Button -->
+      <button  class="flex items-center font-bold">
+        <i class="mr-2 fas fa-arrow-left"></i> 
+        <span class="bg-gradient-to-r from-[--secondary-color] to-[--primary-color] bg-clip-text text-transparent">BACK</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Grid for Items -->
+  <div class="grid gap-4 sm:p-8 py-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 phone:grid-cols-2 grid-cols-1 pb-[5dvh]">
+    <div *ngFor="let item of array; let i = index" class="min-h-[27rem]">
+      <div *ngIf="item.title && item.image" class="flex flex-col justify-between h-full w-full px-0 bg-white shadow-boxz border border-gray-400 rounded-xl overflow-hidden">
+        <h1 class=" text-center uppercase font-extrabold bg-gradient-to-r from-[--secondary-color] to-[--primary-color] bg-clip-text text-transparent md:text-base text-sm p-4">{{item.title}}</h1>
+        <div class="flex-grow flex items-center justify-center p-4">
+          <img [src]="item.image" [alt]="item.title" class="max-w-full max-h-full object-contain">
+        </div>
+        <button (click)="redirectToOtherPage(item.route, item.lesson, item.quiz)" 
+                class="w-full py-2 text-white font-bold text-lg bg-gradient-to-r from-[--secondary-color] to-[--primary-color] hover:opacity-90 transition-opacity">
+          OPEN
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

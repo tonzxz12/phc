@@ -1,0 +1,83 @@
+/* General Form Group Styling */
+.form-group {
+  margin-bottom: 1.5rem;
+  padding: 0 20px; /* Add padding to create spacing around the form */
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Dropdown and Input Fields */
+.form-control {
+  width: 100%;
+  padding: 12px; /* Increased padding for better spacing */
+  font-size: 1rem;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 8px; /* Softer border radius */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for aesthetic effect */
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Increased shadow on focus */
+  outline: none;
+}
+
+/* File Upload Button */
+.btn-upload {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 10px; /* Add margin to separate label from the button */
+}
+
+.btn-upload:hover {
+  background-color: #0056b3;
+}
+
+.file-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Submit Button */
+.btn-submit {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 30px; /* Larger padding for more space */
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.btn-submit:hover {
+  background-color: #218838;
+}
+
+/* Upload Group Styling */
+.upload-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Adding spacing around the entire container */
+.ng-container {
+  padding: 20px;
+  background-color: #f9f9f9; /* Soft background to make form stand out */
+  border-radius: 10px; /* Softer edges around the form */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow around the form */
+}

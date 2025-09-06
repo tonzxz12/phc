@@ -1,0 +1,401 @@
+<div class="evaluation-dashboard-container" [style]="{'background': 'var(--body-color)', 'color': 'var(--text-color)', 'min-height': '100vh'}">
+  <!-- Header Section -->
+  <div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 [style]="{'color': 'var(--text-color)'}">Evaluation Reports Dashboard</h1>
+        <p [style]="{'color': 'var(--text-muted)'}">Monitor and manage student feedback for courses and teachers</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="stats-section">
+    <div class="stats-grid">
+      <!-- Course Evaluations Stats -->
+      <div class="stat-card course-stats" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+        <div class="stat-header">
+          <div class="stat-icon course-icon" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <h3 [style]="{'color': 'var(--text-color)'}">Course Evaluations</h3>
+        </div>
+        <div class="stat-metrics">
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--primary-color)'}">{{ courseStats.total }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Total Evaluations</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--success-color)'}">{{ courseStats.averageRating.toFixed(1) }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Average Rating</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--warning-color)'}">{{ courseStats.pendingReview }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Pending Review</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--secondary-color)'}">{{ courseStats.positiveRecommendations }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Recommended</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teacher Evaluations Stats -->
+      <div class="stat-card teacher-stats" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+        <div class="stat-header">
+          <div class="stat-icon teacher-icon" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+          <h3 [style]="{'color': 'var(--text-color)'}">Teacher Evaluations</h3>
+        </div>
+        <div class="stat-metrics">
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--primary-color)'}">{{ teacherStats.total }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Total Evaluations</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--success-color)'}">{{ teacherStats.averageRating.toFixed(1) }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Average Rating</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--warning-color)'}">{{ teacherStats.pendingReview }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Pending Review</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-value" [style]="{'color': 'var(--secondary-color)'}">{{ teacherStats.positiveRecommendations }}</div>
+            <div class="metric-label" [style]="{'color': 'var(--text-muted)'}">Recommended</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Section -->
+  <div class="tabs-section">
+    <div class="tabs-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <!-- Custom Tab Navigation -->
+      <div class="tab-navigation" [style]="{'border-bottom': '1px solid var(--border-color)'}">
+        <button 
+          class="tab-button"
+          [class.active]="selectedTab === 0"
+          [style]="selectedTab === 0 
+            ? {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)', 'border-bottom': '3px solid var(--primary-color)'} 
+            : {'background': 'transparent', 'color': 'var(--text-color)', 'border-bottom': '3px solid transparent'}"
+          (click)="selectedTab = 0"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          Course Evaluations
+        </button>
+        <button 
+          class="tab-button"
+          [class.active]="selectedTab === 1"
+          [style]="selectedTab === 1 
+            ? {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)', 'border-bottom': '3px solid var(--primary-color)'} 
+            : {'background': 'transparent', 'color': 'var(--text-color)', 'border-bottom': '3px solid transparent'}"
+          (click)="selectedTab = 1"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+          Teacher Evaluations
+        </button>
+      </div>
+
+      <!-- Course Evaluations Tab Content -->
+      <div *ngIf="selectedTab === 0" class="tab-content">
+        <!-- Tab Header -->
+        <div class="tab-content-header">
+          <div class="tab-title-section">
+            <h2 [style]="{'color': 'var(--text-color)'}">Course Evaluations</h2>
+            <p [style]="{'color': 'var(--text-muted)'}">Detailed feedback from students about courses</p>
+          </div>
+          <div class="export-buttons">
+            <button class="export-btn excel-btn" [style]="{'background': 'var(--success-color)', 'color': 'white'}" (click)="exportToExcel('course')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+              Export to Excel
+            </button>
+            <button class="export-btn pdf-btn" [style]="{'background': 'var(--danger-color)', 'color': 'white'}" (click)="exportToPDF('course')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+              Export to PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Course Filters -->
+        <div class="filters-section" [style]="{'background': 'var(--body-color)', 'border': '1px solid var(--border-color)'}">
+          <div class="filters-grid">
+            <div class="filter-item">
+              <label [style]="{'color': 'var(--text-color)'}">Status</label>
+              <select class="filter-select" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border': '1px solid var(--border-color)'}" formControlName="status" (change)="onFilterChange()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label [style]="{'color': 'var(--text-color)'}">Min Rating</label>
+              <select class="filter-select" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border': '1px solid var(--border-color)'}" formControlName="rating" (change)="onFilterChange()">
+                <option value="">All Ratings</option>
+                <option value="1">1+ Stars</option>
+                <option value="2">2+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="4">4+ Stars</option>
+                <option value="5">5 Stars</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label [style]="{'color': 'var(--text-color)'}">Course</label>
+              <select class="filter-select" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border': '1px solid var(--border-color)'}" formControlName="courseId" (change)="onFilterChange()">
+                <option value="">All Courses</option>
+                <option *ngFor="let course of availableCourses" [value]="course.id">{{ course.name }}</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <button class="clear-filters-btn" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}" (click)="clearFilters()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                </svg>
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoadingCourses" class="loading-state">
+          <div class="loading-spinner" [style]="{'border-color': 'var(--border-color)', 'border-top-color': 'var(--primary-color)'}"></div>
+          <p [style]="{'color': 'var(--text-muted)'}">Loading course evaluations...</p>
+        </div>
+
+        <!-- Course Evaluations Table -->
+        <div *ngIf="!isLoadingCourses" class="table-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+          <div class="table-wrapper">
+            <table class="evaluation-table">
+              <thead [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                <tr>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Course</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Student</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Teacher</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Overall</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Content</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Difficulty</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Materials</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Strengths</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Improvements</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Additional</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Recommend</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Submitted</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let evaluation of filteredCourseEvaluations; let i = index" 
+                    [style]="i % 2 === 0 ? {'background': 'var(--card-bg)'} : {'background': 'var(--body-color)'}"
+                    class="table-row">
+                  <td [style]="{'color': 'var(--text-color)'}" class="font-medium">{{ evaluation.course_name || 'N/A' }}</td>
+                  <td [style]="{'color': 'var(--text-color)'}">{{ evaluation.student_name || 'N/A' }}</td>
+                  <td [style]="{'color': 'var(--text-color)'}">{{ evaluation.teacher_name || 'N/A' }}</td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.overall_rating)" class="rating-badge">
+                      {{ evaluation.overall_rating }}/5
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.content_quality)" class="rating-badge">
+                      {{ evaluation.content_quality }}/5
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.difficulty)" class="rating-badge">
+                      {{ evaluation.difficulty }}/5
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.materials)" class="rating-badge">
+                      {{ evaluation.materials }}/5
+                    </span>
+                  </td>
+                  <td class="feedback-cell" [title]="evaluation.strengths">{{ evaluation.strengths || 'N/A' }}</td>
+                  <td class="feedback-cell" [title]="evaluation.improvements">{{ evaluation.improvements || 'N/A' }}</td>
+                  <td class="feedback-cell" [title]="evaluation.additional_feedback">{{ evaluation.additional_feedback || 'N/A' }}</td>
+                  <td>
+                    <span [class]="evaluation.recommend ? 'recommend-yes' : 'recommend-no'" class="recommend-badge">
+                      {{ evaluation.recommend ? 'Yes' : 'No' }}
+                    </span>
+                  </td>
+                  <td [style]="{'color': 'var(--text-muted)'}" class="date-cell">{{ evaluation.submitted_at | date:'short' }}</td>
+                  <td>
+                    <span [class]="getStatusColorClass(evaluation.status)" class="status-badge">
+                      {{ evaluation.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- No Data Message -->
+          <div *ngIf="filteredCourseEvaluations.length === 0" class="no-data-message">
+            <div class="no-data-icon" [style]="{'color': 'var(--text-muted)'}">📊</div>
+            <p [style]="{'color': 'var(--text-muted)'}">No course evaluations found matching your criteria.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teacher Evaluations Tab Content -->
+      <div *ngIf="selectedTab === 1" class="tab-content">
+        <!-- Tab Header -->
+        <div class="tab-content-header">
+          <div class="tab-title-section">
+            <h2 [style]="{'color': 'var(--text-color)'}">Teacher Evaluations</h2>
+            <p [style]="{'color': 'var(--text-muted)'}">Detailed feedback from students about teachers</p>
+          </div>
+          <div class="export-buttons">
+            <button class="export-btn excel-btn" [style]="{'background': 'var(--success-color)', 'color': 'white'}" (click)="exportToExcel('teacher')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+              Export to Excel
+            </button>
+            <button class="export-btn pdf-btn" [style]="{'background': 'var(--danger-color)', 'color': 'white'}" (click)="exportToPDF('teacher')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+              Export to PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Teacher Filters -->
+        <div class="filters-section" [style]="{'background': 'var(--body-color)', 'border': '1px solid var(--border-color)'}">
+          <div class="filters-grid">
+            <div class="filter-item">
+              <label [style]="{'color': 'var(--text-color)'}">Status</label>
+              <select class="filter-select" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border': '1px solid var(--border-color)'}" formControlName="status" (change)="onFilterChange()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label [style]="{'color': 'var(--text-color)'}">Min Rating</label>
+              <select class="filter-select" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border': '1px solid var(--border-color)'}" formControlName="rating" (change)="onFilterChange()">
+                <option value="">All Ratings</option>
+                <option value="1">1+ Stars</option>
+                <option value="2">2+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="4">4+ Stars</option>
+                <option value="5">5 Stars</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label [style]="{'color': 'var(--text-color)'}">Teacher</label>
+              <select class="filter-select" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border': '1px solid var(--border-color)'}" formControlName="teacherId" (change)="onFilterChange()">
+                <option value="">All Teachers</option>
+                <option *ngFor="let teacher of availableTeachers" [value]="teacher.id">{{ teacher.name }}</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <button class="clear-filters-btn" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}" (click)="clearFilters()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                </svg>
+                Clear Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoadingTeachers" class="loading-state">
+          <div class="loading-spinner" [style]="{'border-color': 'var(--border-color)', 'border-top-color': 'var(--primary-color)'}"></div>
+          <p [style]="{'color': 'var(--text-muted)'}">Loading teacher evaluations...</p>
+        </div>
+
+        <!-- Teacher Evaluations Table -->
+        <div *ngIf="!isLoadingTeachers" class="table-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+          <div class="table-wrapper">
+            <table class="evaluation-table">
+              <thead [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                <tr>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Teacher</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Student</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Overall</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Communication</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Knowledge</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Teaching Style</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Strengths</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Improvements</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Additional</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Recommend</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Submitted</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let evaluation of filteredTeacherEvaluations; let i = index" 
+                    [style]="i % 2 === 0 ? {'background': 'var(--card-bg)'} : {'background': 'var(--body-color)'}"
+                    class="table-row">
+                  <td [style]="{'color': 'var(--text-color)'}" class="font-medium">{{ evaluation.teacher_name || 'N/A' }}</td>
+                  <td [style]="{'color': 'var(--text-color)'}">{{ evaluation.student_name || 'N/A' }}</td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.overall_rating)" class="rating-badge">
+                      {{ evaluation.overall_rating }}/5
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.communication)" class="rating-badge">
+                      {{ evaluation.communication }}/5
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.knowledge)" class="rating-badge">
+                      {{ evaluation.knowledge }}/5
+                    </span>
+                  </td>
+                  <td>
+                    <span [class]="getRatingColorClass(evaluation.teaching_style)" class="rating-badge">
+                      {{ evaluation.teaching_style }}/5
+                    </span>
+                  </td>
+                  <td class="feedback-cell" [title]="evaluation.strengths">{{ evaluation.strengths || 'N/A' }}</td>
+                  <td class="feedback-cell" [title]="evaluation.improvements">{{ evaluation.improvements || 'N/A' }}</td>
+                  <td class="feedback-cell" [title]="evaluation.additional_feedback">{{ evaluation.additional_feedback || 'N/A' }}</td>
+                  <td>
+                    <span [class]="evaluation.recommend ? 'recommend-yes' : 'recommend-no'" class="recommend-badge">
+                      {{ evaluation.recommend ? 'Yes' : 'No' }}
+                    </span>
+                  </td>
+                  <td [style]="{'color': 'var(--text-muted)'}" class="date-cell">{{ evaluation.submitted_at | date:'short' }}</td>
+                  <td>
+                    <span [class]="getStatusColorClass(evaluation.status)" class="status-badge">
+                      {{ evaluation.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- No Data Message -->
+          <div *ngIf="filteredTeacherEvaluations.length === 0" class="no-data-message">
+            <div class="no-data-icon" [style]="{'color': 'var(--text-muted)'}">👨🏫</div>
+            <p [style]="{'color': 'var(--text-muted)'}">No teacher evaluations found matching your criteria.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,216 @@
+<body class="flex flex-col p-4" style="background-color: var(--body-color);">
+
+<p-card class="rounded-xl" [style]="{'box-shadow': 'var(--card-shadow)', 'background-color': 'var(--card-bg)'}">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row justify-between items-center py-2 mb-2">
+    <!-- Title & Subtitle on the Left -->
+    <div>
+      <h1 class="text-2xl font-bold" style="color: var(--text-color);">Manage Courses</h1>
+      <p class="text-sm" style="color: var(--input-placeholder);">View, edit, and manage your courses effortlessly.</p>
+    </div>
+
+    <button (click)="openModal()"
+            class="flex items-center px-6 py-2 space-x-2 font-semibold text-white transition-transform duration-300 transform rounded-xl shadow-lg hover:scale-105"
+            style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); transition: var(--tran-03);">
+      <span class="text-2xl material-icons">add_circle_outline</span>
+      <span class="text-lg">Create Course</span>
+    </button>
+  </div>
+
+  <!-- Grid for responsive layout -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">  
+    
+    <!-- Check if courseData is empty -->
+    <ng-container *ngIf="courseData.length === 0">
+      <div class="flex justify-center items-center relative rounded overflow-hidden shadow-md py-4" 
+           style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+        <div class="text-center px-4" style="color: var(--text-color);">
+          There are no courses available. Click the button above to add a course.
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Course Cards -->
+    <ng-container *ngFor="let course of courseData">
+      <div *ngIf="languages.get(selectedLanguage) == null || course.lang == languages.get(selectedLanguage).id" 
+           class="rounded-2xl border overflow-hidden transition-all duration-300 hover:scale-[1.02] group cursor-pointer"
+           style="background-color: var(--card-bg); border-color: var(--card-border); transition: var(--tran-03);"
+           (click)="redirectToLessons(course.id)">
+        
+        <div class="relative aspect-video">
+          <img *ngIf="course.image" [src]="getURL(course.image)" 
+               class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+               alt="Course Image" loading="lazy"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+          <h2 class="absolute bottom-4 left-4 right-4 text-white text-2xl font-bold leading-tight">{{ course.title }}</h2>
+          
+          <div (click)="showQRModal(course); $event.stopPropagation();" 
+              class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-md transition-transform duration-200 cursor-pointer group/qr hover:scale-110"
+              title="View and Download QR Code">
+            <img *ngIf="getQRCodeForCourse(course.id)" 
+                [src]="getQRCodeForCourse(course.id)" 
+                alt="Course QR Code" 
+                class="w-12 h-12 block transition-transform duration-200 group-hover/qr:scale-110">
+            <div *ngIf="!getQRCodeForCourse(course.id)" 
+                class="w-12 h-12 bg-gray-200 flex items-center justify-center rounded transition-transform duration-200 group-hover/qr:scale-110">
+              <i class="fas fa-qrcode text-gray-500"></i>
+            </div>
+            <div class="text-xs text-center mt-1 text-gray-600 font-semibold">QR Code</div>
+          </div>
+          
+          <button (click)="showCertificateModal(course); $event.stopPropagation();" 
+                  class="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-2 shadow-md transition-transform duration-200 hover:scale-110">
+            <i class="fas fa-certificate text-yellow-400 text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="p-6 flex flex-col justify-between">
+          <div class="flex flex-col space-y-2">
+            <div class="grid grid-cols-4 gap-2">
+              <span *ngFor="let audience of safeSlice(course.targetAudience, 4)" 
+                    class="px-2 py-1 text-xs font-semibold rounded-full text-center truncate"
+                    style="background-color: var(--btn-success-bg); color: var(--btn-primary-text);">
+                {{ audience }}
+              </span>
+            </div>
+            <p class="text-sm" style="color: var(--input-placeholder);">
+              <span class="font-medium" style="color: var(--text-color);">Description: </span>
+              {{ trimText(course.description, 15) }}
+            </p>
+            <p class="text-sm" style="color: var(--input-placeholder);">
+              <span class="font-medium" style="color: var(--text-color);">Objectives: </span>
+              {{ trimText(course.objectives, 10) }}
+            </p>
+          </div>
+          
+          <div class="pt-4 flex flex-col space-y-2">
+            <div class="flex justify-between items-center space-x-2">
+              <button (click)="openEdit(course); $event.stopPropagation();" 
+                      class="flex-1 font-semibold py-2 px-4 rounded-lg transition-transform duration-300 shadow-md hover:scale-105"
+                      style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); color: var(--btn-primary-text); transition: var(--tran-03);">
+                Edit Course
+              </button>
+              <p-button severity="danger" (click)="removeCourse(course.id); $event.stopPropagation();" 
+                     outlined="true">
+                <i class="fas fa-trash-alt"></i>
+              </p-button>
+            </div>
+            <button (click)="navigateToCourseForum(course.id); $event.stopPropagation();" 
+                    class="w-full bg-transparent border-2 font-semibold py-2 px-4 rounded-lg transition-transform duration-300 hover:scale-105"
+                    style="border-color: var(--btn-success-bg); color: var(--btn-success-bg); transition: var(--tran-03);">
+              <i class="fas fa-users mr-2"></i>Course Forum
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</p-card>
+
+<!-- QR Modal -->
+<div *ngIf="displayQRModal" class="fixed inset-0 flex items-center justify-center z-50" style="background-color: var(--modal-overlay);">
+  <div class="rounded-lg p-6 w-96 max-w-md mx-4" style="background-color: var(--modal-bg);">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold" style="color: var(--text-color);">
+        Class QR Code
+      </h3>
+      <button (click)="closeQRModal()" 
+              class="transition-transform hover:scale-110"
+              style="color: var(--input-placeholder);">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="text-sm font-medium" style="color: var(--text-color);">
+        {{ currentCourseForQR?.title }}
+      </h4>
+      <p class="text-xs" style="color: var(--input-placeholder);" *ngIf="currentCourseForQR?.selectedClass">
+        Class Code: {{ currentCourseForQR.selectedClass.classcode }}
+      </p>
+    </div>
+
+    <div class="flex justify-center mb-4">
+      <div *ngIf="currentQRCode && currentQRCode !== 'error'" class="bg-white p-4 rounded-lg">
+        <img [src]="currentQRCode" alt="QR Code" class="w-48 h-48">
+      </div>
+      <div *ngIf="currentQRCode === 'error'" class="text-center" style="color: var(--btn-danger-bg);">
+        Error generating QR code
+      </div>
+      <div *ngIf="!currentQRCode" class="text-center" style="color: var(--input-placeholder);">
+        Generating QR code...
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button (click)="downloadQRCode()"
+              [disabled]="!currentQRCode || currentQRCode === 'error'"
+              class="flex-1 px-4 py-2 rounded-lg transition-transform hover:scale-105"
+              style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text); transition: var(--tran-03);">
+        Download PDF
+      </button>
+      <button (click)="closeQRModal()"
+              class="flex-1 px-4 py-2 rounded-lg transition-transform hover:scale-105"
+              style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); transition: var(--tran-03);">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Class Selection Modal -->
+<div *ngIf="showClassSelectionModal" class="fixed inset-0 flex items-center justify-center z-50" style="background-color: var(--modal-overlay);">
+  <div class="rounded-lg p-6 w-96 max-w-md mx-4" style="background-color: var(--modal-bg);">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold" style="color: var(--text-color);">
+        Select Class for QR Code
+      </h3>
+      <button (click)="closeClassSelectionModal()"
+              class="transition-transform hover:scale-110"
+              style="color: var(--input-placeholder);">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="text-sm font-medium mb-2" style="color: var(--text-color);">
+        Course: {{ currentCourseForClassSelection?.title }}
+      </h4>
+      <p class="text-xs" style="color: var(--input-placeholder);">
+        Choose a class to generate its QR code for student enrollment
+      </p>
+    </div>
+
+    <div class="space-y-2 max-h-64 overflow-y-auto">
+      <div *ngFor="let class of currentCourseClasses"
+           class="p-3 border rounded-lg cursor-pointer transition-transform hover:scale-105"
+           style="border-color: var(--card-border); transition: var(--tran-03);"
+           (click)="generateQRForClass(currentCourseForClassSelection.id, class.id, class.classcode)">
+        
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="font-medium" style="color: var(--text-color);">
+              {{ class.classcode }}
+            </p>
+            <p class="text-sm" style="color: var(--input-placeholder);" *ngIf="class.classname">
+              {{ class.classname }}
+            </p>
+          </div>
+          <svg class="w-5 h-5" style="color: var(--input-placeholder);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 text-center" *ngIf="currentCourseClasses.length === 0">
+      <p style="color: var(--input-placeholder);">No classes found for this course</p>
+    </div>
+  </div>
+</div>
+
+</body>

@@ -1,0 +1,40 @@
+<!-- Header -->
+<header class="header px-1 lg:py-3 md:py-3 py-2">
+  <div class="flex items-center justify-between pl-2 pr-6 font-mx-auto lg:px-4 md:px-4">
+    <!-- Breadcrumb -->
+    <p-breadcrumb [model]="breadcrumbItems" [home]="homeItem" class="!text-gray-500"
+                  styleClass="bg-transparent  hidden md:block">
+    </p-breadcrumb>
+
+    <!-- Mobile Menu Button -->
+    <div class="md:hidden">
+      <button class="px-2 py-2 font-bold burger-button nav" (click)="toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="burger-icon" viewBox="0 0 24 24">
+          <rect width="18" height="2" y="6" rx="1" />
+          <rect width="18" height="2" y="11" rx="1" />
+          <rect width="18" height="2" y="16" rx="1" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex items-center ml-auto gap-4">
+      <!-- Dark Mode Icon -->
+      <button class="ml-2 relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-primary-100">
+        <i class="fa-solid fa-sun text-yellow-500 text-lg"></i>
+      </button>
+      
+      <!-- Notification Icon -->
+      <button class="relative flex items-center justify-center w-9 h-9 rounded-full hover:bg-primary-100">
+        <i class="fas fa-bell text-primary-900 text-lg"></i>
+      </button>
+
+      <!-- Profile Picture -->
+      <button class="w-10 h-10 rounded-full overflow-hidden border border-gray-900">
+        <img [src]="userProfile.profilePicture || 'assets/user.png'" 
+             alt="Profile Logo" 
+             class="w-full h-full object-cover"
+             (error)="onProfileImageError($event)">
+      </button>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,92 @@
+<div class="speech-lab-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 14C15.3137 14 18 11.3137 18 8C18 4.68629 15.3137 2 12 2C8.68629 2 6 4.68629 6 8C6 11.3137 8.68629 14 12 14Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M3.41016 22C3.41016 18.13 7.26015 15 12.0002 15C12.9602 15 13.8902 15.13 14.7602 15.37" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M22 18C22 19.66 20.66 21 19 21H18.74C18.38 21 18.07 20.79 17.94 20.46L17.3 18.97C17.04 18.34 16.67 17.77 16.24 17.27C15.39 16.33 14.33 15.61 13.15 15.23C12.71 15.08 12.36 14.79 12.11 14.41C11.43 13.41 11.5 12.09 12.29 11.17C12.97 10.37 14.06 10 15.09 10.34C15.58 10.5 16.03 10.75 16.44 11.05C18.15 12.25 19.22 14.36 19 16.65C19.68 17.03 20.24 17.58 20.66 18.23C21.18 19.03 21.41 19.99 21.27 20.94L22 18Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Join Classroom</h2>
+      <p>Select your class and configure meeting settings</p>
+    </div>
+
+    <div class="class-dropdown" ngbDropdown>
+      <button 
+        id="classSelector"
+        ngbDropdownToggle 
+        class="dropdown-trigger" 
+        (click)="checkIfHasClass()">
+        <span *ngIf="classObj == null">Choose Class</span>
+        <span *ngIf="classObj != null" [title]="classObj.class">
+          {{ classObj.class }}
+        </span>
+        <!-- <svg class="dropdown-caret" viewBox="0 0 24 24">
+          <path d="M7 10l5 5 5-5z"/>
+        </svg> -->
+      </button>
+      
+      <div ngbDropdownMenu 
+           aria-labelledby="classSelector" 
+           [ngClass]="{'hidden': classes.length <= 0}">
+        <button 
+          *ngFor="let class of classes"
+          (click)="setClass(class)"
+          class="dropdown-item">
+          <div class="class-details">
+            <span class="class-name">{{ class.class }}</span>
+            <span class="course-name">{{ class.course }}</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="meeting-settings">
+      <div class="setting-group">
+        <div class="setting-label">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 18.75C15.3137 18.75 18 16.0637 18 12.75V11.25M12 18.75C8.68629 18.75 6 16.0637 6 12.75V11.25M12 18.75V22.5M8.25 22.5H15.75M12 15.75C10.3431 15.75 9 14.4069 9 12.75V4.5C9 2.84315 10.3431 1.5 12 1.5C13.6569 1.5 15 2.84315 15 4.5V12.75C15 14.4069 13.6569 15.75 12 15.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Microphone</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox"  
+                 (change)="toggleMic()" 
+                 [checked]="!isMicMuted">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="setting-group">
+        <div class="setting-label">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.75 10.5L20.25 10.5M20.25 10.5L20.25 19.5C20.25 20.0523 19.8023 20.5 19.25 20.5L4.75 20.5C4.19772 20.5 3.75 20.0523 3.75 19.5L3.75 7.5C3.75 6.94772 4.19772 6.5 4.75 6.5L11.25 6.5M20.25 10.5L14.6572 4.90723C14.3667 4.61671 14.3667 4.14214 14.6572 3.85162L15.4588 3.05C15.7493 2.75948 16.2239 2.75948 16.5144 3.05L22.107 8.64277C22.3976 8.93329 22.3976 9.40786 22.107 9.69838L21.3055 10.5C21.015 10.7905 20.5404 10.7905 20.25 10.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Camera</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" 
+                 (change)="toggleVideo()" 
+                 [checked]="!isVideoDisabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button 
+        class="join-button" 
+        (click)="joinNow()"
+        [disabled]="classObj == null"
+        [ngClass]="{'active': classObj != null}">
+        Join Now
+      </button>
+      <button 
+        class="cancel-button" 
+        (click)="cancelCreation()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

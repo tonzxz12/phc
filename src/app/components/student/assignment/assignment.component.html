@@ -1,0 +1,174 @@
+<div class="assignment-container" [style]="{'background': 'var(--body-color)', 'color': 'var(--text-color)', 'min-height': '100vh'}">
+  <!-- Header Section -->
+  <div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 [style]="{'color': 'var(--text-color)'}">Your Tasks</h1>
+        <p [style]="{'color': 'var(--text-muted)'}">Manage all your assignments and quizzes in one place</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <div class="filter-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="filter-header" [style]="{'border-bottom': '1px solid var(--border-color)'}">
+        <h3 [style]="{'color': 'var(--text-color)'}">Task Filters</h3>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" [style]="{'color': 'var(--text-muted)'}">
+          <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      
+      <div class="filter-content">
+        <div class="filter-buttons">
+          <button (click)="setFilterType('all')" class="filter-btn" [class.active]="filterType === 'all'" [style]="filterType === 'all' ? {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'} : {'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)', 'border': '1px solid var(--border-color)'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+            </svg>
+            All
+          </button>
+          <button (click)="setFilterType('assignment')" class="filter-btn" [class.active]="filterType === 'assignment'" [style]="filterType === 'assignment' ? {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'} : {'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)', 'border': '1px solid var(--border-color)'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+            Assignments
+          </button>
+          <button (click)="setFilterType('quiz')" class="filter-btn" [class.active]="filterType === 'quiz'" [style]="filterType === 'quiz' ? {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'} : {'background': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)', 'border': '1px solid var(--border-color)'}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            Quizzes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tasks Section -->
+  <div class="tasks-section">
+    <div class="section-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="section-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+          </svg>
+          <span>Your Tasks</span>
+        </div>
+      </div>
+      
+      <div class="section-content">
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-grid">
+          <div *ngFor="let i of [1,2,3,4]" class="loading-card" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+            <div class="loading-skeleton">
+              <div class="skeleton-line title" [style]="{'background': 'var(--border-color)'}"></div>
+              <div class="skeleton-line subtitle" [style]="{'background': 'var(--border-color)'}"></div>
+              <div class="skeleton-line content" [style]="{'background': 'var(--border-color)'}"></div>
+              <div class="skeleton-line button" [style]="{'background': 'var(--border-color)'}"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredTasks().length <= 0 && !isLoading" class="empty-state">
+          <div class="empty-icon" [style]="{'color': 'var(--text-muted)'}">📋</div>
+          <h3 [style]="{'color': 'var(--text-color)'}">No Tasks Available</h3>
+          <p [style]="{'color': 'var(--text-muted)'}">No tasks assigned at the moment.</p>
+        </div>
+
+        <!-- Task Cards -->
+        <div *ngIf="!isLoading && filteredTasks().length > 0" class="tasks-grid">
+          <ng-container *ngFor="let task of filteredTasks()">
+            <div *ngIf="task.settings != 'popup_quiz'" class="task-card" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)', 'border-top': '4px solid ' + (task.done || (task.type === 'assignment' && task.submission_count > 0) ? 'var(--success-color)' : 'var(--primary-color)')}" (click)="task.type == 'assignment' ? handleAssignmentAction(task) : attemptQuiz(task)">
+              
+              <!-- Card Header -->
+              <div class="task-header">
+                <div class="task-title-section">
+                  <div class="task-icon" [style]="{'color': task.done || (task.type === 'assignment' && task.submission_count > 0) ? 'var(--success-color)' : checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : !task.done) ? 'var(--danger-color)' : 'var(--primary-color)'}">
+                    <svg *ngIf="task.type == 'assignment'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <svg *ngIf="task.type == 'quiz'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  <h3 class="task-title" [style]="{'color': task.done || (task.type === 'assignment' && task.submission_count > 0) ? 'var(--success-color)' : checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : !task.done) ? 'var(--danger-color)' : 'var(--text-color)'}">
+                    {{switchTag(task.type)}}: {{task.title}}
+                  </h3>
+                </div>
+                
+                <div class="task-badges">
+                  <ng-container *ngIf="task.type == 'quiz'">
+                    <div class="task-badge" [style]="{'background': task.attempt_count > 0 && canRetakeQuiz(task) ? 'var(--success-color)' : task.attempt_count > 0 && !canRetakeQuiz(task) ? 'var(--primary-color)' : 'var(--warning-color)', 'color': 'white'}">
+                      <span *ngIf="task.attempt_count > 0">{{task.attempt_count}}/{{task.retake_limit}}</span>
+                      <span *ngIf="task.attempt_count === 0">{{task.retake_limit}} attempt(s)</span>
+                    </div>
+                    <div *ngIf="task.attempt_count > 0 && getQuizPoint(task.id)" class="task-badge score" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+                      Score: {{getQuizPoint(task.id)}}
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="task.type === 'assignment'">
+                    <div class="task-badge" [style]="{'background': task.submission_count > 0 && task.canResubmit ? 'var(--success-color)' : task.submission_count > 0 && !task.canResubmit ? 'var(--primary-color)' : 'var(--warning-color)', 'color': 'white'}">
+                      <span *ngIf="task.submission_count > 0">{{task.submission_count}}/{{task.resubmit_limit}}</span>
+                      <span *ngIf="task.submission_count === 0">{{task.resubmit_limit}} submission(s)</span>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="task-body">
+                <p class="task-description" [style]="{'color': 'var(--text-color)'}">{{ truncateDescription(task.details, 20) }}</p>
+                
+                <!-- Status Section -->
+                <div class="task-status" [style]="{'background': task.done || (task.type === 'assignment' && task.submission_count > 0) ? 'var(--alert-success-bg)' : checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : !task.done) ? 'var(--alert-error-bg)' : 'var(--alert-warning-bg)', 'border': '1px solid ' + (task.done || (task.type === 'assignment' && task.submission_count > 0) ? 'var(--alert-success-border)' : checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : !task.done) ? 'var(--alert-error-border)' : 'var(--alert-warning-border)')}">
+                  <span class="status-text" [style]="{'color': 'var(--text-color)'}">
+                    {{ task.type === 'assignment' ? getSubmissionStatus(task) : getQuizStatus(task) }}
+                  </span>
+                  <div class="status-icon" [style]="{'color': task.done || (task.type === 'assignment' && task.submission_count > 0) ? 'var(--success-color)' : checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : !task.done) ? 'var(--danger-color)' : 'var(--warning-color)'}">
+                    <svg *ngIf="task.done || (task.type === 'assignment' && task.submission_count > 0)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    <svg *ngIf="checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : !task.done)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    <svg *ngIf="!task.done && !(task.type === 'assignment' && task.submission_count > 0) && !checkOverdue(task.deadline)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Footer -->
+              <div class="task-footer">
+                <div class="due-date" [style]="{'color': checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : !task.done) ? 'var(--danger-color)' : task.done || (task.type === 'assignment' && task.submission_count > 0) ? 'var(--success-color)' : 'var(--text-color)'}">
+                  Due Date: {{parseDate(task.deadline)}}
+                </div>
+                
+                <button class="task-action-btn" [style]="{'background': checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : task.attempt_count === 0) ? 'var(--danger-color)' : (task.type === 'assignment' ? (task.submission_count > 0 && !task.canResubmit) : (task.attempt_count > 0 && !canRetakeQuiz(task))) ? 'var(--primary-color)' : 'var(--primary-color)', 'color': 'var(--text-on-primary)'}" (click)="task.type === 'assignment' ? handleAssignmentAction(task) : attemptQuiz(task)">
+                  {{
+                    checkOverdue(task.deadline) && (task.type === 'assignment' ? task.submission_count === 0 : task.attempt_count === 0)
+                      ? 'Not Available'
+                      : task.type === 'assignment'
+                      ? (task.submission_count === 0 
+                          ? 'Submit' 
+                          : task.canResubmit 
+                            ? 'Resubmit (' + task.submission_count + '/' + task.resubmit_limit + ')'
+                            : 'View Only')
+                      : task.attempt_count === 0
+                      ? 'Start Quiz'
+                      : canRetakeQuiz(task)
+                      ? 'Retake (' + task.attempt_count + '/' + task.retake_limit + ')'
+                      : task.attempt_count >= task.retake_limit
+                      ? 'View Results'
+                      : 'Completed'
+                  }}
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

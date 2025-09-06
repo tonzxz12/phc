@@ -1,0 +1,668 @@
+<!-- Edit Course Modal -->
+<div *ngIf="!showTopicModal" class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: var(--modal-overlay);">
+  <div class="container mx-auto p-8 rounded-xl shadow-lg w-[1000px] max-w-full max-h-[90vh] overflow-y-auto" style="background-color: var(--modal-bg);">
+    <!-- Header -->
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold" style="color: var(--text-color);">Edit Course</h1> 
+    </div>
+
+    <!-- Image Upload Section -->
+    <div class="mb-8">
+      <h2 class="mb-4 text-lg font-semibold" style="color: var(--text-color);">Course Image</h2>
+      <div class="overflow-hidden shadow-sm rounded-xl" style="border: 1px solid var(--card-border);">
+        <div class="flex items-center justify-center h-64" style="background-color: var(--btn-secondary-bg);">
+          <img *ngIf="courseImagePreview; else noImage" [src]="courseImagePreview" alt="Course Image"
+            class="object-cover w-full h-full" />
+          <ng-template #noImage>
+            <button (click)="uploadCourseImage()" class="flex items-center justify-center w-full h-full" style="color: var(--text-color);">
+              <span class="text-center">Please upload a Course Photo / Background</span>
+            </button>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Course Information Section -->
+    <div class="p-6 mb-8 shadow-sm rounded-xl" style="border: 1px solid var(--card-border); background-color: var(--card-bg);">
+      <h2 class="mb-4 text-lg font-semibold" style="color: var(--text-color);">Course Information</h2>
+      <!-- Course Title -->
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">Course Title</label>
+      <input type="text" [(ngModel)]="courseTitle" placeholder="Course Title"
+        class="w-full p-4 mb-4 rounded-lg shadow-sm focus:outline-none focus:ring-2" 
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);" />
+      <!-- Course Description -->
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">Course Description</label>
+      <textarea [(ngModel)]="courseDesc" placeholder="Course Description"
+        class="w-full h-24 p-4 mb-4 rounded-lg shadow-sm focus:outline-none focus:ring-2" 
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"></textarea>
+      <!-- Course Objectives -->
+      <label class="block mb-1 text-sm font-semibold" style="color: var(--text-color);">Course Objectives</label>
+      <textarea [(ngModel)]="courseObjective" placeholder="Course Objectives"
+        class="w-full h-24 p-4 rounded-lg shadow-sm focus:outline-none focus:ring-2" 
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"></textarea>
+    </div>
+
+    <!-- Modules Section -->
+    <div class="p-6 mb-8 shadow-sm rounded-xl" style="border: 1px solid var(--card-border); background-color: var(--card-bg);">
+      <h2 class="mb-4 text-lg font-semibold" style="color: var(--text-color);">Modules</h2>
+      <div class="space-y-6">
+        <div *ngFor="let lesson of lessons; let i = index"
+          class="p-6 border-l-4 rounded-lg shadow-md" style="background-color: var(--card-bg); border-left-color: var(--btn-primary-bg);">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-2xl font-bold" style="color: var(--text-color);">Module {{ i + 1 }}</h3>
+            <button (click)="delete(lesson)" class="transition-transform hover:scale-110" style="color: var(--btn-danger-bg);">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <!-- Module Name -->
+            <label class="block col-span-2 mb-1 text-sm font-semibold" style="color: var(--text-color);">Module Name</label>
+            <input type="text" [(ngModel)]="lesson.lessonName" placeholder="Module Name"
+              class="w-full col-span-2 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2" 
+              style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);" />
+            <!-- Module Complexity -->
+            <label class="block col-span-2 mb-1 text-sm font-semibold" style="color: var(--text-color);">Complexity</label>
+            <select [(ngModel)]="lesson.complexity"
+              class="w-full col-span-2 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2" 
+              style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+              <option *ngFor="let complex of complexityOptions; let j = index" [value]="j">
+                {{ complex }}
+              </option>
+            </select>
+            <!-- Module Description -->
+            <label class="block col-span-2 mb-1 text-sm font-semibold" style="color: var(--text-color);">Description</label>
+            <textarea [(ngModel)]="lesson.description" placeholder="Description"
+              class="w-full h-24 col-span-2 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2" 
+              style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"></textarea>
+          </div>
+
+          <!-- Topics Section -->
+          <div class="mt-4">
+            <h4 class="mb-2 text-xl font-bold" style="color: var(--text-color);">Topics</h4>
+            <div *ngIf="lesson.topics && lesson.topics.length > 0; else noTopics">
+              <!-- Enhanced topic display -->
+              <div *ngFor="let topic of lesson.topics; let idx = index"
+              class="p-4 mb-3 rounded-lg shadow-sm" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+              <div class="flex items-center justify-between mb-2">
+                <strong style="color: var(--text-color);">Topic #{{ idx + 1 }}: {{ topic.title }}</strong>
+                <div>
+                  <button class="mr-2 text-sm transition-transform hover:scale-110" style="color: var(--btn-primary-bg);"
+                    (click)="openTopicModal(true, topic, lesson.id)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="text-sm transition-transform hover:scale-110" style="color: var(--btn-danger-bg);"
+                    (click)="deleteTopic(topic, lesson)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <p style="color: var(--input-placeholder);">{{ topic.details }}</p>
+
+                <!-- Display Attachments -->
+<div *ngIf="topic.attachments && topic.attachments.length > 0"
+  class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 md:grid-cols-3">
+  <div *ngFor="let file of topic.attachments"
+    class="p-3 transition-all duration-300 rounded-lg cursor-pointer hover:scale-105"
+    style="background-color: var(--card-bg);"
+    (click)="openFile(file)">
+
+    <div class="flex items-center mb-2">
+      <i [class]="getFileIcon(file)" class="mr-3 text-2xl"></i>
+      <div class="overflow-hidden">
+        <p class="font-medium truncate" style="color: var(--btn-primary-bg);" [title]="getOriginalFilename(file)">
+          {{ isYoutube(file) ? 'YouTube Video' : getOriginalFilename(file) }}
+        </p> 
+        <p class="text-xs" style="color: var(--input-placeholder);">{{ getFileType(file) }}</p>
+      </div>
+    </div>
+    <div class="relative w-full h-32 overflow-hidden rounded" style="background-color: var(--btn-secondary-bg);">
+      <ng-container [ngSwitch]="true">
+        <ng-container *ngSwitchCase="isImage(file)">
+          <img [src]="getFilePath(file)" alt="Preview" class="object-cover w-full h-full">
+        </ng-container>
+        <ng-container *ngSwitchCase="isVideo(file)">
+          <video [src]="getFilePath(file)" class="object-cover w-full h-full" controls></video>
+        </ng-container>
+        <ng-container *ngSwitchCase="isPDF(file)">
+          <div class="flex items-center justify-center w-full h-full">
+            <i class="text-4xl fas fa-file-pdf" style="color: var(--btn-danger-bg);"></i>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="isPowerPoint(file)">
+          <div class="flex items-center justify-center w-full h-full">
+            <i class="text-4xl fas fa-file-powerpoint" style="color: var(--btn-primary-bg);"></i>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="isDoc(file)">
+          <div class="flex items-center justify-center w-full h-full">
+            <i class="text-4xl fas fa-file-word" style="color: var(--btn-primary-bg);"></i>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="isExcelFile(file)">
+          <div class="flex items-center justify-center w-full h-full">
+            <i class="text-4xl fas fa-file-excel" style="color: var(--btn-success-bg);"></i>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="isTextFile(file)">
+          <div class="flex items-center justify-center w-full h-full">
+            <i class="text-4xl fas fa-file-alt" style="color: var(--btn-primary-bg);"></i>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <div class="flex items-center justify-center w-full h-full">
+            <i class="text-4xl fas fa-file" style="color: var(--input-placeholder);"></i>
+          </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="isYoutube(file)">
+          <div class="flex flex-col items-center justify-center w-full h-full cursor-pointer"
+              (click)="playYouTubeVideo(file)">
+            <div class="relative w-full h-full">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                [src]="getYouTubeEmbedUrl(file) | safe" 
+                frameborder="1" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+              </iframe>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+    
+    <span *ngIf="isInteractiveVideo(file)" class="block mt-2 text-xs font-semibold" style="color: var(--btn-success-bg);">
+      <i class="mr-1 fas fa-hand-pointer"></i> Interactive
+    </span>
+  </div>
+</div>
+              </div>
+
+              <!-- Add Topic Button -->
+              <button
+                class="px-4 py-2 mt-4 text-white rounded-md shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+                style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));"
+                (click)="openTopicModal(false, null, lesson.id)">
+                <i class="mr-2 fas fa-plus"></i>Add Another Topic
+              </button>
+            </div>
+            <ng-template #noTopics>
+              <p style="color: var(--input-placeholder);">No topics available.</p>
+              <button
+                class="px-4 py-2 mt-2 text-white rounded-md shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+                style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));"
+                (click)="openTopicModal(false, null, lesson.id)">
+                <i class="mr-2 fas fa-plus"></i>Add a Topic
+              </button>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Module Button -->
+    <div class="mb-8 text-right">
+      <button
+        class="px-6 py-2 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+        style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));"
+        (click)="addLesson()">
+        <i class="mr-2 fas fa-plus"></i>Add Module
+      </button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-center space-x-4">
+      <button
+        class="px-8 py-3 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+        style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));"
+        (click)="submit()">
+        Save Changes
+      </button>
+      <button
+        class="px-8 py-3 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+        style="background-color: var(--btn-danger-bg);"
+        (click)="closeModal()">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Topic Modal -->
+<div *ngIf="showTopicModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" style="background-color: var(--modal-overlay);">
+  <div class="p-10 rounded-2xl shadow-xl relative w-[700px] max-w-full max-h-[90vh] overflow-y-auto" style="background-color: var(--modal-bg);">
+    <!-- Close Button -->
+    <button (click)="closeTopicModal()" class="absolute top-4 right-4 transition-transform hover:scale-110" style="color: var(--input-placeholder);">
+      <i class="text-2xl fas fa-times"></i>
+    </button>
+
+    <!-- Modal Title -->
+    <h2 class="mb-8 text-2xl font-bold text-center" style="color: var(--text-color);">{{ editingTopic ? 'Edit Topic' : 'Add Topic' }}</h2>
+
+    <!-- Input Fields for Title and Details -->
+    <div class="mb-6">
+      <label class="block mb-2 text-sm font-semibold" style="color: var(--text-color);">Topic Title</label>
+      <input type="text" [(ngModel)]="newTopic.title" placeholder="Enter topic title"
+        class="w-full p-4 rounded-lg shadow-sm focus:outline-none focus:ring-2" 
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);" />
+    </div>
+    <div class="mb-6">
+      <label class="block mb-2 text-sm font-semibold" style="color: var(--text-color);">Topic Details</label>
+      <textarea [(ngModel)]="newTopic.details" placeholder="Enter topic details"
+        class="w-full p-4 rounded-lg shadow-sm focus:outline-none focus:ring-2"
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"
+        rows="4"></textarea>
+    </div>
+
+    <div *ngIf="newTopic.attachments.length > 0" class="mb-6">
+      <h3 class="mb-4 text-lg font-semibold" style="color: var(--text-color);">Attached Files:</h3>
+      <ul class="ml-5 space-y-2 list-disc">
+        <li *ngFor="let file of newTopic.attachments; let i = index"
+          class="flex items-center justify-between p-3 border rounded-lg shadow-inner" style="background-color: var(--btn-secondary-bg); border-color: var(--card-border);">
+          <div class="flex-grow">
+            <!-- Regular File Display -->
+            <span *ngIf="isFile(file)" style="color: var(--text-color);">{{ file.name }}</span>
+            <span *ngIf="isString(file)" style="color: var(--text-color);">{{ getFilenameFromPath(file) }}</span>
+
+            <!-- Interactive Video Display -->
+            <div *ngIf="!isFile(file) && !isString(file)" style="color: var(--text-color);">
+              <p>{{ file.file.name }}</p>
+            </div>
+          </div>
+
+          <!-- Delete Button -->
+          <button (click)="deleteAttachment(i)" class="ml-2 transition-transform hover:scale-110" style="color: var(--btn-danger-bg);">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Attach Files Notice -->
+    <div *ngIf="!editingTopic" class="flex justify-center mt-8 space-x-4">
+      <h1 class="block mb-2 text-sm font-medium" style="color: var(--btn-danger-bg);">Save the topic first to attach a file</h1>
+    </div>
+
+    <!-- File Attachments Section -->
+    <div *ngIf="editingTopic" class="mb-6">
+      <label class="flex justify-center mb-4 text-sm font-semibold" style="color: var(--text-color);">Attach Files</label>
+      <div class="flex gap-4 justify-center">
+        <!-- Attach Files Buttons -->
+        <button (click)="attachFile('mp4')" class="px-4 py-2 rounded-lg text-white transition-transform hover:scale-105" style="background-color: var(--btn-primary-bg);">
+          <i class="fas fa-video mr-2"></i>Video
+        </button>
+        <button (click)="attachFile('pdf')" class="px-4 py-2 rounded-lg text-white transition-transform hover:scale-105" style="background-color: var(--btn-primary-bg);">
+          <i class="fas fa-file-pdf mr-2"></i>PDF
+        </button>
+        <button (click)="attachFile('any')" class="px-4 py-2 rounded-lg text-white transition-transform hover:scale-105" style="background-color: var(--btn-primary-bg);">
+          <i class="fas fa-paperclip mr-2"></i>Other
+        </button>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-center mt-8 space-x-6">
+      <button (click)="closeTopicModal()"
+        class="px-8 py-3 text-white transition-transform hover:scale-105 rounded-lg shadow-lg focus:outline-none focus:ring-2"
+        style="background: linear-gradient(to right, var(--btn-danger-bg), var(--btn-danger-hover));">
+        <i class="mr-2 fas fa-times"></i>Cancel
+      </button>
+      <button (click)="saveTopic()"
+        class="px-8 py-3 text-white transition-transform hover:scale-105 rounded-lg shadow-lg focus:outline-none focus:ring-2"
+        style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+        <i class="mr-2 fas fa-save"></i>Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Video Options Modal -->
+<div *ngIf="showVideoOptionsModal"
+  class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: var(--modal-overlay);">
+  <div class="p-8 rounded-xl shadow-lg relative w-[400px] max-w-full" style="background-color: var(--modal-bg);">
+    <h2 class="mb-6 text-xl font-semibold text-center" style="color: var(--text-color);">Choose Video Type</h2>
+    <div class="flex justify-between space-x-4">
+      <button (click)="handleVideoOption('video')"
+        class="w-full py-2 text-white rounded-lg focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+        style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+        Video only
+      </button>
+      <button (click)="handleVideoOption('interactive')"
+        class="w-full py-2 text-white rounded-lg focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+        style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+        Interactive Video
+      </button>
+    </div>
+    <div class="flex flex-col text-center justify-center mt-8 space-x-6 w-full">
+      <p style="color: var(--text-color);">Or paste the Youtube video URL here:</p>
+      <div class="flex flex-row justify-center items-center mt-8 space-x-4 w-full max-w-2xl mx-auto">
+        <div class="w-2/3 h-full">
+          <input type="text" [(ngModel)]="videoUrl" placeholder="Enter video URL" 
+                 class="w-full p-2 rounded-lg" 
+                 style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+        </div>
+        <button (click)="handleVideoUrl()" class="h-10 py-2 w-1/3 text-white rounded-lg focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+                style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+          Add Video
+        </button>
+      </div>
+    </div>
+    <button (click)="showVideoOptionsModal = false" class="absolute top-2 right-2 transition-transform hover:scale-110" style="color: var(--input-placeholder);">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Interactive Video Modal -->
+<div *ngIf="showInteractiveVideoModal"
+  class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: var(--modal-overlay);">
+  <div class="p-6 rounded-xl shadow-lg relative w-[750px] max-w-full max-h-[98vh] overflow-y-auto" style="background-color: var(--modal-bg);">
+    <h2 class="mb-6 text-xl font-semibold text-center" style="color: var(--text-color);">Interactive Video Settings</h2>
+
+    <!-- Stepper Navigation -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <!-- Step 1: Upload Video & Quiz -->
+        <div class="flex items-center">
+          <div 
+            [class]="currentStep >= 1 ? 'text-white' : 'text-gray-500'"
+            [style.background-color]="currentStep >= 1 ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
+            <i *ngIf="currentStep > 1" class="fas fa-check"></i>
+            <span *ngIf="currentStep <= 1">1</span>
+          </div>
+          <div class="ml-3">
+            <h3 
+              [style.color]="currentStep === 1 ? 'var(--btn-primary-bg)' : (currentStep > 1 ? 'var(--text-color)' : 'var(--input-placeholder)')"
+              class="text-sm font-medium">
+              Upload Video & Quiz
+            </h3>
+            <p class="text-xs" style="color: var(--input-placeholder);">
+              Select video file and optional quiz
+            </p>
+          </div>
+        </div>
+        
+        <!-- Connecting Line -->
+        <div class="flex-1 mx-4">
+          <div 
+            [style.background-color]="currentStep >= 2 ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+            class="h-0.5 w-full">
+          </div>
+        </div>
+        
+        <!-- Step 2: Table of Contents -->
+        <div class="flex items-center">
+          <div 
+            [class]="currentStep >= 2 ? 'text-white' : 'text-gray-500'"
+            [style.background-color]="currentStep >= 2 ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)'"
+            class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
+            <i *ngIf="currentStep > 2" class="fas fa-check"></i>
+            <span *ngIf="currentStep <= 2">2</span>
+          </div>
+          <div class="ml-3">
+            <h3 
+              [style.color]="currentStep === 2 ? 'var(--btn-primary-bg)' : (currentStep > 2 ? 'var(--text-color)' : 'var(--input-placeholder)')"
+              class="text-sm font-medium">
+              Table of Contents
+            </h3>
+            <p class="text-xs" style="color: var(--input-placeholder);">
+              Define video chapters (optional)
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Video & Quiz Setup -->
+    <div *ngIf="currentStep === 1" class="space-y-6">
+      <!-- Video Upload Section -->
+      <div class="mb-6">
+        <label class="block mb-2 text-sm font-medium" style="color: var(--text-color);">
+          <i class="fas fa-upload mr-2"></i>Upload Video File
+        </label>
+        <input type="file" accept=".mp4" (change)="onInteractiveVideoSelected($event)"
+          class="w-full p-3 rounded-lg focus:outline-none focus:ring-2" 
+          style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+        <div *ngIf="interactiveVideoFile" class="mt-2 text-sm" style="color: var(--btn-success-bg);">
+          <i class="fas fa-check-circle mr-1"></i>
+          Selected: {{ interactiveVideoFile.name }}
+        </div>
+      </div>
+
+      <!-- Quiz Selection Section -->
+      <div class="mb-6">
+        <label class="block mb-2 text-sm font-medium" style="color: var(--text-color);">
+          <i class="fas fa-question-circle mr-2"></i>Select Quiz (Optional)
+        </label>
+        <select [(ngModel)]="selectedQuiz" class="w-full p-3 rounded-lg focus:outline-none focus:ring-2" 
+                style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+          <option value="">Select a quiz (optional)</option>
+          <option *ngFor="let quiz of quizOptions" [ngValue]="quiz">{{ quiz.title }}</option>
+        </select>
+        <!-- Debug info for quizzes -->
+        <div *ngIf="quizOptions.length === 0" class="mt-2 text-xs" style="color: var(--btn-primary-bg);">
+          <i class="fas fa-info-circle mr-1"></i>
+          No popup quizzes found. Create a quiz with "popup_quiz" setting first.
+        </div>
+        <div *ngIf="quizOptions.length > 0" class="mt-2 text-xs" style="color: var(--btn-success-bg);">
+          <i class="fas fa-check-circle mr-1"></i>
+          {{ quizOptions.length }} popup quiz{{ quizOptions.length !== 1 ? 'es' : '' }} available
+        </div>
+      </div>
+
+      <!-- Quiz Timestamp Section -->
+      <div class="mb-6" *ngIf="selectedQuiz">
+        <label class="block mb-2 text-sm font-medium" style="color: var(--text-color);">
+          <i class="fas fa-clock mr-2"></i>Quiz Timestamp (seconds)
+        </label>
+        <input type="number" [(ngModel)]="videoTimestamp" 
+          placeholder="Enter when quiz should appear (e.g., 30)"
+          class="w-full p-3 rounded-lg focus:outline-none focus:ring-2" 
+          style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+        <div class="mt-1 text-xs" style="color: var(--input-placeholder);">
+          <i class="fas fa-info-circle mr-1"></i>
+          Time in seconds when the popup quiz should appear during video playback
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Table of Contents -->
+    <div *ngIf="currentStep === 2" class="space-y-4">
+      <!-- Warning when no video is saved yet -->
+      <div *ngIf="!currentAttachmentId" class="border rounded-lg p-4 mb-4" style="background-color: var(--alert-warning-bg); border-color: var(--alert-warning-border);">
+        <div class="flex items-center">
+          <i class="fas fa-exclamation-triangle mr-3" style="color: var(--alert-warning-border);"></i>
+          <div>
+            <h4 class="text-sm font-medium" style="color: var(--text-color);">Save Video First</h4>
+            <p class="text-sm mt-1" style="color: var(--input-placeholder);">
+              Please save the video in the database first by clicking "Save to Database" before adding table of contents.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="border rounded-lg p-4" style="background-color: var(--alert-info-bg); border-color: var(--alert-info-border);">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h3 class="text-lg font-semibold flex items-center" style="color: var(--text-color);">
+              <i class="fas fa-list-ul mr-2"></i>
+              Table of Contents
+            </h3>
+            <p class="text-sm" style="color: var(--input-placeholder);">Add chapters and timestamps for easy navigation (YouTube-like chapters)</p>
+            <p class="text-xs mt-1" style="color: var(--input-placeholder);">
+              <i class="fas fa-info-circle mr-1"></i>
+              Define chapters here, they will be saved when you click "Save Table of Contents"
+            </p>
+          </div>
+          <button 
+            (click)="addNewTableOfContentsEntry()"
+            [disabled]="!currentAttachmentId"
+            class="text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+            style="background: linear-gradient(to right, var(--btn-success-bg), var(--btn-primary-bg));">
+            <i class="fas fa-plus"></i>
+            <span>Add Chapter</span>
+          </button>
+        </div>
+        
+        <!-- Table of Contents Editor -->
+        <div class="space-y-3">
+          <div *ngFor="let content of pendingTableOfContents; let i = index" 
+               class="border rounded-lg p-4" style="background-color: var(--card-bg); border-color: var(--card-border);">
+            
+            <div class="flex justify-between items-start mb-3">
+              <h4 class="font-medium" style="color: var(--text-color);">Chapter {{ i + 1 }}</h4>
+              <button 
+                (click)="removeTableOfContentsEntry(i)"
+                class="transition-transform hover:scale-110" style="color: var(--btn-danger-bg);">
+                <i class="fas fa-trash text-sm"></i>
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Content Name -->
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium mb-1" style="color: var(--text-color);">Chapter Name</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="content.content_name"
+                  placeholder="e.g., Introduction, Main Content, Summary"
+                  class="w-full p-2 text-sm rounded-lg focus:outline-none focus:ring-2" 
+                  style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+              </div>
+              
+              <!-- Start Time -->
+              <div>
+                <label class="block text-xs font-medium mb-1" style="color: var(--text-color);">Start Time</label>
+                <div class="flex space-x-1">
+                  <input 
+                    type="number" 
+                    [(ngModel)]="content.start_minutes"
+                    (ngModelChange)="updateTimestamp(content, 'start')"
+                    min="0"
+                    placeholder="MM"
+                    class="flex-1 p-2 text-sm text-center rounded-lg focus:outline-none focus:ring-2" 
+                    style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+                  <span class="flex items-center" style="color: var(--input-placeholder);">:</span>
+                  <input 
+                    type="number" 
+                    [(ngModel)]="content.start_seconds"
+                    (ngModelChange)="updateTimestamp(content, 'start')"
+                    min="0" max="59"
+                    placeholder="SS"
+                    class="flex-1 p-2 text-sm text-center rounded-lg focus:outline-none focus:ring-2" 
+                    style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+                </div>
+                <div class="text-xs mt-1" style="color: var(--input-placeholder);">{{ formatTimestamp(content.start_timestamp || 0) }}</div>
+              </div>
+              
+              <!-- End Time -->
+              <div>
+                <label class="block text-xs font-medium mb-1" style="color: var(--text-color);">End Time</label>
+                <div class="flex space-x-1">
+                  <input 
+                    type="number" 
+                    [(ngModel)]="content.end_minutes"
+                    (ngModelChange)="updateTimestamp(content, 'end')"
+                    min="0"
+                    placeholder="MM"
+                    class="flex-1 p-2 text-sm text-center rounded-lg focus:outline-none focus:ring-2" 
+                    style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+                  <span class="flex items-center" style="color: var(--input-placeholder);">:</span>
+                  <input 
+                    type="number" 
+                    [(ngModel)]="content.end_seconds"
+                    (ngModelChange)="updateTimestamp(content, 'end')"
+                    min="0" max="59"
+                    placeholder="SS"
+                    class="flex-1 p-2 text-sm text-center rounded-lg focus:outline-none focus:ring-2" 
+                    style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+                </div>
+                <div class="text-xs mt-1" style="color: var(--input-placeholder);">{{ formatTimestamp(content.end_timestamp || 0) }}</div>
+              </div>
+              
+              <!-- Description -->
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium mb-1" style="color: var(--text-color);">Description (Optional)</label>
+                <textarea 
+                  [(ngModel)]="content.description"
+                  placeholder="Brief description of this chapter content..."
+                  rows="2"
+                  class="w-full p-2 text-sm rounded-lg focus:outline-none focus:ring-2" 
+                  style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"></textarea>
+              </div>
+            </div>
+            
+            <!-- Validation Messages -->
+            <div *ngIf="!isValidTimeRange(content)" class="mt-2 text-xs" style="color: var(--btn-danger-bg);">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              End time must be greater than start time
+            </div>
+          </div>
+          
+          <!-- Empty State -->
+          <div *ngIf="pendingTableOfContents.length === 0" 
+               class="text-center py-8 border-2 border-dashed rounded-lg" style="color: var(--input-placeholder); border-color: var(--card-border);">
+            <i class="fas fa-list-ul text-2xl mb-2"></i>
+            <p class="text-sm">No chapters defined yet.</p>
+            <p class="text-xs">Click "Add Chapter" to create your first chapter.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end space-x-4 mt-6 pt-4" style="border-top: 1px solid var(--card-border);">
+      <button (click)="cancelInteractiveVideo()"
+        class="px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 transition-transform hover:scale-105"
+        style="background-color: var(--btn-danger-bg);">
+        <i class="fas fa-times mr-2"></i>Cancel
+      </button>
+      
+      <!-- Show different buttons based on current step -->
+      <div *ngIf="currentStep === 1">
+        <!-- Step 1: Save video to database -->
+        <button (click)="saveVideoToDatabase()"
+          [disabled]="isSaving || !interactiveVideoFile"
+          class="px-6 py-2 text-white rounded-lg focus:outline-none focus:ring-2 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-105"
+          style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover));">
+          <i class="fas fa-database"></i>
+          <span>{{ isSaving ? 'Saving...' : 'Save to Database & Continue' }}</span>
+        </button>
+      </div>
+      
+      <div *ngIf="currentStep === 2">
+        <!-- Step 2: Save table of contents or finish -->
+        <div class="flex space-x-3">
+          <!-- Back button -->
+          <button (click)="goToStep(1)"
+            class="px-4 py-2 rounded-lg focus:outline-none focus:ring-2 flex items-center space-x-2 transition-all duration-200 hover:scale-105"
+            style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text);">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+          </button>
+          
+          <button (click)="saveTableOfContentsAndClose()"
+            [disabled]="isSaving || pendingTableOfContents.length === 0"
+            class="px-6 py-2 text-white rounded-lg focus:outline-none focus:ring-2 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+            style="background: linear-gradient(to right, var(--btn-success-bg), var(--btn-primary-bg));">
+            <i class="fas fa-save"></i>
+            <span>{{ isSaving ? 'Saving...' : 'Save Table of Contents' }}</span>
+          </button>
+          
+          <button (click)="finishWithoutTableOfContents()"
+            class="px-6 py-2 text-white rounded-lg focus:outline-none focus:ring-2 flex items-center space-x-2 transition-all duration-200 hover:scale-105"
+            style="background: linear-gradient(to right, var(--btn-secondary-bg), var(--btn-secondary-hover));">
+            <i class="fas fa-check"></i>
+            <span>Finish Without Chapters</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button (click)="showInteractiveVideoModal = false"
+      class="absolute top-2 right-2 transition-transform hover:scale-110" style="color: var(--input-placeholder);">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>

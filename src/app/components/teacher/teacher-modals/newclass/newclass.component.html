@@ -1,0 +1,240 @@
+<!-- <div class="modal-content custom-modal-content">
+  <form #classForm="ngForm">
+    <div class="mt-2 inputwrap">
+      <div class="form-group">
+        <label for="className">Class Name:</label>
+        <input
+          [(ngModel)]="className"
+          [ngModelOptions]="{ standalone: true }"
+          name="className"
+          #nameCtrl="ngModel"
+          type="text"
+          id="className"
+          placeholder="Enter class name"
+          [ngClass]="{ 'invalid-input': nameCtrl.invalid && nameCtrl.touched }"
+          required
+        />
+        <div class="error-message" *ngIf="nameCtrl.invalid && nameCtrl.touched">
+          Field is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="classCode">Class Code:</label>
+        <input
+          [(ngModel)]="classCode"
+          [ngModelOptions]="{ standalone: true }"
+          name="classCode"
+          #codeCtrl="ngModel"
+          type="text"
+          id="classCode"
+          placeholder="Enter class code"
+          [ngClass]="{ 'invalid-input': codeCtrl.invalid && codeCtrl.touched }"
+          required
+        />
+        <div class="error-message" *ngIf="codeCtrl.invalid && codeCtrl.touched">
+          Field is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="course">Course:</label>
+        <select
+          #courseCtrl="ngModel"
+          [(ngModel)]="course"
+          [ngModelOptions]="{ standalone: true }"
+          name="course"
+          id="course"
+          [ngClass]="{
+            'invalid-input': course == '' && courseCtrl.touched,
+            'text-gray-400': course == ''
+          }"
+        >
+          <option value="" disabled selected hidden>Select Course</option>
+          <option [value]="course.value.id" *ngFor="let course of courses | keyvalue">
+            {{ course.value.course }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="course == '' && courseCtrl.touched">
+          Field is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Time Schedule:</label>
+        <div *ngFor="let schedule of timeSchedules; let i = index" class="time-schedule">
+          <div class="time-input">
+            <select [(ngModel)]="startHours[i]" name="startHour{{i}}" (change)="updateTimeSchedule(i)">
+              <option value="" disabled selected>HH</option>
+              <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
+            </select>
+            <span class="time-separator">:</span>
+            <select [(ngModel)]="startMinutes[i]" name="startMinute{{i}}" (change)="updateTimeSchedule(i)">
+              <option value="" disabled selected>MM</option>
+              <option *ngFor="let m of minutes" [value]="m">{{ m }}</option>
+            </select>
+            <select [(ngModel)]="startPeriods[i]" name="startPeriod{{i}}" (change)="updateTimeSchedule(i)">
+              <option value="" disabled selected>AM/PM</option>
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+          <span class="time-range-separator">-</span>
+          <div class="time-input">
+            <select [(ngModel)]="endHours[i]" name="endHour{{i}}" (change)="updateTimeSchedule(i)">
+              <option value="" disabled selected>HH</option>
+              <option *ngFor="let h of hours" [value]="h">{{ h }}</option>
+            </select>
+            <span class="time-separator">:</span>
+            <select [(ngModel)]="endMinutes[i]" name="endMinute{{i}}" (change)="updateTimeSchedule(i)">
+              <option value="" disabled selected>MM</option>
+              <option *ngFor="let m of minutes" [value]="m">{{ m }}</option>
+            </select>
+            <select [(ngModel)]="endPeriods[i]" name="endPeriod{{i}}" (change)="updateTimeSchedule(i)">
+              <option value="" disabled selected>AM/PM</option>
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+          <button class="remove-button" (click)="removeTimeSchedule(i)">Remove</button>
+        </div>
+        <button class="add-button" (click)="addTimeSchedule()">Add Time Schedule</button>
+        <div class="error-message" *ngIf="(startHours[0] === '' || startMinutes[0] === '' || startPeriods[0] === '' || endHours[0] === '' || endMinutes[0] === '' || endPeriods[0] === '')">
+          Fields are required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Day Schedule:</label>
+        <div class="day-schedule">
+          <label *ngFor="let day of weekDays" class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="day.checked"
+              [checked]="day.checked"
+              [ngModelOptions]="{ standalone: true }"
+              (change)="updateDaySchedule(day.name, $event)"
+            />
+            {{ day.name }}
+          </label>
+        </div>
+        <div class="error-message" *ngIf="showDayScheduleError">
+          At least one day must be selected
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="duration-300 hover:scale-105 hover:ease-out save-button" (click)="classForm.form.markAllAsTouched(); manageClass()">
+          Save
+        </button>
+        <button class="cancel-button" (click)="closeModal(null)">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div> -->
+
+
+<div class="bg-white rounded-lg shadow-lg p-8 w-[500px] mx-auto">
+  <form #classForm="ngForm">
+    <!-- Header -->
+    <div class="flex items-center justify-center mb-8">
+      <h1 class="text-2xl font-bold text-center text-primary-2">
+        {{ isEditMode ? 'EDIT CLASS' : 'NEW CLASS' }}
+      </h1>
+    </div>
+
+    <!-- Class Name -->
+    <div class="mb-4">
+      <label for="className" class="block mb-2 text-sm font-bold">Class Name:</label>
+      <input
+        [(ngModel)]="className"
+        name="className"
+        #nameCtrl="ngModel"
+        type="text"
+        id="className"
+        placeholder="Enter class name"
+        class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        [ngClass]="{ 'border-red-500': nameCtrl.invalid && nameCtrl.touched }"
+        required
+      />
+      <div *ngIf="nameCtrl.invalid && nameCtrl.touched" class="mt-1 text-sm text-red-500">
+        Field is required
+      </div>
+    </div>
+
+    <!-- Class Code -->
+    <div class="mb-4">
+      <label for="classCode" class="block mb-2 text-sm font-bold">Class Code:</label>
+      <input
+        [(ngModel)]="classCode"
+        name="classCode"
+        #codeCtrl="ngModel"
+        type="text"
+        id="classCode"
+        placeholder="Enter class code"
+        class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        [ngClass]="{ 'border-red-500': codeCtrl.invalid && codeCtrl.touched }"
+        required
+      />
+      <div *ngIf="codeCtrl.invalid && codeCtrl.touched" class="mt-1 text-sm text-red-500">
+        Field is required
+      </div>
+    </div>
+
+    <!-- Course Selection -->
+    <div class="mb-4">
+      <label for="course" class="block mb-2 text-sm font-bold">Course:</label>
+      <select
+        #courseCtrl="ngModel"
+        [(ngModel)]="course"
+        name="course"
+        id="course"
+        class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        [ngClass]="{ 'border-red-500': course == '' && courseCtrl.touched }"
+        required
+      >
+        <option value="" disabled selected hidden>Select Course</option>
+        <option [value]="course.value.id" *ngFor="let course of courses | keyvalue">
+          {{ course.value.course }}
+        </option>
+      </select>
+      <div *ngIf="course == '' && courseCtrl.touched" class="mt-1 text-sm text-red-500">
+        Field is required
+      </div>
+    </div>
+
+    <!-- Duration Input -->
+    <div class="mb-4">
+      <label for="duration" class="block mb-2 text-sm font-bold">Class Duration (days):</label>
+      <input
+        [(ngModel)]="duration"
+        name="duration"
+        type="number"
+        min="1"
+        id="duration"
+        placeholder="Enter duration in days"
+        class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        required
+      />
+    </div>
+
+  <!-- Button Group -->
+  <div class="flex items-center justify-center gap-4 mt-6 space-x-4">
+    <button
+      [disabled]="classForm.form.invalid"
+      type="submit"
+      class="bg-primary-2 text-white w-full py-2.5 rounded-lg shadow-md hover:bg-primary-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      (click)="classForm.form.markAllAsTouched(); manageClass()"
+    >
+      {{ isEditMode ? 'Update' : 'Save' }}
+    </button>
+    <button
+      type="button"
+      class="bg-gray-500 text-white w-full py-2.5 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+      (click)="closeModal(null)"
+    >
+      Cancel
+    </button>
+  </div>
+</form>
+</div>

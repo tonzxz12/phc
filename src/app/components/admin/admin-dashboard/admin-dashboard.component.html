@@ -1,0 +1,294 @@
+<!-- Modern Hospital Admin Dashboard -->
+<div class="hospital-admin-dashboard" [style]="{'background-color': 'var(--body-color)'}">
+  <!-- Medical Background Pattern -->
+  <div class="medical-bg-pattern">
+    <div class="medical-cross medical-cross-1"></div>
+    <div class="medical-cross medical-cross-2"></div>
+    <div class="pulse-ring pulse-ring-1"></div>
+    <div class="pulse-ring pulse-ring-2"></div>
+    <div class="dna-helix"></div>
+  </div>
+
+  <!-- Dashboard Header -->
+  <div class="dashboard-header" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)'}">
+    <div class="header-content">
+      <div class="header-title" [style]="{'color': 'var(--primary-color)'}">
+        <i class="pi pi-chart-line"></i>
+        <h1>Admin Dashboard</h1>
+      </div>
+      <div class="header-subtitle">
+        <p [style]="{'color': 'var(--text-color)'}">Real-time PHC healthcare analytics and learning management system overview</p>
+      </div>
+    </div>
+    <div class="medical-status-indicator" [style]="{'background-color': 'var(--alert-success-bg)', 'border': '1px solid var(--alert-success-border)'}">
+      <div class="status-dot status-active"></div>
+      <span>All Systems Operational</span>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="medical-stats-grid">
+    <!-- Student Count Card -->
+    <div class="medical-stat-card stat-card-primary" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)'}">
+      <div class="stat-background">
+        <div class="stat-pattern stat-pattern-1"></div>
+      </div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <div class="stat-icon stat-icon-students">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="stat-badge" [style]="{'background-color': 'var(--alert-info-bg)', 'border': '1px solid var(--alert-info-border)', 'color': 'var(--primary-color)'}">Active</div>
+        </div>
+        <div class="stat-body">
+          <h3 class="stat-title" [style]="{'color': 'var(--text-color)'}">Student Enrollment</h3>
+          <div class="stat-number">
+            <span class="number" [style]="{'color': 'var(--primary-color)'}">{{students || 0}}</span>
+            <span class="unit" [style]="{'color': 'var(--text-color)'}">Students</span>
+          </div>
+          <div class="stat-trend">
+            <i class="pi pi-arrow-up"></i>
+            <span>+12% this month</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teachers Card -->
+    <div class="medical-stat-card stat-card-success" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)'}">
+      <div class="stat-background">
+        <div class="stat-pattern stat-pattern-2"></div>
+      </div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <div class="stat-icon stat-icon-teachers">
+            <i class="pi pi-user-edit"></i>
+          </div>
+          <div class="stat-badge" [style]="{'background-color': 'var(--alert-info-bg)', 'border': '1px solid var(--alert-info-border)', 'color': 'var(--primary-color)'}">Certified</div>
+        </div>
+        <div class="stat-body">
+          <h3 class="stat-title" [style]="{'color': 'var(--text-color)'}">Medical Staff</h3>
+          <div class="stat-number">
+            <span class="number" [style]="{'color': 'var(--primary-color)'}">{{teachers || 0}}</span>
+            <span class="unit" [style]="{'color': 'var(--text-color)'}">Professionals</span>
+          </div>
+          <div class="stat-trend">
+            <i class="pi pi-arrow-up"></i>
+            <span>+3% this quarter</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Courses Card -->
+    <div class="medical-stat-card stat-card-info" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)'}">
+      <div class="stat-background">
+        <div class="stat-pattern stat-pattern-3"></div>
+      </div>
+      <div class="stat-content">
+        <div class="stat-header">
+          <div class="stat-icon stat-icon-courses">
+            <i class="pi pi-book"></i>
+          </div>
+          <div class="stat-badge" [style]="{'background-color': 'var(--alert-info-bg)', 'border': '1px solid var(--alert-info-border)', 'color': 'var(--primary-color)'}">Available</div>
+        </div>
+        <div class="stat-body">
+          <h3 class="stat-title" [style]="{'color': 'var(--text-color)'}">Training Programs</h3>
+          <div class="stat-number">
+            <span class="number" [style]="{'color': 'var(--primary-color)'}">{{courses || 0}}</span>
+            <span class="unit" [style]="{'color': 'var(--text-color)'}">Courses</span>
+          </div>
+          <div class="stat-trend">
+            <i class="pi pi-arrow-up"></i>
+            <span>+8% new content</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Analytics Section -->
+  <div class="analytics-section">
+    <div class="analytics-grid">
+      <!-- Course Analytics Chart -->
+      <div class="analytics-card analytics-card-primary" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)'}">
+        <div class="card-header" [style]="{'border-bottom': '1px solid var(--card-border)'}">
+          <div class="card-title">
+            <i class="pi pi-chart-bar" [style]="{'color': 'var(--primary-color)'}"></i>
+            <h3 [style]="{'color': 'var(--text-color)'}">Top Performing Courses</h3>
+          </div>
+          <div class="card-actions">
+            <button class="action-btn" title="Refresh Data" [style]="{'background-color': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)'}">
+              <i class="pi pi-refresh"></i>
+            </button>
+            <button class="action-btn" title="Export Report" [style]="{'background-color': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)'}">
+              <i class="pi pi-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="chart-container">
+            <canvas id="courseChart" class="analytics-chart"></canvas>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item" [style]="{'color': 'var(--text-color)'}">
+              <div class="legend-color legend-color-1"></div>
+              <span>Emergency Medicine</span>
+            </div>
+            <div class="legend-item" [style]="{'color': 'var(--text-color)'}">
+              <div class="legend-color legend-color-2"></div>
+              <span>Nursing Fundamentals</span>
+            </div>
+            <div class="legend-item" [style]="{'color': 'var(--text-color)'}">
+              <div class="legend-color legend-color-3"></div>
+              <span>Medical Ethics</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Performance Overview -->
+      <div class="analytics-card analytics-card-secondary" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)'}">
+        <div class="card-header" [style]="{'border-bottom': '1px solid var(--card-border)'}">
+          <div class="card-title">
+            <i class="pi pi-users" [style]="{'color': 'var(--primary-color)'}"></i>
+            <h3 [style]="{'color': 'var(--text-color)'}">Student Performance Overview</h3>
+          </div>
+          <div class="card-actions">
+            <button class="action-btn" title="View Details" [style]="{'background-color': 'var(--btn-secondary-bg)', 'color': 'var(--btn-secondary-text)'}">
+              <i class="pi pi-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="performance-metrics">
+            <div class="metric-item">
+              <div class="metric-header">
+                <span class="metric-label" [style]="{'color': 'var(--text-color)'}">Average Score</span>
+                <span class="metric-value" [style]="{'color': 'var(--primary-color)'}">87.5%</span>
+              </div>
+              <div class="metric-bar" [style]="{'background-color': 'var(--card-border)'}">
+                <div class="metric-progress" style="width: 87.5%" [style]="{'background': 'linear-gradient(90deg, var(--primary-color), var(--secondary-color))'}"></div>
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-header">
+                <span class="metric-label" [style]="{'color': 'var(--text-color)'}">Completion Rate</span>
+                <span class="metric-value" [style]="{'color': 'var(--primary-color)'}">92.3%</span>
+              </div>
+              <div class="metric-bar" [style]="{'background-color': 'var(--card-border)'}">
+                <div class="metric-progress" style="width: 92.3%" [style]="{'background': 'linear-gradient(90deg, var(--primary-color), var(--secondary-color))'}"></div>
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-header">
+                <span class="metric-label" [style]="{'color': 'var(--text-color)'}">Engagement</span>
+                <span class="metric-value" [style]="{'color': 'var(--primary-color)'}">78.9%</span>
+              </div>
+              <div class="metric-bar" [style]="{'background-color': 'var(--card-border)'}">
+                <div class="metric-progress" style="width: 78.9%" [style]="{'background': 'linear-gradient(90deg, var(--primary-color), var(--secondary-color))'}"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Quick Actions Panel -->
+  <div class="quick-actions-panel" [style]="{'background-color': 'var(--card-bg)', 'box-shadow': 'var(--card-shadow)', 'border': '1px solid var(--card-border)'}">
+    <div class="panel-header" [style]="{'border-bottom': '1px solid var(--card-border)'}">
+      <div class="panel-title">
+        <i class="pi pi-bolt" [style]="{'color': 'var(--primary-color)'}"></i>
+        <h3 [style]="{'color': 'var(--text-color)'}">Quick Actions</h3>
+      </div>
+    </div>
+    <div class="actions-grid">
+      <button class="action-card action-card-primary" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-user-plus"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">Add Student</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Register new student</p>
+        </div>
+      </button>
+      
+      <button class="action-card action-card-success" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">Manage Staff</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Add or edit medical staff</p>
+        </div>
+      </button>
+      
+      <button class="action-card action-card-info" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-plus"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">New Course</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Create training program</p>
+        </div>
+      </button>
+      
+      <button class="action-card action-card-warning" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-cog"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">System Settings</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Configure platform</p>
+        </div>
+      </button>
+      
+      <button class="action-card action-card-danger" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-chart-line"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">Reports</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Generate analytics</p>
+        </div>
+      </button>
+      
+      <button class="action-card action-card-secondary" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">Security</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Manage access controls</p>
+        </div>
+      </button>
+
+      <button class="action-card action-card-warning" (click)="setActiveTab('reported')" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-comments"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">Moderation</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Review reported content</p>
+        </div>
+        <div *ngIf="reportedMessagesCount > 0" class="action-badge" [style]="{'background-color': 'var(--danger-color)', 'color': 'white'}">
+          {{reportedMessagesCount}}
+        </div>
+      </button>
+
+      <button class="action-card action-card-info" (click)="openCensorWordsModal()" [style]="{'background-color': 'var(--card-bg)', 'border': '1px solid var(--card-border)'}">
+        <div class="action-icon">
+          <i class="pi pi-filter"></i>
+        </div>
+        <div class="action-content">
+          <h4 [style]="{'color': 'var(--text-color)'}">Auto Censor</h4>
+          <p [style]="{'color': 'var(--input-placeholder)'}">Manage word filters</p>
+        </div>
+      </button>
+    </div>
+  </div>
+
+</div>

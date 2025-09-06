@@ -1,0 +1,448 @@
+<!-- GERIA DRIVE - TAILWIND CSS DESIGN -->
+<div class="min-h-screen bg-white">
+  
+  <!-- Header Section - Emerald Theme Like Landing Page -->
+  <header class="bg-white/95 border-b border-gray-200 sticky top-0 z-40 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      
+      <!-- Title Section -->
+      <div class="flex items-center gap-3 mb-4">
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight m-0 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Geria Drive</h1>
+        <p class="text-sm text-gray-500 font-medium m-0">Your secure learning files</p>
+      </div>
+      
+      <!-- Enhanced Search - Emerald Theme -->
+      <div class="w-full max-w-lg">
+        <div class="w-full">
+          <div class="flex items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2 transition-all duration-200 hover:bg-gray-100 focus-within:bg-white focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-100">
+            <div class="mr-3">
+              <i class="bx bx-search w-5 h-5 text-gray-400"></i>
+            </div>
+            <input 
+              type="text" 
+              class="flex-1 bg-transparent border-none outline-none text-gray-900 text-sm placeholder-gray-500"
+              placeholder="Search in Drive"
+              [(ngModel)]="searchQuery"
+              (input)="onSearch()"
+            >
+            <button class="ml-2 p-1 rounded-full bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-gray-200" title="Search options">
+              <i class="bx bx-tune w-4 h-4 text-gray-400"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Section - Clean Breadcrumbs -->
+  <nav class="bg-white border-b border-gray-100 sticky top-[73px] z-30">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      
+      <!-- Breadcrumb Navigation -->
+      <div class="flex items-center gap-4 flex-1">
+        <button 
+          *ngIf="navigationHistory.length > 0" 
+          class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-100 hover:border-gray-300"
+          (click)="navigateBack()"
+          title="Go back"
+        >
+          <i class="bx bx-arrow-back"></i>
+          <span>Back</span>
+        </button>
+        
+        <!-- Enhanced Breadcrumb Path -->
+        <div class="flex items-center gap-2 text-sm">
+          <!-- Home Icon -->
+          <div class="flex items-center gap-2 text-gray-600">
+            <i class="bx bx-home-alt text-emerald-600"></i>
+            <button 
+              class="font-medium text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
+              (click)="navigateToRoot()"
+            >
+              My Drive
+            </button>
+          </div>
+          
+          <!-- Breadcrumb Items -->
+          <ng-container *ngFor="let level of getBreadcrumbPath(); let i = index">
+            <i class="bx bx-chevron-right text-gray-400 text-xs"></i>
+            <button 
+              class="font-medium transition-colors duration-200"
+              [class]="i === getBreadcrumbPath().length - 1 ? 'text-gray-900 cursor-default' : 'text-emerald-600 hover:text-emerald-700'"
+              [disabled]="i === getBreadcrumbPath().length - 1"
+              (click)="navigateToBreadcrumb(i)"
+            >
+              {{ level.name }}
+            </button>
+          </ng-container>
+          
+          <!-- Current Level Badge -->
+          <span *ngIf="currentNavigationLevel.type !== 'root'" 
+                class="ml-3 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-100 border border-emerald-200 rounded-full">
+            {{ currentNavigationLevel.type | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <!-- File Count and View Controls -->
+      <div class="flex items-center gap-4">
+        <!-- File Count -->
+        <span class="text-sm text-gray-500">
+          {{ (filteredFiles.length || 0) }} item{{ (filteredFiles.length || 0) !== 1 ? 's' : '' }}
+        </span>
+        
+        <!-- View Mode Toggle -->
+        <div class="flex rounded-lg border border-gray-200 bg-gray-50">
+          <button
+            class="flex items-center justify-center w-9 h-9 rounded-l-lg transition-all duration-200"
+            [class]="viewMode === 'grid' ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+            (click)="setViewMode('grid')"
+            title="Grid view"
+          >
+            <i class="bx bx-grid-alt text-sm"></i>
+          </button>
+          <button
+            class="flex items-center justify-center w-9 h-9 rounded-r-lg transition-all duration-200"
+            [class]="viewMode === 'list' ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+            (click)="setViewMode('list')"
+            title="List view"
+          >
+            <i class="bx bx-list-ul text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content Section -->
+  <main class="max-w-7xl mx-auto px-6 py-6">
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      
+      <!-- Grid Loading -->
+      <div *ngIf="viewMode === 'grid'" class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse">
+          <div class="p-6 flex flex-col items-center justify-center h-32 bg-gray-50">
+            <div class="w-16 h-16 bg-gray-200 rounded-xl"></div>
+          </div>
+          <div class="p-4 flex flex-col gap-3">
+            <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-2 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- List Loading -->
+      <div *ngIf="viewMode === 'list'" class="bg-white border border-gray-200 rounded-lg">
+        <div class="grid grid-cols-5 gap-4 px-4 py-3 bg-gray-50 border border-gray-200 rounded-t-lg text-xs font-medium text-gray-600 uppercase tracking-wide sticky top-[121px] z-20">
+          <div class="flex items-center gap-2">
+            <i class="bx bx-file"></i>
+            <span>Name</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="bx bx-user"></i>
+            <span>Owner</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="bx bx-time"></i>
+            <span>Last Modified</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="bx bx-info-circle"></i>
+            <span>Description</span>
+          </div>
+          <div></div>
+        </div>
+        
+        <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="grid grid-cols-5 gap-4 px-4 py-3 border-b border-gray-100 items-center animate-pulse">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="w-8 h-8 bg-gray-200 rounded-lg"></div>
+            <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+          </div>
+          <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+          <div class="h-3 bg-gray-200 rounded w-3/5"></div>
+          <div class="h-3 bg-gray-200 rounded w-4/5"></div>
+          <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Display -->
+    <div *ngIf="!loading">
+      
+      <!-- Empty State - Emerald Theme -->
+      <div *ngIf="!filteredFiles || filteredFiles.length === 0" class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="mb-6">
+          <div class="w-20 h-20 mx-auto mb-4 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-500 text-3xl">
+            <i class="bx bx-folder-open"></i>
+          </div>
+        </div>
+        
+        <div class="max-w-md">
+          <h2 class="text-xl font-semibold text-gray-900 m-0 mb-2">
+            {{ searchQuery ? 'No files found' : 'Welcome to Geria Drive' }}
+          </h2>
+          <p class="text-gray-600 m-0 mb-8 leading-relaxed">
+            <span *ngIf="searchQuery">
+              We couldn't find any files matching "{{ searchQuery }}". Try searching for something else.
+            </span>
+            <span *ngIf="!searchQuery">
+              Get started by uploading your first file or creating a new folder. Your learning materials will appear here.
+            </span>
+          </p>
+          
+       
+        </div>
+      </div>
+
+      <!-- Grid View - Emerald Theme Cards -->
+      <div *ngIf="filteredFiles && filteredFiles.length > 0 && viewMode === 'grid'" class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div 
+          *ngFor="let file of filteredFiles; trackBy: trackByFileId" 
+          class="group bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-gray-300 hover:-translate-y-1"
+          (click)="navigateToFolder(file)"
+          (contextmenu)="showContextMenu($event, file)"
+        >
+          <!-- Card Header -->
+          <div class="relative p-6 flex flex-col items-center justify-center h-32 bg-gray-50">
+            <div class="flex items-center justify-center">
+              <!-- File Type Icon with Blurred Background -->
+              <div class="relative w-16 h-16 rounded-xl flex items-center justify-center text-gray-700 text-2xl backdrop-blur-sm border border-white/20 shadow-lg" 
+                [ngClass]="{
+                  'bg-emerald-500/20 shadow-emerald-500/25': file.type === 'folder',
+                  'bg-red-500/20 shadow-red-500/25': file.type === 'video', 
+                  'bg-red-600/20 shadow-red-600/25': file.type === 'youtube',
+                  'bg-amber-500/20 shadow-amber-500/25': file.type === 'image',
+                  'bg-blue-500/20 shadow-blue-500/25': file.type === 'document',
+                  'bg-violet-500/20 shadow-violet-500/25': file.type === 'audio',
+                  'bg-gray-500/20 shadow-gray-500/25': file.type === 'other' || !file.type
+                }">
+                <!-- Background blur effect -->
+                <div class="absolute inset-0 rounded-xl backdrop-blur-sm"
+                  [ngClass]="{
+                    'bg-gradient-to-br from-emerald-400/30 to-emerald-600/30': file.type === 'folder',
+                    'bg-gradient-to-br from-red-400/30 to-red-600/30': file.type === 'video', 
+                    'bg-gradient-to-br from-red-500/30 to-red-700/30': file.type === 'youtube',
+                    'bg-gradient-to-br from-amber-400/30 to-amber-600/30': file.type === 'image',
+                    'bg-gradient-to-br from-blue-400/30 to-blue-600/30': file.type === 'document',
+                    'bg-gradient-to-br from-violet-400/30 to-violet-600/30': file.type === 'audio',
+                    'bg-gradient-to-br from-gray-400/30 to-gray-600/30': file.type === 'other' || !file.type
+                  }"></div>
+                
+                <!-- Icon with better contrast -->
+                <i class="relative z-10 drop-shadow-sm"
+                  [ngClass]="getFileIconClass(file.type)"
+                  [style.color]="getFileIconColor(file.type)"></i>
+              </div>
+            </div>
+            
+            <!-- Card Actions -->
+            <div class="absolute top-3 right-3 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              <button 
+                class="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-white/40 flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-white hover:shadow-md" 
+                [class]="file.starred ? 'text-yellow-600 hover:text-yellow-700' : 'text-gray-600 hover:text-gray-900'"
+                (click)="toggleStar(file.id); $event.stopPropagation()"
+                title="Add to starred"
+              >
+                <i [ngClass]="file.starred ? 'bx bxs-star' : 'bx bx-star'"></i>
+              </button>
+              <button 
+                class="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-white/40 flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-white hover:shadow-md"
+                [class]="file.shared ? 'text-emerald-600 hover:text-emerald-700' : 'text-gray-600 hover:text-gray-900'"
+                (click)="shareFile(file); $event.stopPropagation()" 
+                title="Share"
+              >
+                <i class="bx bx-share-alt"></i>
+              </button>
+              <button 
+                class="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-white/40 flex items-center justify-center text-gray-600 cursor-pointer transition-all duration-200 hover:text-gray-900 hover:bg-white hover:shadow-md"
+                (click)="showFileMenu($event, file)"
+                title="More options"
+              >
+                <i class="bx bx-dots-vertical-rounded"></i>
+              </button>
+            </div>
+          </div>
+          
+    
+          <!-- Card Footer -->
+          <div class="px-4 py-3 border-t border-gray-100">
+            <h3 class="text-sm font-medium text-gray-900 truncate mb-1" [title]="file.name">
+              {{ file.name }}
+            </h3>
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <span class="capitalize">{{ getFileTypeDisplayName(file.type) }}</span>
+              <span *ngIf="file.modified" class="text-gray-400">
+                {{ file.modified | date:'MMM d, y' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- List View - Clean Table -->
+      <div *ngIf="filteredFiles && filteredFiles.length > 0 && viewMode === 'list'">
+        
+        <!-- List Header -->
+        <div class="grid grid-cols-5 gap-4 px-4 py-3 bg-gray-50 border border-gray-200 rounded-t-lg text-xs font-medium text-gray-600 uppercase tracking-wide sticky top-[121px] z-20">
+          <div class="flex items-center gap-2">
+            <i class="bx bx-file"></i>
+            <span>Name</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="bx bx-user"></i>
+            <span>Owner</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="bx bx-time"></i>
+            <span>Last Modified</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="bx bx-info-circle"></i>
+            <span>Description</span>
+          </div>
+          <div></div>
+        </div>
+        
+        <!-- List Items -->
+        <div class="bg-white border-l border-r border-b border-gray-200 rounded-b-lg">
+          <div 
+            *ngFor="let file of filteredFiles; trackBy: trackByFileId" 
+            class="grid grid-cols-5 gap-4 px-4 py-3 border-b border-gray-100 cursor-pointer transition-colors duration-200 items-center hover:bg-gray-50 last:border-b-0 group"
+            (click)="navigateToFolder(file)"
+            (contextmenu)="showContextMenu($event, file)"
+          >
+            
+            <!-- File Info Column -->
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm flex-shrink-0"
+                [ngClass]="{
+                  'bg-emerald-600': file.type === 'folder',
+                  'bg-red-600': file.type === 'video', 
+                  'bg-red-700': file.type === 'youtube',
+                  'bg-amber-600': file.type === 'image',
+                  'bg-blue-600': file.type === 'document',
+                  'bg-violet-600': file.type === 'audio',
+                  'bg-gray-600': file.type === 'other' || !file.type
+                }">
+                <i [ngClass]="getFileIconClass(file.type)"></i>
+              </div>
+              
+              <!-- File Name and Type -->
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-gray-900 truncate" [title]="file.name">
+                  {{ file.name }}
+                </p>
+                <p class="text-xs text-gray-500 capitalize">
+                  {{ getFileTypeDisplayName(file.type) }}
+                </p>
+              </div>
+            </div>
+            
+            <!-- Owner Column -->
+            <div class="text-sm text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">{{ file.owner || 'You' }}</div>
+            
+         
+            
+         
+            
+            <!-- Actions Column -->
+            <button 
+              class="w-8 h-8 rounded-full bg-transparent border-none flex items-center justify-center text-gray-400 cursor-pointer transition-all duration-200 opacity-0 hover:text-gray-600 hover:bg-gray-100 group-hover:opacity-100"
+              (click)="showFileMenu($event, file); $event.stopPropagation()"
+              title="More options"
+            >
+              <i class="bx bx-dots-horizontal-rounded"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Context Menu - Emerald Theme -->
+<div 
+  *ngIf="showContextMenuFlag" 
+  class="fixed bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-48 py-1"
+  [style.left.px]="contextMenuPosition.x"
+  [style.top.px]="contextMenuPosition.y"
+  (click)="hideContextMenu()"
+>
+  <div class="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer transition-colors duration-200 hover:bg-gray-50" (click)="openFile(selectedFile!)">
+    <div class="w-4 h-4 flex items-center justify-center text-gray-500">
+      <i class="bx bx-folder-open"></i>
+    </div>
+    <span class="flex-1">Open</span>
+    <span class="text-xs text-gray-400">Enter</span>
+  </div>
+  
+  <div class="h-px bg-gray-200 my-1"></div>
+  
+  <div class="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer transition-colors duration-200 hover:bg-gray-50" (click)="downloadFile(selectedFile!)">
+    <div class="w-4 h-4 flex items-center justify-center text-gray-500">
+      <i class="bx bx-download"></i>
+    </div>
+    <span class="flex-1">Download</span>
+    <span class="text-xs text-gray-400">Ctrl+S</span>
+  </div>
+  
+  <div class="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer transition-colors duration-200 hover:bg-gray-50" (click)="shareFile(selectedFile!)">
+    <div class="w-4 h-4 flex items-center justify-center text-gray-500">
+      <i class="bx bx-share-alt"></i>
+    </div>
+    <span class="flex-1">Share</span>
+  </div>
+  
+  <div class="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer transition-colors duration-200 hover:bg-gray-50" (click)="toggleStar(selectedFile!.id)">
+    <div class="w-4 h-4 flex items-center justify-center text-gray-500">
+      <i [ngClass]="selectedFile?.starred ? 'bx bxs-star' : 'bx bx-star'"></i>
+    </div>
+    <span class="flex-1">{{ selectedFile?.starred ? 'Remove from starred' : 'Add to starred' }}</span>
+  </div>
+  
+  <div class="h-px bg-gray-200 my-1"></div>
+  
+  <div class="flex items-center gap-3 px-3 py-2 text-sm text-red-600 cursor-pointer transition-colors duration-200 hover:bg-red-50" (click)="deleteFile(selectedFile!)">
+    <div class="w-4 h-4 flex items-center justify-center text-gray-500">
+      <i class="bx bx-trash"></i>
+    </div>
+    <span class="flex-1">Move to trash</span>
+    <span class="text-xs text-gray-400">Del</span>
+  </div>
+</div>
+
+<!-- Upload Progress Modal - Emerald Theme -->
+<div *ngIf="isUploading" class="fixed inset-0 bg-black/25 flex items-center justify-center z-50" (click)="cancelUpload()">
+  <div class="bg-white rounded-xl shadow-2xl w-[90%] max-w-md overflow-hidden" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center gap-3 text-lg font-semibold text-gray-900">
+        <i class="bx bx-cloud-upload w-5 h-5 text-emerald-500"></i>
+        <span>Uploading Files</span>
+      </div>
+      <button class="w-8 h-8 rounded-full bg-transparent border-none flex items-center justify-center text-gray-400 cursor-pointer transition-all duration-200 hover:text-gray-600 hover:bg-gray-100" (click)="cancelUpload()">
+        <i class="bx bx-x"></i>
+      </button>
+    </div>
+    
+    <div class="p-6">
+      <div class="flex flex-col gap-3">
+        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-emerald-500 rounded-full transition-all duration-300" [style.width.%]="uploadProgress"></div>
+        </div>
+        <div class="text-center text-sm font-medium text-gray-600">{{ uploadProgress }}% complete</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden File Input -->
+<input 
+  #fileInput
+  type="file" 
+  multiple 
+  (change)="uploadFiles($event)"
+  style="display: none">
+
+

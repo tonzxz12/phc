@@ -1,0 +1,178 @@
+<div class="fixed inset-0 z-50 flex flex-col p-4 bg-gray-900">
+  <!-- Header -->
+  <div class="flex items-center justify-between px-4 py-2 text-white ">
+    <h2 class="text-xl font-semibold truncate">{{ getFileName() }}</h2>
+    <div class="flex items-center space-x-2">
+      <!-- Debug info for YouTube -->
+      <span *ngIf="isYouTubeLink()" class="text-xs bg-red-500 px-2 py-1 rounded">YouTube {{ getYouTubeEmbedUrl() ? '' : 'FAIL' }}</span>
+      <button (click)="close()" class="text-white hover:text-gray-300 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative flex-grow my-4 overflow-hidden bg-white rounded-b-lg">
+    <!-- Video Controls Overlay -->
+    <div *ngIf="isVideoFile() && !isYouTubeLink() && tableOfContents.length > 0" 
+         class="absolute top-4 right-4 z-10 flex space-x-2">
+   
+    </div>
+
+    <!-- Table of Contents Sidebar -->
+    <div *ngIf="isVideoFile() && !isYouTubeLink() && showTableOfContents && tableOfContents.length > 0" 
+         class="absolute top-0 right-0 w-80 h-full bg-gray-900 bg-opacity-95 text-white z-10 overflow-y-auto">
+      <div class="p-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Table of Contents</h3>
+          <button (click)="toggleTableOfContents()" 
+                  class="text-gray-300 hover:text-white transition-colors">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="space-y-2">
+          <button 
+            *ngFor="let chapter of tableOfContents; let i = index"
+            (click)="jumpToTimestamp(chapter.start_timestamp)"
+            [class.bg-blue-600]="isChapterActive(chapter)"
+            [class.bg-gray-700]="!isChapterActive(chapter)"
+            class="w-full text-left p-3 rounded-lg hover:bg-blue-500 transition-all duration-200 border border-gray-600">
+            
+            <div class="flex justify-between items-start mb-1">
+              <span class="font-medium text-sm">{{ i + 1 }}. {{ chapter.content_name }}</span>
+              <span class="text-xs text-gray-300 ml-2">
+                {{ formatTimestamp(chapter.start_timestamp) }}
+              </span>
+            </div>
+            
+            <div *ngIf="chapter.description" class="text-xs text-gray-300 leading-relaxed">
+              {{ chapter.description }}
+            </div>
+            
+            <div class="text-xs text-gray-400 mt-1">
+              Duration: {{ formatTimestamp(chapter.end_timestamp - chapter.start_timestamp) }}
+            </div>
+          </button>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t border-gray-600 text-xs text-gray-400">
+          <i class="fas fa-info-circle mr-1"></i>
+          Click any chapter to jump to that section
+        </div>
+      </div>
+    </div>
+
+    <!-- YouTube Video Player -->
+    <div *ngIf="isYouTubeLink()" class="relative w-full h-full bg-black">
+      <iframe
+        [src]="getYouTubeEmbedUrl() | safe"
+        class="w-full h-full"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- Video Element for Interactive Content -->
+    <div *ngIf="isVideoFile() && !isYouTubeLink()" class="video-container relative w-full h-full">
+      <!-- Video Player -->
+      <video
+        #videoPlayer
+        [src]="link"
+        class="object-contain w-full h-full"
+        controls
+        (timeupdate)="onTimeUpdate($event)"
+        (loadedmetadata)="onVideoLoaded($event)">
+      </video>
+
+      <!-- Table of Contents Button -->
+      <button *ngIf="tableOfContents.length > 0"
+              (click)="toggleTableOfContents()"
+              class="toc-button-left">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <span class="toc-button-text">Chapters</span>
+      </button>
+    </div>
+
+    <!-- PowerPoint Viewer -->
+    <ngx-doc-viewer
+    *ngIf="isPowerPointFile()"
+    [url]="link"
+    viewer="google"
+    style="width: 100%; height: 100%;"
+  ></ngx-doc-viewer>
+  
+    <!-- Word Document Viewer -->
+    <ngx-doc-viewer
+      *ngIf="isDocFile()"
+      [url]="link"
+      viewer="google"
+      style="width: 100%; height: 100%;"
+    ></ngx-doc-viewer>
+        
+          <!-- Excel Viewer -->
+      <ngx-doc-viewer
+      *ngIf="isExcelFile()"
+      [url]="link"
+      viewer="google"
+      style="width: 100%; height: 100%;"
+      ></ngx-doc-viewer>
+
+      <!-- Text File Viewer -->
+      <ngx-doc-viewer
+      *ngIf="isTextFile()"
+      [url]="link"
+      viewer="google"
+      style="width: 100%; height: 100%;"
+      ></ngx-doc-viewer>
+
+      <!-- HTML Viewer -->
+      <ngx-doc-viewer
+      *ngIf="isHtmlFile()"
+      [url]="link"
+      viewer="google"
+      style="width: 100%; height: 100%;"
+      ></ngx-doc-viewer>
+
+
+
+    <!-- PDF and other supported files -->
+    <iframe
+      *ngIf="isPdfFile() || isOtherSupportedFile()"
+      [src]="link | safe"
+      class="w-full h-full"
+    ></iframe>
+
+    <!-- Image viewer -->
+    <img
+      *ngIf="isImageFile()"
+      [src]="link | safe"
+      class="object-contain w-full h-full"
+      alt="Image preview"
+      (error)="handleImageError($event)"
+    >
+
+    <!-- Unsupported file type message -->
+    <div *ngIf="isUnsupportedFile()" class="flex items-center justify-center w-full h-full text-gray-700">
+      <p>This file type is not supported for preview. Please download to view.</p>
+    </div>
+
+    <!-- Countdown Display -->
+    <div *ngIf="showCountdown" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <p class="text-5xl font-bold text-white">{{ countdown }}</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex justify-end px-4 py-2 text-white ">
+    <button *ngIf="!isYouTubeLink()" (click)="downloadFile()" class="px-4 py-2 font-bold text-white bg-[#00cc99] rounded hover:bg-[#00a77d]">
+      Download 
+    </button>
+  </div>
+</div>

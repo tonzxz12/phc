@@ -1,0 +1,813 @@
+<body class="flex flex-col p-4" style="background-color: var(--body-color);">
+  <p-card class="rounded-xl" [style]="{'box-shadow': 'var(--card-shadow)', 'background-color': 'var(--card-bg)'}">
+    <div class="flex flex-col sm:flex-row justify-between items-center py-2 mb-2">
+      <div>
+  <h1 class="text-2xl font-bold" style="color: var(--text-color);">Quiz Management</h1>
+  <p class="text-sm" style="color: var(--input-placeholder);">Manage and analyze your quizzes effortlessly.</p>
+      </div>
+      <div>
+        <button (click)="createQuiz()"
+           class="flex items-center px-6 py-2 space-x-2 font-semibold text-white transition-transform duration-300 transform rounded-xl shadow-lg hover:scale-105"
+           style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); transition: var(--tran-03);">
+          <span class="text-2xl material-icons">add_circle_outline</span>
+          <span class="text-lg">Create Quiz</span>
+        </button>
+      </div>
+    </div>
+    
+    <app-custom-tabs>
+      <app-custom-tab-panel title="Quizzes">
+        <!-- Content for Quizzes tab -->
+        <div class="w-full p-6" style="background-color: var(--card-bg);">
+          <div class="flex space-x-4 mb-5">
+            <!-- Course Dropdown -->
+            <p-dropdown *ngIf="courses.length > 0" [options]="courses" [(ngModel)]="currentCourse" optionLabel="title" placeholder="Select Course"
+              (onChange)="changeCourse($event.value)" class="w-1/5" 
+              [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"></p-dropdown>
+
+            <!-- Class Dropdown -->
+            <p-dropdown [options]="classes" [(ngModel)]="currentClass" optionLabel="name" placeholder="Select Class"
+              [disabled]="!currentCourse" (onChange)="changeClass($event.value)" class="w-1/5"
+              [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}">
+            </p-dropdown>
+          </div>
+
+          <!-- Quiz List Table -->
+          <app-custom-table 
+            [data]="getQuizTableData()" 
+            [columns]="quizTableColumns"
+            [paginator]="true"
+[rows]="5"
+            (rowClick)="getAverageScore($event)"
+            (actionClick)="handleQuizAction($event)">
+          </app-custom-table>
+          
+          <!-- Empty State -->
+          <div *ngIf="quizzes.length === 0" class="text-center py-8" style="color: var(--input-placeholder);">
+            <div class="flex flex-col items-center justify-center" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+              <svg class="w-12 h-12 mb-2" style="color: var(--input-placeholder);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2m6-10V7a4 4 0 00-4-4H9a4 4 0 00-4 4v2m16-2a4 4 0 00-4-4h-1a4 4 0 00-4 4v2" />
+              </svg>
+              <span class="text-lg font-medium" style="color: var(--text-color);">No quizzes found</span>
+              <span class="text-sm" style="color: var(--input-placeholder);">Create a new quiz to get started.</span>
+            </div>
+          </div>
+        </div>
+      </app-custom-tab-panel>
+      
+      <app-custom-tab-panel title="Quiz Analytics">
+        <!-- Content for Quiz Analytics tab -->
+        <div class="w-full p-6 rounded-lg" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+          <!-- Quiz Selection Dropdown -->
+          <div class="mb-6 p-4 rounded-lg" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+            <h3 class="text-lg font-semibold mb-3" style="color: var(--text-color);">Select Quiz</h3>
+            <p-dropdown 
+              [options]="quizzes" 
+              [(ngModel)]="selectedQuiz" 
+              optionLabel="title" 
+              placeholder="Choose a quiz to view analytics" 
+              class="w-full"
+              [style]="{'background-color': 'var(--input-bg)', 'color': 'var(--input-text)', 'border-color': 'var(--input-border)'}"
+              [showClear]="false"
+              (onChange)="getAverageScore($event.value)"
+              [panelStyle]="{ 'background-color': 'var(--modal-bg)', 'color': 'var(--text-color)' }">
+            </p-dropdown>
+          </div>
+          
+          <!-- Average Score Section -->
+          <div *ngIf="selectedQuiz" class="mb-6 p-4 rounded-lg" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+            <p class="text-xl font-semibold gradient-text" style="color: var(--text-color);">
+              Average Score: 
+              <span class="text-lg" style="color: var(--text-color);">{{ gettingAvg ? "Calculating..." : (mockAverageScore * 100).toFixed(2) + "%" }}</span>
+            </p>
+          </div>
+          
+          <!-- Student Data Table -->
+          <div class="p-4 rounded-lg mb-6" style="box-shadow: var(--card-shadow); background-color: var(--card-bg);">
+            <h3 class="text-lg font-semibold mb-4" style="color: var(--text-color);">Student Performance</h3>
+            
+            <div *ngIf="!selectedQuiz" class="text-center py-4" style="color: var(--input-placeholder);">
+              Please select a quiz from the dropdown above to view student data
+            </div>
+
+            <div *ngIf="loadingStudentData" class="text-center py-4" style="color: var(--text-color);">
+              <p>Loading student data...</p>
+            </div>
+
+            <div *ngIf="selectedQuiz && !loadingStudentData && quizStudentData.length === 0" class="text-center py-4" style="color: var(--input-placeholder);">
+              No student data available for this quiz
+            </div>
+            
+            <app-custom-table 
+              *ngIf="selectedQuiz && quizStudentData.length > 0" 
+              [data]="getStudentTableData()" 
+              [columns]="studentTableColumns"
+              [paginator]="true"
+  [rows]="5"
+              (actionClick)="handleStudentAction($event)">
+            </app-custom-table>
+          </div>
+        </div>
+      </app-custom-tab-panel>
+      
+      <app-custom-tab-panel title="Question Bank">
+        <!-- Content for Question Bank tab -->
+        <div class="w-full p-6">
+          <!-- Question Bank Header - Mobile Responsive -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div class="w-full sm:w-auto">
+              <h3 class="text-xl font-bold" style="color: var(--text-color);">Question Bank</h3>
+              <p class="text-sm sm:text-base" style="color: var(--input-placeholder);">Manage your question library and create reusable questions</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <button 
+                (click)="openQuestionBankModal()"
+                class="btn-question-add flex items-center justify-center px-4 py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+                style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text); transition: var(--tran-02);">
+                <span class="material-icons mr-2 text-sm sm:text-base">add_circle_outline</span>
+                <span class="hidden sm:inline">Add Question</span>
+                <span class="sm:hidden">Add</span>
+              </button>
+              <button 
+                (click)="openQuestionBankBrowser()"
+                class="btn-question-browse flex items-center justify-center px-4 py-2 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+                style="background-color: var(--btn-success-bg); color: var(--btn-primary-text); transition: var(--tran-02);">
+                <span class="material-icons mr-2 text-sm sm:text-base">library_books</span>
+                <span class="hidden sm:inline">Choose Questions</span>
+                <span class="sm:hidden">Browse</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Question Bank Stats - Mobile Responsive Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <div class="rounded-lg p-3 sm:p-4" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+              <div class="flex items-center">
+                <div class="p-2 rounded-lg" style="background-color: var(--btn-success-bg);">
+                  <span class="material-icons text-sm sm:text-base" style="color: var(--btn-primary-text);">quiz</span>
+                </div>
+                <div class="ml-2 sm:ml-3">
+                  <p class="text-xs sm:text-sm font-medium" style="color: var(--input-placeholder);">Total Questions</p>
+                  <p class="text-lg sm:text-2xl font-semibold" style="color: var(--text-color);">{{ questionBankStats.total || 0 }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-3 sm:p-4" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+              <div class="flex items-center">
+                <div class="p-2 rounded-lg" style="background-color: var(--btn-success-bg);">
+                  <span class="material-icons text-sm sm:text-base" style="color: var(--btn-primary-text);">category</span>
+                </div>
+                <div class="ml-2 sm:ml-3">
+                  <p class="text-xs sm:text-sm font-medium" style="color: var(--input-placeholder);">Categories</p>
+                  <p class="text-lg sm:text-2xl font-semibold" style="color: var(--text-color);">{{ questionBankStats.categories || 0 }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-3 sm:p-4" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+              <div class="flex items-center">
+                <div class="p-2 rounded-lg" style="background-color: var(--btn-success-bg);">
+                  <span class="material-icons text-sm sm:text-base" style="color: var(--btn-primary-text);">edit_note</span>
+                </div>
+                <div class="ml-2 sm:ml-3">
+                  <p class="text-xs sm:text-sm font-medium" style="color: var(--input-placeholder);">Multiple Choice</p>
+                  <p class="text-lg sm:text-2xl font-semibold" style="color: var(--text-color);">{{ questionBankStats.multipleChoice || 0 }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-3 sm:p-4" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+              <div class="flex items-center">
+                <div class="p-2 rounded-lg" style="background-color: var(--btn-success-bg);">
+                  <span class="material-icons text-sm sm:text-base" style="color: var(--btn-primary-text);">edit_note</span>
+                </div>
+                <div class="ml-2 sm:ml-3">
+                  <p class="text-xs sm:text-sm font-medium" style="color: var(--input-placeholder);">Essay Questions</p>
+                  <p class="text-lg sm:text-2xl font-semibold" style="color: var(--text-color);">{{ questionBankStats.essay || 0 }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Bank Content - Mobile Responsive -->
+          <div class="rounded-lg" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+            <div class="px-3 sm:px-6 py-4" style="border-bottom: 1px solid var(--card-border);">
+              <!-- Header with Items Per Page - Mobile Stacked -->
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                <h4 class="text-lg font-medium" style="color: var(--text-color);">Archive</h4>
+                <!-- Items Per Page Selector - Mobile Responsive -->
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                  <label class="text-xs sm:text-sm whitespace-nowrap" style="color: var(--input-placeholder);">Show:</label>
+                  <select 
+                    [(ngModel)]="questionBankItemsPerPage"
+                    (change)="onQuestionBankItemsPerPageChange($event)"
+                    class="px-2 py-1 rounded text-xs sm:text-sm flex-1 sm:flex-none"
+                    style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                  </select>
+                  <span class="text-xs sm:text-sm whitespace-nowrap" style="color: var(--input-placeholder);">per page</span>
+                </div>
+              </div>
+              
+              <!-- Filters and Search - Mobile Responsive Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <!-- Category Filter -->
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-1" style="color: var(--text-color);">Category</label>
+                  <select 
+                    name="category"
+                    [(ngModel)]="questionBankFilters.category" 
+                    (change)="onQuestionBankFilterChange($event)"
+                    class="w-full px-2 sm:px-3 py-2 rounded-md focus:outline-none text-sm"
+                    style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+                    <option value="all">All Categories</option>
+                    <option *ngFor="let category of existingCategories" [value]="category">
+                      {{ category }}
+                    </option>
+                  </select>
+                </div>
+                
+                <!-- Type Filter -->
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-1" style="color: var(--text-color);">Question Type</label>
+                  <select 
+                    name="type"
+                    [(ngModel)]="questionBankFilters.type" 
+                    (change)="onQuestionBankFilterChange($event)"
+                    class="w-full px-2 sm:px-3 py-2 rounded-md focus:outline-none text-sm"
+                    style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+                    <option value="all">All Types</option>
+                    <option value="0">Multiple Choice</option>
+                    <option value="1">True/False</option>
+                    <option value="2">Identification</option>
+                    <option value="3">Essay</option>
+                  </select>
+                </div>
+                
+                <!-- Search -->
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-1" style="color: var(--text-color);">Search</label>
+                  <input 
+                    type="text" 
+                    name="search"
+                    [(ngModel)]="questionBankFilters.search" 
+                    (input)="onQuestionBankSearch($event)"
+                    placeholder="Search questions..."
+                    class="w-full px-2 sm:px-3 py-2 rounded-md focus:outline-none text-sm"
+                    style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+                </div>
+                
+                <!-- Clear Filters Button -->
+                <div class="flex items-end">
+                  <button 
+                    (click)="clearQuestionBankFilters()"
+                    class="btn-clear-filters w-full px-3 sm:px-4 py-2 rounded-md transition-colors duration-200 text-sm"
+                    style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); transition: var(--tran-02);">
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div *ngIf="loading && recentQuestions.length === 0" class="p-8 text-center">
+              <div class="inline-flex items-center justify-center w-12 h-12 rounded-full animate-spin mx-auto loading-spinner" 
+                   style="border: 4px solid var(--input-border); border-top: 4px solid var(--primary-color);"></div>
+              <p class="mt-2 text-sm sm:text-base" style="color: var(--input-placeholder);">Loading questions...</p>
+            </div>
+            
+            <!-- Empty State -->
+            <div *ngIf="!loading && allQuestions.length === 0" class="p-6 sm:p-8 text-center">
+              <div class="mb-4" style="color: var(--input-placeholder);">
+                <span class="material-icons text-4xl sm:text-6xl">quiz</span>
+              </div>
+              <p class="mb-4 text-sm sm:text-base" style="color: var(--input-placeholder);">No questions in your bank yet. Start by adding your first question!</p>
+              <button 
+                (click)="openQuestionBankModal()"
+                class="btn-create-first px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+                style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text); transition: var(--tran-02);">
+                <span class="material-icons mr-2 text-sm sm:text-base">add_circle_outline</span>
+                Create Your First Question
+              </button>
+            </div>
+            
+            <!-- No Results State -->
+            <div *ngIf="!loading && allQuestions.length > 0 && recentQuestions.length === 0" class="p-6 sm:p-8 text-center">
+              <div class="mb-4" style="color: var(--input-placeholder);">
+                <span class="material-icons text-4xl sm:text-6xl">search_off</span>
+              </div>
+              <p class="mb-4 text-sm sm:text-base" style="color: var(--input-placeholder);">No questions match your current filters.</p>
+              <button 
+                (click)="clearQuestionBankFilters()"
+                class="btn-clear-no-results px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-colors duration-200 text-sm sm:text-base"
+                style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text); transition: var(--tran-02);">
+                Clear Filters
+              </button>
+            </div>
+          
+            <!-- Questions List - Mobile Responsive -->
+            <div *ngIf="!loading && recentQuestions.length > 0" style="border-top: 1px solid var(--card-border);">
+              <div 
+                *ngFor="let question of recentQuestions" 
+                class="question-item p-3 sm:p-4 transition-colors duration-200"
+                style="border-bottom: 1px solid var(--card-border);">
+                
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div class="flex-1 min-w-0">
+                    <!-- Question Type and Category Tags - Mobile Stacked -->
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                            style="background-color: var(--alert-info-bg); color: var(--primary-color);">
+                        {{ getQuestionTypeLabel(question.type) }}
+                      </span>
+                      <span *ngIf="question.category" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                            style="background-color: var(--alert-success-bg); color: var(--btn-success-bg);">
+                        {{ question.category }}
+                      </span>
+                    </div>
+                    
+                    <!-- Question Text - Mobile Responsive -->
+                    <h5 class="text-sm sm:text-base font-medium mb-1 break-words" style="color: var(--text-color);">
+                      {{ getQuestionPreview(question.question) }}
+                    </h5>
+                    
+                    <!-- Created Date - Mobile Responsive -->
+                    <p class="text-xs" style="color: var(--input-placeholder);">
+                      Created {{ formatDate(question.created_at) }}
+                    </p>
+                  </div>
+                  
+                  <!-- Action Buttons - Mobile Responsive -->
+                  <div class="flex gap-2 sm:ml-4 self-start">
+                    <button 
+                      (click)="editQuestion(question)"
+                      class="btn-edit-question p-2 transition-colors rounded-md"
+                      style="color: var(--input-placeholder);">
+                      <span class="material-icons text-sm sm:text-base">edit</span>
+                    </button>
+                    <button 
+                      (click)="deleteQuestion(question.id)"
+                      class="btn-delete-question p-2 transition-colors rounded-md"
+                      style="color: var(--input-placeholder);">
+                      <span class="material-icons text-sm sm:text-base">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Pagination Controls - Mobile Responsive -->
+            <div *ngIf="!loading && allQuestions.length > 0 && questionBankTotalItems > questionBankItemsPerPage" class="px-3 sm:px-6 py-4" style="border-top: 1px solid var(--card-border);">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <!-- Page Info - Mobile Centered -->
+                <div class="text-xs sm:text-sm text-center sm:text-left" style="color: var(--text-color);">
+                  Showing {{ (questionBankPage * questionBankItemsPerPage) + 1 }} to 
+                  {{ Math.min((questionBankPage + 1) * questionBankItemsPerPage, questionBankTotalItems) }} 
+                  of {{ questionBankTotalItems }} questions
+                </div>
+                
+                <!-- Pagination Buttons - Mobile Responsive -->
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                  <!-- Previous Button -->
+                  <button 
+                    (click)="onQuestionBankPageChange(questionBankPage - 1)"
+                    [disabled]="questionBankPage === 0"
+                    class="btn-pagination-prev px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-md transition-colors duration-200 disabled:cursor-not-allowed"
+                    style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+                    [style.opacity]="questionBankPage === 0 ? '0.5' : '1'">
+                    Previous
+                  </button>
+                  
+                  <!-- Page Numbers - Mobile Compact -->
+                  <div class="flex items-center space-x-1">
+                    <button 
+                      *ngFor="let page of getPageNumbers()"
+                      (click)="onQuestionBankPageChange(page)"
+                      class="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-md transition-colors duration-200"
+                      [style.background-color]="page === questionBankPage ? 'var(--btn-primary-bg)' : 'var(--input-bg)'"
+                      [style.color]="page === questionBankPage ? 'var(--btn-primary-text)' : 'var(--input-text)'"
+                      [style.border]="'1px solid ' + (page === questionBankPage ? 'var(--btn-primary-bg)' : 'var(--input-border)')">
+                      {{ page + 1 }}
+                    </button>
+                  </div>
+                  
+                  <!-- Next Button -->
+                  <button 
+                    (click)="onQuestionBankPageChange(questionBankPage + 1)"
+                    [disabled]="questionBankPage >= questionBankTotalPages - 1"
+                    class="btn-pagination-next px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-md transition-colors duration-200 disabled:cursor-not-allowed"
+                    style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+                    [style.opacity]="questionBankPage >= questionBankTotalPages - 1 ? '0.5' : '1'">
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </app-custom-tab-panel>
+    </app-custom-tabs>
+  </p-card>
+</body>
+
+<app-quiz-creation *ngIf="isModalOpen" [questionsFromBank]="selectedQuestionsFromBank" [quiz]="selectedQuiz" (closed)="closeQuiz()"></app-quiz-creation>
+
+<!-- Add this to your component HTML -->
+<p-dialog 
+  [(visible)]="displayFeedbackModal" 
+  [header]="'Send Feedback to ' + (selectedStudentForFeedback?.name || 'Student')"
+  [modal]="true" 
+  [style]="{width: '500px'}" 
+  [draggable]="false" 
+  [resizable]="false">
+  
+  <div class="p-4" style="background-color: var(--modal-bg);">
+    <div class="mb-4">
+      <p class="text-sm mb-2" style="color: var(--text-color);">
+        <strong>Student:</strong> {{ selectedStudentForFeedback?.name }}
+      </p>
+      <p class="text-sm mb-2" style="color: var(--text-color);">
+        <strong>Quiz:</strong> {{ selectedQuiz?.title }}
+      </p>
+      <p class="text-sm mb-2" style="color: var(--text-color);">
+        <strong>Score:</strong> 
+        <span class="font-semibold"
+              [style.color]="selectedStudentForFeedback && +selectedStudentForFeedback.percentage >= 80 ? 'var(--alert-success-border)' : 
+                           (selectedStudentForFeedback && +selectedStudentForFeedback.percentage >= 60 && +selectedStudentForFeedback.percentage < 80 ? 'var(--alert-warning-border)' : 'var(--alert-error-border)')">
+          {{ selectedStudentForFeedback?.score }}/{{ selectedStudentForFeedback?.totalPoints }} 
+          ({{ selectedStudentForFeedback?.percentage }}%)
+        </span>
+      </p>
+    </div>
+    
+    <div class="mb-3">
+      <label for="feedbackText" class="block text-sm font-medium mb-1" style="color: var(--text-color);">Your Feedback</label>
+      <textarea 
+        id="feedbackText"
+        [(ngModel)]="feedback" 
+        rows="5" 
+        placeholder="Write your feedback to the student..." 
+        class="w-full px-3 py-2 text-sm rounded-md focus:outline-none"
+        style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+      </textarea>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end space-x-2">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="p-button-text p-button-secondary" 
+        (click)="closeFeedbackModal()">
+      </button>
+      <button 
+        pButton 
+        label="Send Feedback" 
+        class="p-button-success" 
+        (click)="sendFeedback()"
+        [disabled]="!feedback.trim()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+
+<!-- Add Question Modal - Dynamic fields based on question type -->
+<div *ngIf="showAddQuestionModal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50" style="background-color: var(--modal-overlay);">
+  <div class="modal-content rounded-lg p-6 w-[500px] max-w-md" style="background-color: var(--modal-bg);">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold" style="color: var(--text-color);">Add Question to Bank</h3>
+      <button 
+        (click)="showAddQuestionModal = false"
+        class="transition-colors duration-200" style="color: var(--input-placeholder);">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <form (ngSubmit)="addNewQuestion()" #questionForm="ngForm">
+      <!-- Question Type -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Question Type *</label>
+        <select 
+          [(ngModel)]="newQuestion.type" 
+          name="type" 
+          required
+          (change)="onQuestionTypeChange()"
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          <option value="0">Multiple Choice</option>
+          <option value="1">True/False</option>
+          <option value="2">Identification</option>
+          <option value="3">Essay</option>
+        </select>
+      </div>
+      
+      <!-- Question Text -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Question Text *</label>
+        <textarea 
+          [(ngModel)]="newQuestion.question" 
+          name="question" 
+          required
+          rows="3"
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          placeholder="Enter your question here..."></textarea>
+      </div>
+      
+      <!-- Dynamic Fields Based on Question Type -->
+      
+      <!-- Multiple Choice Options (only for type 0) -->
+      <div *ngIf="newQuestion.type === '0'" class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Multiple Choice Options *</label>
+        <div class="space-y-2">
+          <div *ngFor="let option of multipleChoiceOptions; let i = index; trackBy: trackByIndex" class="flex items-center space-x-2">
+            <input 
+              type="radio" 
+              name="correctAnswer" 
+              [value]="i"
+              [(ngModel)]="newQuestion.answer"
+              class="focus:ring-2"
+              style="color: var(--primary-color); --tw-ring-color: var(--primary-color);">
+            <input 
+              type="text" 
+              [value]="multipleChoiceOptions[i]"
+              (input)="updateMultipleChoiceOption(i, $event)"
+              [placeholder]="'Option ' + (i + 1)"
+              class="flex-1 px-3 py-2 rounded-md focus:outline-none"
+              style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          </div>
+        </div>
+      </div>
+      
+      <!-- True/False Answer (only for type 1) -->
+      <div *ngIf="newQuestion.type === '1'" class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Correct Answer *</label>
+        <select 
+          [(ngModel)]="newQuestion.answer" 
+          name="answer" 
+          required
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          <option value="">Select answer</option>
+          <option value="T">True</option>
+          <option value="F">False</option>
+        </select>
+      </div>
+      
+      <!-- Identification/Essay Answer (for types 2 and 3) -->
+      <div *ngIf="newQuestion.type === '2' || newQuestion.type === '3'" class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">
+          {{ newQuestion.type === '2' ? 'Correct Answer' : 'Sample Answer' }} *
+        </label>
+        <textarea 
+          [(ngModel)]="newQuestion.answer" 
+          name="answer" 
+          required
+          rows="2"
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          [placeholder]="newQuestion.type === '2' ? 'Enter the correct answer' : 'Enter a sample answer or key points'"></textarea>
+      </div>
+      
+      <!-- Category Dropdown with Add New Option -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Category</label>
+        <div class="flex space-x-2">
+          <select 
+            [(ngModel)]="newQuestion.category" 
+            name="category"
+            (change)="onCategoryChange()"
+            class="flex-1 px-3 py-2 rounded-md focus:outline-none"
+            style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+            <option value="">Select category</option>
+            <option *ngFor="let category of existingCategories" [value]="category">
+              {{ category }}
+            </option>
+            <option value="__NEW__">+ Add New Category</option>
+          </select>
+          <button 
+            type="button"
+            (click)="showNewCategoryInput = true"
+            class="btn-add-category px-3 py-2 rounded-md transition-colors"
+            style="background-color: var(--btn-success-bg); color: var(--btn-primary-text);">
+            <span class="material-icons text-sm">add</span>
+          </button>
+        </div>
+        
+        <!-- New Category Input (shown when needed) -->
+        <div *ngIf="showNewCategoryInput || newQuestion.category === '__NEW__'" class="mt-3 p-3 rounded-lg" style="background-color: var(--alert-info-bg); border: 1px solid var(--card-border);">
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">New Category Name</label>
+          
+          <!-- Debug info -->
+          <div class="mb-2 p-2 rounded text-xs" style="background-color: var(--alert-warning-bg); color: var(--input-placeholder);">
+            <strong>Debug:</strong> Value: "{{ newCategoryName }}" | Length: {{ newCategoryName.length }} | Trimmed: "{{ newCategoryName.trim() }}" | Button Enabled: {{ !!newCategoryName.trim() }}
+          </div>
+          
+          <input 
+            type="text" 
+            [value]="newCategoryName"
+            (input)="debugCategoryInput()"
+            placeholder="Enter new category name"
+            class="w-full px-3 py-2 rounded-md focus:outline-none"
+            style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          
+          <div class="flex space-x-2 mt-3">
+            <button 
+              type="button"
+              (click)="addNewCategory()"
+              [disabled]="!newCategoryName.trim()"
+              class="btn-add-new-category px-4 py-2 rounded-md transition-colors disabled:cursor-not-allowed"
+              style="background-color: var(--btn-success-bg); color: var(--btn-primary-text);"
+              [style.opacity]="!newCategoryName.trim() ? '0.5' : '1'">
+              <span class="material-icons text-sm mr-1">check</span>
+              Add Category
+            </button>
+            <button 
+              type="button"
+              (click)="cancelNewCategory()"
+              class="btn-cancel-category px-4 py-2 rounded-md transition-colors"
+              style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text);">
+              <span class="material-icons text-sm mr-1">close</span>
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-3">
+        <button 
+          type="button"
+          (click)="showAddQuestionModal = false"
+          class="btn-cancel-modal px-4 py-2 rounded-md transition-colors"
+          style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text);">
+          Cancel
+        </button>
+        <!-- Update the submit button to show more detailed validation info -->
+        <button 
+          type="submit"
+          [disabled]="!isFormValid()"
+          class="btn-submit-question px-4 py-2 rounded-md transition-colors disabled:cursor-not-allowed"
+          style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);"
+          [style.opacity]="!isFormValid() ? '0.5' : '1'">
+          <span *ngIf="!isFormValid()">
+            Fill Required Fields ({{ newQuestion.type === '0' ? 'Need 4 options + correct answer' : 'Need answer' }})
+          </span>
+          <span *ngIf="isFormValid()">Add to Question Bank</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Edit Question Modal - Fixed Multiple Choice -->
+<div *ngIf="showEditQuestionModal" class="modal-overlay fixed inset-0 flex items-center justify-center z-50" style="background-color: var(--modal-overlay);">
+  <div class="modal-content rounded-lg p-6 w-[500px] max-w-md max-h-[90vh] overflow-y-auto" style="background-color: var(--modal-bg);">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold" style="color: var(--text-color);">Edit Question</h3>
+      <button 
+        (click)="showEditQuestionModal = false"
+        class="transition-colors duration-200" style="color: var(--input-placeholder);">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <form (ngSubmit)="updateExistingQuestion()" #editForm="ngForm">
+      <!-- Question Type -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Question Type *</label>
+        <select 
+          [(ngModel)]="selectedQuestionForEdit.type" 
+          name="type" 
+          required
+          (change)="onEditQuestionTypeChange()"
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          <option value="0">Multiple Choice</option>
+          <option value="1">True/False</option>
+          <option value="2">Identification</option>
+          <option value="3">Essay</option>
+        </select>
+      </div>
+      
+      <!-- Question Text -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Question Text *</label>
+        <textarea 
+          [(ngModel)]="selectedQuestionForEdit.question" 
+          name="question" 
+          required
+          rows="3"
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"></textarea>
+      </div>
+      
+      <!-- Dynamic Fields Based on Question Type -->
+      
+      <!-- Multiple Choice Options (only for type 0) - FIXED -->
+      <div *ngIf="selectedQuestionForEdit.type === '0'" class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Multiple Choice Options *</label>
+        <div class="space-y-2">
+          <div *ngFor="let option of editMultipleChoiceOptions; let i = index; trackBy: trackByIndex" class="flex items-center space-x-2">
+            <input 
+              type="radio" 
+              [name]="'editCorrectAnswer' + selectedQuestionForEdit.id"
+              [value]="i"
+              [(ngModel)]="selectedQuestionForEdit.answer"
+              class="focus:ring-2"
+              style="color: var(--primary-color); --tw-ring-color: var(--primary-color);">
+            <input 
+              type="text" 
+              [(ngModel)]="editMultipleChoiceOptions[i]"
+              (input)="onEditOptionChange(i, $event)"
+              [placeholder]="'Option ' + (i + 1)"
+              class="flex-1 px-3 py-2 rounded-md focus:outline-none"
+              style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          </div>
+        </div>
+        <p class="text-xs mt-1" style="color: var(--input-placeholder);">Select the radio button next to the correct answer</p>
+        
+        <!-- Debug Info for Multiple Choice -->
+        <div class="mt-2 p-2 rounded text-xs" style="background-color: var(--alert-info-bg); color: var(--input-placeholder);">
+          <strong>Debug:</strong> Answer: {{ selectedQuestionForEdit.answer }} | Options: {{ editMultipleChoiceOptions.join(' | ') }}
+        </div>
+      </div>
+      
+      <!-- True/False Answer (only for type 1) -->
+      <div *ngIf="selectedQuestionForEdit.type === '1'" class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Correct Answer *</label>
+        <select 
+          [(ngModel)]="selectedQuestionForEdit.answer" 
+          name="answer" 
+          required
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          <option value="">Select answer</option>
+          <option value="T">True</option>
+          <option value="F">False</option>
+        </select>
+      </div>
+      
+      <!-- Identification/Essay Answer (for types 2 and 3) -->
+      <div *ngIf="selectedQuestionForEdit.type === '2' || selectedQuestionForEdit.type === '3'" class="mb-4">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">
+          {{ selectedQuestionForEdit.type === '2' ? 'Correct Answer' : 'Sample Answer' }} *
+        </label>
+        <textarea 
+          [(ngModel)]="selectedQuestionForEdit.answer" 
+          name="answer" 
+          required
+          rows="2"
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);"
+          [placeholder]="selectedQuestionForEdit.type === '2' ? 'Enter the correct answer' : 'Enter a sample answer or key points'"></textarea>
+      </div>
+      
+      <!-- Category Dropdown -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Category</label>
+        <select 
+          [(ngModel)]="selectedQuestionForEdit.category" 
+          name="category"
+          class="w-full px-3 py-2 rounded-md focus:outline-none"
+          style="border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--input-text);">
+          <option value="">Select category</option>
+          <option *ngFor="let category of existingCategories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-3">
+        <button 
+          type="button"
+          (click)="showEditQuestionModal = false"
+          class="btn-cancel-edit px-4 py-2 rounded-md transition-colors"
+          style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text);">
+          Cancel
+        </button>
+        <button 
+          type="submit"
+          [disabled]="!isEditFormValid()"
+          class="btn-update-question px-4 py-2 rounded-md transition-colors disabled:cursor-not-allowed"
+          style="background-color: var(--btn-success-bg); color: var(--btn-primary-text);"
+          [style.opacity]="!isEditFormValid() ? '0.5' : '1'">
+          <span *ngIf="!isEditFormValid()">Fill Required Fields</span>
+          <span *ngIf="isEditFormValid()">Update Question</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,347 @@
+<body class="">
+  <div class="flex flex-col w-full gap-8 main ">
+    <div class="w-full wrapbox" style="background: var(--card-bg); box-shadow: var(--card-shadow);">
+      <div class="top">
+        <div class="imageProfile" style="background: var(--card-bg);">
+          <img src="{{ user.profile ? getURL(user.profile) : noProfile() }}" class="object-cover" alt="Profile Image" />
+        </div>
+        <div (click)="file_select.click()"
+          class="editpic cursor-pointer transition-opacity select-none opacity-0 hover:!opacity-100">
+          <h1 class="cursor-pointer" style="color: var(--primary-color);">Change Photo</h1>
+          <input #file_select class="cursor-pointer" type="file" (change)="onFileSelected($event)" [hidden]="true"
+            id="fileInput" />
+          <label class="cursor-pointer flex items-center"></label>
+        </div>
+      </div>
+      <div class="justify-between pl-1 buttom">
+        <!-- <div class="bio">
+                    <div class="wrapflex">
+                    <h1 class="">{{user.firstname+ ' ' + user.lastname}}</h1>
+                    <img class="w-5 h-5 mt-2 cursor-pointer" src="assets/studentprofile/consedit.png" alt="" *ngIf="showEditPic">
+                </div>
+                    <div class="thisrespo">
+                    <div class="location">
+                       <img src="assets/studentprofile/Location.png" alt="">
+                        <h2 class="">{{user.address}}</h2>
+                    </div>
+                </div>
+                </div> -->
+        <div class="mt-3 bio">
+          <div class="wrapflex">
+            <div class="flex flex-col" *ngIf="editing">
+              <label style="color: var(--text-secondary);">First Name</label>
+              <input
+                style="background: var(--input-bg); color: var(--text-color); border: 2px solid var(--primary-color); border-radius: 6px;"
+                class="mt-1.5 text-xl w-full px-2 overflow-x-auto lg:text-2xl"
+                [(ngModel)]="user.firstname"
+                placeholder="Enter first name" />
+            </div>
+            <div class="flex flex-col" *ngIf="editing">
+              <label style="color: var(--text-secondary);">Last Name</label>
+              <input
+                style="background: var(--input-bg); color: var(--text-color); border: 2px solid var(--primary-color); border-radius: 6px;"
+                class="ml-2 mt-1.5 text-xl w-full px-2 overflow-x-auto lg:text-2xl"
+                [(ngModel)]="user.lastname"
+                placeholder="Enter last name" />
+            </div>
+
+            <h1 class="mt-1" style="color: var(--text-color);" *ngIf="!editing">
+              {{ user.firstname + " " + user.lastname }}
+            </h1>
+            <span *ngIf="!editing" class="w-5 h-5 mt-2 ml-5 cursor-pointer" (click)="toggleEdit()">
+              <!-- Exact SVG from user, styled for Tailwind and dark mode -->
+              <svg class="w-6 h-6" style="color: var(--primary-color);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div *ngIf="editing" class="flex items-center gap-2 mt-4 ml-5">
+              <span class="w-6 h-6 cursor-pointer" (click)="toggleEdit()">
+                <!-- Save SVG Icon (new floppy disk from SVG Repo) -->
+                <svg class="w-6 h-6" style="color: var(--primary-color);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1716 1C18.702 1 19.2107 1.21071 19.5858 1.58579L22.4142 4.41421C22.7893 4.78929 23 5.29799 23 5.82843V20C23 21.6569 21.6569 23 20 23H4C2.34315 23 1 21.6569 1 20V4C1 2.34315 2.34315 1 4 1H18.1716ZM4 3C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21L5 21L5 15C5 13.3431 6.34315 12 8 12L16 12C17.6569 12 19 13.3431 19 15V21H20C20.5523 21 21 20.5523 21 20V6.82843C21 6.29799 20.7893 5.78929 20.4142 5.41421L18.5858 3.58579C18.2107 3.21071 17.702 3 17.1716 3H17V5C17 6.65685 15.6569 8 14 8H10C8.34315 8 7 6.65685 7 5V3H4ZM17 21V15C17 14.4477 16.5523 14 16 14L8 14C7.44772 14 7 14.4477 7 15L7 21L17 21ZM9 3H15V5C15 5.55228 14.5523 6 14 6H10C9.44772 6 9 5.55228 9 5V3Z" fill="currentColor"/>
+                </svg>
+              </span>
+              <span class="w-6 h-6 cursor-pointer" (click)="cancelEdit()">
+                <!-- Cancel SVG Icon (X mark) -->
+                <svg class="w-6 h-6" style="color: var(--danger-color);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="thisrespo">
+            <div *ngIf="student" class="location flex items-center gap-2">
+              <!-- Common Location SVG Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" style="color: var(--primary-color);" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <h2 class="" style="color: var(--text-color);">{{ user.address }}</h2>
+            </div>
+          </div>
+
+        </div>
+        <!-- <div class="-mr-12 editwrap md:mr-1">
+                    <button class="custom-edit-btn" (click)="toggleEditPic()">
+                      <h1 class="hidden  md:inline-block">EDIT</h1> <img src="assets/studentprofile/Edit.png" alt="">
+                    </button>
+                  </div>
+                   -->
+      </div>
+    </div>
+
+  <div class="w-full p-8 rounded-xl border-primary-2" style="background: var(--card-bg); box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-3xl font-bold" style="color: var(--text-color);">Personal Information</h2>
+        <div class="flex gap-2">
+          <button (click)="toggleEditPersonalInfo()" style="background: var(--btn-primary-bg); color: var(--btn-primary-text); border: 1px solid var(--border-color);" class="px-4 py-2 rounded-md hover:opacity-90 transition-colors">
+            {{ editingPersonalInfo ? 'Save' : 'Edit' }}
+          </button>
+          <button *ngIf="editingPersonalInfo" (click)="cancelEditPersonalInfo()" style="background: var(--danger-color); color: white;" class="px-4 py-2 rounded-md hover:opacity-90 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+      <div class="space-y-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div class="flex items-center p-4 space-x-4 transition-all duration-300 rounded-lg hover:shadow-md" style="background: var(--input-bg); border: 1px solid var(--border-color);">
+            <div class="p-2 rounded-full flex items-center justify-center" style="background: var(--btn-primary-bg);">
+              <!-- Common Calendar SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color: var(--btn-primary-text);" viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zm0-13H5V6h14v1z"/></svg>
+            </div>
+            <div>
+              <span class="font-semibold block" style="color: var(--text-color);">Birthdate</span>
+              <span *ngIf="!editingPersonalInfo" style="color: var(--text-color);">{{ parseDate(user.birthdate) }}</span>
+              <input *ngIf="editingPersonalInfo" type="date" [(ngModel)]="user.birthdate" style="background: var(--input-bg); color: var(--text-color); border: 2px solid var(--input-border);" class="px-2 py-1 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-500" placeholder="Select birthdate">
+            </div>
+          </div>
+          <div class="flex items-center p-4 space-x-4 transition-all duration-300 rounded-lg hover:shadow-md" style="background: var(--input-bg); border: 1px solid var(--border-color);">
+            <div class="p-2 rounded-full flex items-center justify-center" style="background: var(--btn-primary-bg);">
+              <!-- Common User SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color: var(--btn-primary-text);" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+            </div>
+            <div>
+              <span class="font-semibold block" style="color: var(--text-color);">Gender</span>
+              <span *ngIf="!editingPersonalInfo" style="color: var(--text-color);">{{ user.gender }}</span>
+                <select *ngIf="editingPersonalInfo" [(ngModel)]="user.gender" style="background: var(--input-bg); color: var(--text-color); border: 2px solid var(--input-border);" class="px-2 py-1 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex items-center p-4 space-x-4 transition-all duration-300 rounded-lg hover:shadow-md" style="background: var(--input-bg); border: 1px solid var(--border-color);">
+            <div class="p-2 rounded-full flex items-center justify-center" style="background: var(--btn-primary-bg);">
+              <!-- Common Flag SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color: var(--btn-primary-text);" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4v16h2v-7h12v7h2V4H4zm2 7V6h12v5H6z"/></svg>
+            </div>
+            <div>
+              <span class="font-semibold block" style="color: var(--text-color);">Nationality</span>
+              <span *ngIf="!editingPersonalInfo" style="color: var(--text-color);">{{ user.nationality }}</span>
+              <input *ngIf="editingPersonalInfo" type="text" [(ngModel)]="user.nationality" style="background: var(--input-bg); color: var(--text-color); border: 2px solid var(--input-border);" class="px-2 py-1 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-500" placeholder="Enter nationality">
+            </div>
+          </div>
+          <div class="flex items-center p-4 space-x-4 transition-all duration-300 rounded-lg hover:shadow-md" style="background: var(--input-bg); border: 1px solid var(--border-color);">
+            <div class="p-2 rounded-full flex items-center justify-center" style="background: var(--btn-primary-bg);">
+              <!-- Common Home SVG -->
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color: var(--btn-primary-text);" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            <div>
+              <span class="font-semibold block" style="color: var(--text-color);">Home Address</span>
+              <span *ngIf="!editingPersonalInfo" style="color: var(--text-color);">{{ user.address }}</span>
+              <input *ngIf="editingPersonalInfo" type="text" [(ngModel)]="user.address" style="background: var(--input-bg); color: var(--text-color); border: 2px solid var(--input-border);" class="px-2 py-1 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-500" placeholder="Enter home address">
+            </div>
+          </div> 
+        </div>
+        <div class="flex items-center p-4 space-x-4 transition-all duration-300 rounded-lg hover:shadow-md" style="background: var(--input-bg); border: 1px solid var(--border-color);">
+          <div class="p-2 rounded-full flex items-center justify-center" style="background: var(--btn-primary-bg);">
+            <!-- Common Envelope SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" style="color: var(--btn-primary-text);" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div>
+            <span class="font-semibold block" style="color: var(--text-color);">Email</span>
+            <span *ngIf="!editingPersonalInfo" style="color: var(--text-color);">{{ user.email }}</span>
+            <input *ngIf="editingPersonalInfo" type="email" [(ngModel)]="user.email" style="background: var(--input-bg); color: var(--text-color); border: 2px solid var(--input-border);" class="px-2 py-1 rounded focus:border-blue-500 focus:ring-2 focus:ring-blue-500" placeholder="Enter email address">
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="teacher || principal" class="mt-8">
+        <div class="relative w-full h-40 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-300" style="background: var(--input-bg); border: 2px solid var(--border-color);">
+          <button (click)="openSignatureModal()"
+            class="w-full h-full flex items-center justify-center hover:opacity-90 transition-colors" style="color: var(--text-color);">
+            <div class="flex items-center justify-center w-full h-full">
+              <img [src]="getUserSignature() || 'assets/Esig.png'" class="max-h-32 max-w-[220px] object-contain mx-auto rounded-lg shadow" style="border: 1px solid var(--border-color); background: var(--card-bg);" />
+              <span *ngIf="!imageUrl" class="absolute inset-0 flex items-center justify-center text-base font-semibold" style="background: rgba(0,0,0,0.5); color: white;">
+                Click to add signature
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signature Modal -->
+    <div *ngIf="showSignatureModal" [@fadeInOut] class="modal w-full z-[1000]">
+      <div class="flex items-center justify-center w-full h-full">
+        <div class="w-full mx-auto flex flex-col gap-4 rounded-xl relative lg:max-w-[50%] max-w-[90%]" style="background: var(--modal-bg);">
+          <span><i
+              class="absolute text-2xl duration-300 ease-in-out cursor-pointer fas fa-times top-1 right-2" style="color: var(--text-color);" 
+              (click)="closeSignatureModal()"></i></span>
+          <div class="flex items-center justify-center w-full p-4">
+            <h2 class="font-serif text-3xl italic font-semibold text-center uppercase title" style="color: var(--text-color);">E-Signature</h2>
+          </div>
+
+          <canvas #signPadCanvas width="400" height="200" class="mx-auto border" style="border-color: var(--border-color);"></canvas>
+          <div class="flex items-center justify-center w-full">
+            <span class="title" style="color: var(--text-color);">Write the signature and click on Save</span>
+          </div>
+     <div class="flex items-center justify-center w-full gap-4 pb-8">
+          <button class="w-32 px-4 py-2 rounded-lg font-semibold transition-colors shadow" style="background: var(--btn-primary-bg); color: var(--btn-primary-text);" (click)="saveSignPad()">Save</button>
+          <button class="w-32 px-4 py-2 rounded-lg font-semibold transition-colors shadow" style="background: var(--btn-secondary-bg); color: var(--btn-secondary-text);" (click)="clearSignPad()">Clear</button>
+          <button class="w-32 px-4 py-2 rounded-lg font-semibold transition-colors shadow" style="background: var(--warning-color); color: white;" (click)="undoSign()">Undo</button>
+        </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="flex items-center justify-center gap-3 p-4 my-4 btn-container rounded-xl mb-5">
+    <button *ngIf="teacher" (click)="viewGrades()"
+      class="bg-transparent border-2 border-solid w-36 rounded-xl" style="border-color: var(--primary-color);">
+      <h1 class="p-2 text-sm font-semibold" style="color: var(--primary-color);">View Grades</h1>
+    </button>
+
+    <!-- <button (click)="openModalEmail()"
+      class="bg-transparent border-2 border-green-500 border-solid shadow-sm w-36 rounded-xl">
+      <h1 class="p-2 text-sm font-semibold text-green-500">Change Email</h1>
+    </button> -->
+
+    <button (click)="openModalPassword()" class="w-36 rounded-xl" style="background: var(--danger-color);">
+      <h1 class="p-2 text-sm font-semibold text-white">Change Password</h1>
+    </button>
+  </div>
+
+<!-- Email Change Modal -->
+<div *ngIf="showModalEmail" [@fadeInOut] class="fixed inset-0 flex items-center justify-center z-[1000]" style="background: rgba(0,0,0,0.5);">
+  <div class="w-full max-w-md mx-4 rounded-lg shadow-xl" style="background: var(--modal-bg);">
+    <header class="flex items-center justify-between px-6 py-4 border-b" style="border-color: var(--border-color);">
+      <h2 class="text-2xl font-bold" style="color: var(--text-color);">Change Email</h2>
+      <button (click)="closeModalEmail()" class="transition-colors duration-200 focus:outline-none" style="color: var(--text-secondary);">
+        <i class="text-xl fas fa-times"></i>
+      </button>
+    </header>
+
+    <main class="p-6">
+      <div class="space-y-4">
+        <div *ngIf="!editingEmail" class="flex items-center justify-between">
+          <div>
+            <label class="block text-sm font-medium" style="color: var(--text-secondary);">Current Email</label>
+            <p class="mt-1 text-lg font-semibold" style="color: var(--text-color);">{{ user.email }}</p>
+          </div>
+          <button (click)="toggleEditEmail()" class="focus:outline-none" style="color: var(--primary-color);">
+            <i class="text-xl fas fa-edit"></i>
+          </button>
+        </div>
+
+        <div *ngIf="editingEmail" class="space-y-2">
+          <label for="newEmail" class="block text-sm font-medium" style="color: var(--text-secondary);">New Email</label>
+          <input id="newEmail" type="email" [(ngModel)]="user.email"
+                 class="w-full px-3 py-2 rounded-md shadow-sm" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"
+                 placeholder="Enter new email">
+        </div>
+      </div>
+    </main>
+
+    <footer class="px-6 py-4 rounded-b-lg" style="background: var(--input-bg);">
+      <button *ngIf="editingEmail" (click)="toggleEditEmail()"
+              class="w-full py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none" style="background: var(--btn-primary-bg); color: var(--btn-primary-text);">
+        Update Email
+      </button>
+    </footer>
+  </div>
+</div>
+
+<!-- Password Change Modal -->
+<div *ngIf="showModalPassword" [@fadeInOut] class="fixed inset-0 flex items-center justify-center z-[1000]" style="background: rgba(0,0,0,0.5);">
+  <div class="w-full max-w-md mx-4 rounded-lg shadow-xl" style="background: var(--modal-bg); border: 1px solid var(--border-color);">
+    <header class="flex items-center justify-between px-6 py-4 border-b" style="border-color: var(--border-color);">
+      <h2 class="text-2xl font-bold" style="color: var(--text-color);">Change Password</h2>
+      <button (click)="closeModalPassword()" class="transition-colors duration-200 focus:outline-none" style="color: var(--text-secondary);">
+        <i class="text-xl fas fa-times"></i>
+      </button>
+    </header>
+
+    <main class="p-6">
+      <div class="space-y-4">
+        <div *ngIf="!editingPassword" class="flex items-center justify-between">
+          <div>
+            <label class="block text-sm font-medium" style="color: var(--text-secondary);">Current Password</label>
+            <p class="mt-1 text-lg font-semibold" style="color: var(--text-color);">••••••••</p>
+          </div>
+          <button (click)="toggleEditPassword()" class="focus:outline-none" style="color: var(--primary-color);">
+            <i class="text-xl fas fa-edit"></i>
+          </button>
+        </div>
+
+        <div *ngIf="editingPassword" class="space-y-4">
+          <div>
+            <label for="currentPassword" class="block text-sm font-medium" style="color: var(--text-secondary);">Current Password</label>
+            <div class="relative">
+              <input id="currentPassword"
+                    [type]="showCurrentPassword ? 'text' : 'password'"
+                    [(ngModel)]="currentPasswordInput"
+                    class="mt-1 w-full px-3 py-2 rounded-md shadow-sm" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"
+                    placeholder="Enter current password"
+                    required>
+              <button type="button"
+                      class="absolute inset-y-0 right-0 flex items-center px-3" style="color: var(--text-secondary);"
+                      (click)="showCurrentPassword = !showCurrentPassword">
+                <i [ngClass]="showCurrentPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+          <div>
+            <div class="relative">
+              <input id="newPassword"
+                    [type]="showNewPassword ? 'text' : 'password'"
+                    [(ngModel)]="newPassword"
+                    class="mt-1 w-full px-3 py-2 rounded-md shadow-sm" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"
+                    placeholder="Enter new password"
+                    required>
+              <button type="button"
+                      class="absolute inset-y-0 right-0 flex items-center px-3" style="color: var(--text-secondary);"
+                      (click)="showNewPassword = !showNewPassword">
+                <i [ngClass]="showNewPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+          <div>
+            <div class="relative">
+              <input id="confirmPassword"
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    [(ngModel)]="confirmPassword"
+                    class="mt-1 w-full px-3 py-2 rounded-md shadow-sm" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"
+                    placeholder="Confirm new password"
+                    required>
+              <button type="button"
+                      class="absolute inset-y-0 right-0 flex items-center px-3" style="color: var(--text-secondary);"
+                      (click)="showConfirmPassword = !showConfirmPassword">
+                <i [ngClass]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="px-6 py-4 rounded-b-lg border-t" style="background: var(--input-bg); border-color: var(--border-color);">
+      <button *ngIf="editingPassword" (click)="toggleEditPassword()"
+              class="w-full py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none" style="background: var(--btn-primary-bg); color: var(--btn-primary-text);">
+        Update Password
+      </button>
+    </footer>
+  </div>
+</div>
+</body>

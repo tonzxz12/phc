@@ -1,0 +1,252 @@
+<!-- Dark mode toggle -->
+<div id="login-page" class="absolute top-4 right-4 z-50">
+  <button
+    class="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 shadow-sm transition-colors dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+    (click)="toggleDarkMode()"
+  >
+    <i class="fa-solid {{isDarkModeEnabled() ? 'fa-moon':'fa-sun'}} text-yellow-500 text-lg"></i>
+  </button>
+</div>
+
+<!-- Main container with hospital background shapes -->
+<div class="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
+  
+  <!-- Hospital themed background shapes with animations and blur - Minimal and elegant -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <!-- Medical Cross 1 - Simple floating -->
+    <div class="absolute top-20 left-20 w-8 h-8 opacity-3 dark:opacity-6 blur-sm" style="animation: float 12s ease-in-out infinite;">
+      <div class="w-full h-full relative">
+        <div class="absolute top-1/2 left-0 w-full h-1 bg-red-300 transform -translate-y-1/2 rounded-full"></div>
+        <div class="absolute left-1/2 top-0 w-1 h-full bg-red-300 transform -translate-x-1/2 rounded-full"></div>
+      </div>
+    </div>
+    
+    <!-- Heart - Gentle pulse -->
+    <div class="absolute top-32 right-32 w-6 h-6 opacity-4 dark:opacity-7 blur-sm" style="animation: pulse 4s ease-in-out infinite;">
+      <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full text-pink-300">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+    
+    <!-- Medical Cross 2 - Bottom right -->
+    <div class="absolute bottom-20 right-20 w-6 h-6 opacity-3 dark:opacity-5 blur-sm" style="animation: float 15s ease-in-out infinite reverse;">
+      <div class="w-full h-full relative">
+        <div class="absolute top-1/2 left-0 w-full h-1 bg-blue-300 transform -translate-y-1/2 rounded-full"></div>
+        <div class="absolute left-1/2 top-0 w-1 h-full bg-blue-300 transform -translate-x-1/2 rounded-full"></div>
+      </div>
+    </div>
+    
+    <!-- Heartbeat line - Subtle -->
+    <div class="absolute top-1/3 right-10 w-16 h-1 opacity-4 dark:opacity-6 blur-sm" style="animation: pulse 3s ease-in-out infinite;">
+      <div class="w-full h-full bg-gradient-to-r from-transparent via-emerald-300 to-transparent rounded-full"></div>
+    </div>
+    
+    <!-- Simple circle - Top left -->
+    <div class="absolute top-1/4 left-10 w-4 h-4 opacity-3 dark:opacity-5 blur-sm" style="animation: float 10s ease-in-out infinite;">
+      <div class="w-full h-full bg-teal-300 rounded-full"></div>
+    </div>
+    
+    <!-- Simple circle - Bottom left -->
+    <div class="absolute bottom-1/3 left-1/4 w-3 h-3 opacity-3 dark:opacity-5 blur-sm" style="animation: float 8s ease-in-out infinite reverse;">
+      <div class="w-full h-full bg-purple-300 rounded-full"></div>
+    </div>
+    
+    <!-- Medical Cross 3 - Minimal -->
+    <div class="absolute top-1/2 left-1/6 w-5 h-5 opacity-2 dark:opacity-4 blur-sm" style="animation: float 18s ease-in-out infinite;">
+      <div class="w-full h-full relative">
+        <div class="absolute top-1/2 left-0 w-full h-0.5 bg-cyan-300 transform -translate-y-1/2 rounded-full"></div>
+        <div class="absolute left-1/2 top-0 w-0.5 h-full bg-cyan-300 transform -translate-x-1/2 rounded-full"></div>
+      </div>
+    </div>
+    
+    <!-- Simple dot - Right side -->
+    <div class="absolute top-2/3 right-1/4 w-2 h-2 opacity-3 dark:opacity-5 blur-sm" style="animation: pulse 6s ease-in-out infinite;">
+      <div class="w-full h-full bg-pink-300 rounded-full"></div>
+    </div>
+  </div>
+
+  <!-- Custom keyframes for animations -->
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+  </style>
+
+  <!-- Login Card -->
+  <div class="flex flex-col gap-8 w-full max-w-lg relative z-10">
+    <!-- Card -->
+    <div class="bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/50 dark:border-gray-700/50 overflow-hidden">
+      <!-- Card Header -->
+      <div class="relative p-6 pb-4 text-center bg-gradient-to-br from-gray-50/50 to-white/50 dark:from-gray-800/50 dark:to-gray-900/50 border-b border-gray-100/50 dark:border-gray-700/50">
+        <!-- Decorative background pattern -->
+        <div class="absolute inset-0 opacity-5">
+          <div class="absolute top-4 left-4 w-3 h-3 border border-red-300 rounded-full"></div>
+          <div class="absolute top-6 right-6 w-2 h-2 bg-red-200 rounded-full"></div>
+          <div class="absolute bottom-4 left-1/3 w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+        </div>
+        
+        <!-- Logo and Philippine Heart Center -->
+        <div class="relative mb-4">
+          <div class="flex items-center justify-between w-full mb-4 px-2">
+            <!-- Logo -->
+            <div class="flex-shrink-0">
+              <div class="relative">
+                <!-- Enhanced glow effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-red-500/15 to-pink-500/15 rounded-2xl blur-xl"></div>
+                <!-- Logo container -->
+                <div class="relative bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-800 dark:via-gray-750 dark:to-gray-900 p-4 rounded-2xl  border-2 border-red-100 dark:border-red-800/40">
+                  <img [src]="imageSrc" [alt]="imageAlt" class="h-12 w-auto object-contain drop-shadow-sm" />
+                </div>
+              </div>
+            </div>
+            
+            <!-- Philippine Heart Center Text -->
+            <div class="flex-1 text-right ml-6">
+              <div class="space-y-1">
+                <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-700 via-red-600 to-red-800 dark:from-red-400 dark:via-red-300 dark:to-red-500 tracking-wide leading-tight" style="font-family: 'Arial', 'Helvetica', sans-serif; letter-spacing: 1px;">
+                  AMERICAN CHAMBER
+                </h1>
+                <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-800 via-red-700 to-red-900 dark:from-red-300 dark:via-red-200 dark:to-red-400 tracking-wide leading-tight" style="font-family: 'Arial', 'Helvetica', sans-serif; letter-spacing: 1px;">
+                   OF COMMERCE
+                </h1>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Enhanced Subtitle with full width -->
+          <div class="relative">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="h-0.5 bg-gradient-to-r from-transparent via-red-400 to-red-300 flex-1 rounded-full"></div>
+              <div class="px-3 py-1.5 bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/30 dark:to-pink-900/30 rounded-full border border-red-200/50 dark:border-red-700/50">
+                <p class="text-xs font-semibold text-red-700 dark:text-red-300 tracking-widest" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; letter-spacing: 2px;">
+                  LEARNING MANAGEMENT SYSTEM
+                </p>
+              </div>
+              <div class="h-0.5 bg-gradient-to-l from-transparent via-red-400 to-red-300 flex-1 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="relative space-y-1">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-50 tracking-tight" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+            Welcome Back
+          </h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+            Sign in to your account to continue
+          </p>
+        </div>
+      </div>
+      
+      <!-- Card Content -->
+      <div class="p-6 pt-4">
+        <form class="space-y-4">
+          <!-- Email and Password Form -->
+          <div class="space-y-4">
+            <!-- Email field -->
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-gray-700 dark:text-gray-300" for="email" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+                Email Address
+              </label>
+              <div class="relative">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  [(ngModel)]="username"
+                  [placeholder]="emailPlaceholder"
+                  class="w-full h-12 px-4 py-3 bg-gray-50/50 dark:bg-gray-800/50 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:border-red-400 dark:focus:border-red-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-200 backdrop-blur-sm"
+                  style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;"
+                  required
+                />
+                <div class="absolute inset-0 rounded-xl ring-2 ring-transparent focus-within:ring-red-200 dark:focus-within:ring-red-800/30 pointer-events-none transition-all duration-200"></div>
+              </div>
+            </div>
+            
+            <!-- Password field -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300" for="password" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+                  Password
+                </label>
+                
+              </div>
+              <div class="relative">
+                <input
+                  id="password"
+                  name="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="password"
+                  [placeholder]="passwordPlaceholder"
+                  class="w-full h-12 px-4 py-3 pr-12 bg-gray-50/50 dark:bg-gray-800/50 border-2 border-gray-200/50 dark:border-gray-700/50 rounded-xl text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:border-red-400 dark:focus:border-red-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-200 backdrop-blur-sm"
+                  style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;"
+                  required
+                />
+                <button
+                  type="button"
+                  (click)="toggleShowPassword()"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200"
+                >
+                  <i class="fas text-lg" [ngClass]="{ 'fa-eye': showPassword, 'fa-eye-slash': !showPassword }" aria-hidden="true"></i>
+                </button>
+                <div class="absolute inset-0 rounded-xl ring-2 ring-transparent focus-within:ring-red-200 dark:focus-within:ring-red-800/30 pointer-events-none transition-all duration-200"></div>
+              </div>
+            </div>
+            
+            <!-- Remember me checkbox -->
+            <div class="flex items-center space-x-3 pt-2">
+              <div class="relative">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  [(ngModel)]="rememberMe"
+                  name="remember"
+                  class="h-5 w-5 rounded-md border-2 border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500 dark:focus:ring-red-400 focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 bg-white dark:bg-gray-800 transition-all duration-200"
+                />
+              </div>
+              <label for="remember" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+                {{ rememberMeText }}
+              </label>
+            </div>
+            
+            <!-- Login Button -->
+            <div class="pt-2">
+              <button
+                type="submit"
+                (click)="login()"
+                class="relative w-full h-11 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-red-200 dark:focus:ring-red-800/30 overflow-hidden"
+                style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;"
+              >
+                <!-- Button glow effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-red-400/20 to-red-600/20 opacity-0 hover:opacity-100 transition-opacity duration-200"></div>
+                <span class="relative z-10">{{ loginButtonText }}</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Sign up link -->
+          <div class="text-center pt-3 border-t border-gray-100 dark:border-gray-700">
+            <p class="text-sm text-gray-600 dark:text-gray-400" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+              Don't have an account? 
+              <a class="font-semibold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer transition-colors duration-200 ml-1" (click)="openModal()">
+                Create account
+              </a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Terms and Privacy -->
+    <!-- <div class="text-center">
+      <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 dark:border-gray-700/50">
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed" style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+          By continuing, you agree to our 
+          <a href="#" class="font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200">Terms of Service</a>
+          and 
+          <a href="#" class="font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200">Privacy Policy</a>
+        </p>
+      </div>
+    </div> -->
+  </div>
+</div>

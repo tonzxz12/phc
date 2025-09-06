@@ -1,0 +1,36 @@
+<app-loader></app-loader>
+<router-outlet *ngIf="initializedConfig() && !environment.maintenance"></router-outlet>
+<div *ngIf="environment.maintenance" class="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4">
+    <!-- Maintenance Container -->
+    <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+      <!-- Maintenance Icon -->
+      <div class="mb-6">
+        <svg class="mx-auto h-16 w-16 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+  
+      <!-- Title -->
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">Under Maintenance</h1>
+  
+      <!-- Message -->
+      <p class="text-gray-600 mb-6">
+        We're currently performing maintenance to improve your experience. 
+        The site will be back online soon!
+      </p>
+  
+      <!-- Contact Info -->
+      <p class="text-sm text-gray-500">
+        Need help? Contact us at 
+        <a href="mailto:support@example.com" class="text-blue-600 hover:underline">
+          support&#64;quanbyit.com
+        </a>
+      </p>
+    </div>
+  
+    <!-- Footer -->
+    <footer class="mt-8 text-gray-500 text-sm">
+      &copy; 2025 Quanby Solutions Inc. All rights reserved.
+    </footer>
+  </div>

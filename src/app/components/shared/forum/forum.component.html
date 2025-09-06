@@ -1,0 +1,152 @@
+<div class="forum-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Classes View -->
+  <div *ngIf="!selectedClass && !loading" class="classes-view">
+    <div class="header-section">
+      <h2 class="page-title">
+        <i class="fas fa-comments"></i>
+        Forum - {{ isTeacher ? 'My Courses' : 'Enrolled Courses' }}
+      </h2>
+      <p class="page-subtitle">Select a course to view forum discussions</p>
+    </div>
+
+    <div class="classes-grid" *ngIf="classes.length > 0">
+      <div 
+        *ngFor="let class of classes" 
+        class="class-card"
+        (click)="selectClass(class)"
+      >
+        <div class="class-header">
+          <h3 class="class-name">{{ class.course || class.title || 'Untitled Course' }}</h3>
+          <span class="class-code">{{ class.difficulty || 'Course' }}</span>
+        </div>
+        <div class="class-info">
+          <p class="class-description">
+            {{ class.details || class.description || 'No description available' }}
+          </p>
+          <div class="class-meta">
+            <span class="meta-item">
+              <i class="fas fa-book"></i>
+              {{ class.lessons || class.lessoncount || 0 }} lessons
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-comments"></i>
+              0 threads
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="classes.length === 0" class="empty-state">
+      <i class="fas fa-graduation-cap empty-icon"></i>
+      <h3>No Courses Found</h3>
+      <p>{{ isTeacher ? 'You haven\'t created any courses yet.' : 'You\'re not enrolled in any courses yet.' }}</p>
+    </div>
+  </div>
+
+  <!-- Threads View -->
+  <div *ngIf="selectedClass && !loading" class="threads-view">
+    <div class="header-section">
+      <div class="breadcrumb">
+        <button class="btn btn-link p-0" (click)="backToClasses()">
+          <i class="fas fa-arrow-left"></i> Back to Courses
+        </button>
+        <span class="breadcrumb-separator">/</span>
+        <span class="current-page">{{ selectedClass.course || selectedClass.title || 'Course Forum' }}</span>
+      </div>
+      
+      <div class="thread-header">
+        <h2 class="page-title">
+          <i class="fas fa-comments"></i>
+          Forum Discussions
+        </h2>
+        <button 
+          *ngIf="canCreateThread()" 
+          class="btn btn-primary"
+          (click)="openNewThreadModal()"
+        >
+          <i class="fas fa-plus"></i>
+          New Thread
+        </button>
+      </div>
+    </div>
+
+    <div class="threads-list" *ngIf="threads.length > 0">
+      <div 
+        *ngFor="let thread of threads" 
+        class="thread-card"
+        [class.locked]="thread.isLocked"
+        (click)="openThread(thread)"
+      >
+        <div class="thread-content">
+          <div class="thread-header-info">
+            <div class="thread-title-section">
+              <h3 class="thread-title">
+                <i *ngIf="thread.isLocked" class="fas fa-lock lock-icon"></i>
+                {{ thread.title }}
+              </h3>
+              <p class="thread-body" *ngIf="thread.body">{{ thread.body }}</p>
+            </div>
+            <div class="thread-meta">
+              <span class="meta-item">
+                <i class="fas fa-comments"></i>
+                {{ thread.post_count || 0 }} posts
+              </span>
+              <span class="meta-item">
+                <i class="fas fa-clock"></i>
+                {{ formatDate(thread.createdAt) }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="thread-actions" *ngIf="isTeacher">
+            <button 
+              class="btn btn-sm btn-outline-warning"
+              [class.active]="thread.isLocked"
+              (click)="toggleLock(thread, $event)"
+              title="{{ thread.isLocked ? 'Unlock' : 'Lock' }} thread"
+            >
+              <i class="fas fa-lock"></i>
+            </button>
+            <button 
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteThread(thread, $event)"
+              title="Delete thread"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="threads.length === 0" class="empty-state">
+      <i class="fas fa-comments empty-icon"></i>
+      <h3>No Discussions Yet</h3>
+      <p>{{ isTeacher ? 'Start the conversation by creating the first thread.' : 'No discussions have been started yet.' }}</p>
+      <button 
+        *ngIf="canCreateThread()" 
+        class="btn btn-primary mt-3"
+        (click)="openNewThreadModal()"
+      >
+        <i class="fas fa-plus"></i>
+        Create First Thread
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- New Thread Modal -->
+<app-new-thread-modal 
+  [selectedClass]="selectedClass"
+  [isTeacher]="isTeacher"
+  (threadCreated)="onThreadCreated($event)"
+  #newThreadModal>
+</app-new-thread-modal>

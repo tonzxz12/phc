@@ -1,0 +1,359 @@
+<div class="users-management-container" [style]="{'background': 'var(--body-color)', 'color': 'var(--text-color)', 'min-height': '100vh'}">
+  <!-- Header Section -->
+  <div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 [style]="{'color': 'var(--text-color)'}">User Management</h1>
+        <p [style]="{'color': 'var(--text-muted)'}">Manage students, teachers, and administrators</p>
+      </div>
+      
+      <!-- User Type Selector -->
+      <div class="user-type-selector">
+        <div class="selector-tabs">
+          <button 
+            *ngFor="let option of ['Students', 'Teachers', 'Administrators']"
+            (click)="selectOption(option)"
+            [class.active]="selectedOption === option"
+            [style]="selectedOption === option 
+              ? {'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)', 'border': '1px solid var(--primary-color)'} 
+              : {'background': 'transparent', 'color': 'var(--text-color)', 'border': '1px solid var(--border-color)'}"
+            class="selector-tab"
+          >
+            <svg *ngIf="option === 'Students'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <svg *ngIf="option === 'Teachers'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <svg *ngIf="option === 'Administrators'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 1l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            {{ option === 'Administrators' ? 'Admin' : option }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar" [style]="{'background': 'var(--card-bg)', 'border-bottom': '1px solid var(--border-color)'}">
+    <div class="action-content">
+      <div class="stats-section">
+        <div class="stat-card" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 7h-.79l-1.21-1.93A2 2 0 0 0 14.84 4H9.16a2 2 0 0 0-1.7 1.07L6.25 7h-.79a1.5 1.5 0 0 0-1.42 1.37L1.5 16H4v6h2v-6h12v6h2z"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-number">{{ getTotalCount() }}</span>
+            <span class="stat-label">Total {{ selectedOption }}</span>
+          </div>
+        </div>
+        
+        <div class="stat-card" [style]="{'background': 'var(--success-color)', 'color': 'white'}" *ngIf="selectedOption === 'Students'">
+          <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-number">{{ getApprovedCount() }}</span>
+            <span class="stat-label">Approved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <!-- Delete Button -->
+        <button 
+          class="action-btn danger-btn" 
+          [style]="{'background': 'var(--danger-color)', 'color': 'white', 'border': '1px solid var(--danger-color)'}"
+          (click)="delete()" 
+          *ngIf="selectedOption === 'Students' || selectedOption === 'Teachers' || selectedOption === 'Administrators'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+          </svg>
+          <span>Delete Selected</span>
+        </button>
+
+        <!-- Add Buttons -->
+        <button 
+          class="action-btn primary-btn" 
+          [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)', 'border': '1px solid var(--primary-color)'}"
+          *ngIf="selectedOption === 'Teachers'" 
+          (click)="addTeachers()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          <span>Add Teacher</span>
+        </button>
+
+        <button 
+          class="action-btn primary-btn" 
+          [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)', 'border': '1px solid var(--primary-color)'}"
+          *ngIf="selectedOption === 'Administrators'" 
+          (click)="addPrincipal()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          <span>Add Admin</span>
+        </button>
+
+        <!-- Edit Buttons -->
+        <button 
+          class="action-btn secondary-btn" 
+          [style]="{'background': 'var(--secondary-color)', 'color': 'white', 'border': '1px solid var(--secondary-color)'}"
+          *ngIf="selectedOption === 'Teachers'" 
+          (click)="editDetailsTeacher()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M3 17.25V21h3.75l11.07-11.07-3.75-3.75L3 17.25zm18-11.66l-2.34-2.34a1.03 1.03 0 00-1.46 0l-2.34 2.34 3.75 3.75 2.34-2.34a1.03 1.03 0 000-1.46z"/>
+          </svg>
+          <span>Edit Teacher</span>
+        </button>
+
+        <button 
+          class="action-btn secondary-btn" 
+          [style]="{'background': 'var(--secondary-color)', 'color': 'white', 'border': '1px solid var(--secondary-color)'}"
+          *ngIf="selectedOption === 'Students'" 
+          (click)="editDetailsStudent()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M3 17.25V21h3.75l11.07-11.07-3.75-3.75L3 17.25zm18-11.66l-2.34-2.34a1.03 1.03 0 00-1.46 0l-2.34 2.34 3.75 3.75 2.34-2.34a1.03 1.03 0 000-1.46z"/>
+          </svg>
+          <span>Edit Student</span>
+        </button>
+
+        <button 
+          class="action-btn secondary-btn" 
+          [style]="{'background': 'var(--secondary-color)', 'color': 'white', 'border': '1px solid var(--secondary-color)'}"
+          *ngIf="selectedOption === 'Administrators'" 
+          (click)="editDetailsPrincipal()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M3 17.25V21h3.75l11.07-11.07-3.75-3.75L3 17.25zm18-11.66l-2.34-2.34a1.03 1.03 0 00-1.46 0l-2.34 2.34 3.75 3.75 2.34-2.34a1.03 1.03 0 000-1.46z"/>
+          </svg>
+          <span>Edit Admin</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-section">
+    <div class="table-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      
+      <!-- Students Table -->
+      <ng-container *ngIf="selectedOption == 'Students'; else otherTables">
+        <div class="table-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+          <div class="table-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            <span>Students Directory</span>
+          </div>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="modern-table">
+            <thead [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+              <tr>
+                <th><input type="checkbox" class="select-all-checkbox"></th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Student ID</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Full Name</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Email Address</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Last Activity</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Status</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let student of students; let i = index"
+                (click)="selectUser(student)" 
+                [ngClass]="{ 'selected-row': selectedUser === student }"
+                [style]="selectedUser === student 
+                  ? {'background': 'var(--primary-color-light)', 'color': 'var(--text-color)'} 
+                  : {'background': i % 2 === 0 ? 'var(--card-bg)' : 'var(--body-color)', 'color': 'var(--text-color)'}"
+                class="table-row"
+              >
+                <td><input type="checkbox" [checked]="selectedUser === student"></td>
+                <td class="student-id">
+                  <span *ngIf="!student.token" class="id-badge" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                    {{ student.visibleid }}
+                  </span>
+                  <span *ngIf="student.token" class="pending-badge" [style]="{'background': 'var(--warning-color)', 'color': 'white'}">
+                    PENDING
+                  </span>
+                </td>
+                <td class="user-info">
+                  <div class="user-avatar" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                    {{ student.firstname?.charAt(0) }}{{ student.lastname?.charAt(0) }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ student.lastname }}, {{ student.firstname }}</span>
+                  </div>
+                </td>
+                <td class="email" [style]="{'color': 'var(--text-color)'}">{{ student.email }}</td>
+                <td class="last-seen">
+                  <span *ngIf="!student.token" [style]="{'color': 'var(--text-color)'}">{{ parseDate(student.lastseen) }}</span>
+                  <span *ngIf="student.token" [style]="{'color': 'var(--text-muted)'}">Not available</span>
+                </td>
+                <td class="status">
+                  <span 
+                    class="status-badge"
+                    [style]="student.approved || student.token == null 
+                      ? {'background': 'var(--success-color)', 'color': 'white'} 
+                      : {'background': 'var(--warning-color)', 'color': 'white'}"
+                  >
+                    {{ student.approved || student.token == null ? 'Approved' : 'Pending' }}
+                  </span>
+                </td>
+                <td class="actions">
+                  <div class="action-buttons-inline">
+                    <button 
+                      class="approve-btn" 
+                      [style]="{'background': 'var(--success-color)', 'color': 'white'}"
+                      (click)="acceptStudent(student)" 
+                      *ngIf="!student.approved && student.token != null"
+                      title="Approve Student"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                      </svg>
+                    </button>
+                    <button 
+                      class="reject-btn" 
+                      [style]="{'background': 'var(--danger-color)', 'color': 'white'}"
+                      (click)="cancelStudent(student)" 
+                      *ngIf="!student.approved && student.token != null"
+                      title="Reject Student"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <!-- Other Tables Template -->
+      <ng-template #otherTables>
+        <ng-container *ngIf="selectedOption === 'Administrators'; else teachersTable">
+          <div class="table-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+            <div class="table-title">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M12 1l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              <span>Administrators Directory</span>
+            </div>
+          </div>
+          
+          <div class="table-wrapper">
+            <table class="modern-table">
+              <thead [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                <tr>
+                  <th><input type="checkbox" class="select-all-checkbox"></th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Role</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Full Name</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Email Address</th>
+                  <th [style]="{'color': 'var(--text-on-primary)'}">Last Activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr 
+                  *ngFor="let admin of admins; let i = index"
+                  (click)="selectUser(admin)" 
+                  [ngClass]="{ 'selected-row': selectedUser === admin }"
+                  [style]="selectedUser === admin 
+                    ? {'background': 'var(--primary-color-light)', 'color': 'var(--text-color)'} 
+                    : {'background': i % 2 === 0 ? 'var(--card-bg)' : 'var(--body-color)', 'color': 'var(--text-color)'}"
+                  class="table-row"
+                >
+                  <td><input type="checkbox" [checked]="selectedUser === admin"></td>
+                  <td class="role">
+                    <span class="role-badge" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+                      {{ admin.role }}
+                    </span>
+                  </td>
+                  <td class="user-info">
+                    <div class="user-avatar" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+                      {{ admin.firstname?.charAt(0) }}{{ admin.lastname?.charAt(0) }}
+                    </div>
+                    <div class="user-details">
+                      <span class="user-name">{{ admin.lastname }}, {{ admin.firstname }}</span>
+                    </div>
+                  </td>
+                  <td class="email" [style]="{'color': 'var(--text-color)'}">{{ admin.email }}</td>
+                  <td class="last-seen" [style]="{'color': 'var(--text-color)'}">{{ parseDate(admin.lastseen) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+      </ng-template>
+
+      <!-- Teachers Table -->
+      <ng-template #teachersTable>
+        <div class="table-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+          <div class="table-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span>Teachers Directory</span>
+          </div>
+        </div>
+        
+        <div class="table-wrapper">
+          <table class="modern-table">
+            <thead [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+              <tr>
+                <th><input type="checkbox" class="select-all-checkbox"></th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Teacher ID</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Full Name</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Email Address</th>
+                <th [style]="{'color': 'var(--text-on-primary)'}">Last Activity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let teacher of teachers; let i = index"
+                (click)="selectUser(teacher)" 
+                [ngClass]="{ 'selected-row': selectedUser === teacher }"
+                [style]="selectedUser === teacher 
+                  ? {'background': 'var(--primary-color-light)', 'color': 'var(--text-color)'} 
+                  : {'background': i % 2 === 0 ? 'var(--card-bg)' : 'var(--body-color)', 'color': 'var(--text-color)'}"
+                class="table-row"
+              >
+                <td><input type="checkbox" [checked]="selectedUser === teacher"></td>
+                <td class="teacher-id">
+                  <span class="id-badge" [style]="{'background': 'var(--success-color)', 'color': 'white'}">
+                    {{ teacher.visibleid }}
+                  </span>
+                </td>
+                <td class="user-info">
+                  <div class="user-avatar" [style]="{'background': 'var(--success-color)', 'color': 'white'}">
+                    {{ teacher.firstname?.charAt(0) }}{{ teacher.lastname?.charAt(0) }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ teacher.lastname }}, {{ teacher.firstname }}</span>
+                  </div>
+                </td>
+                <td class="email" [style]="{'color': 'var(--text-color)'}">{{ teacher.email }}</td>
+                <td class="last-seen" [style]="{'color': 'var(--text-color)'}">{{ parseDate(teacher.lastseen) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

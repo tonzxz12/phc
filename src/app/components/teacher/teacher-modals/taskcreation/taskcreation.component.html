@@ -1,0 +1,157 @@
+<div class="flex flex-col w-full gap-4" style="background-color: var(--modal-bg);">
+  <div class="w-full py-4">
+    <h1 class="text-2xl text-center" style="color: var(--text-color);">{{ isEditMode ? 'EDIT ASSIGNMENT' : 'ASSIGNMENT CREATION FORM' }}</h1>
+  </div>
+
+  <div class="flex flex-col w-full gap-4 p-4">
+    <input [(ngModel)]="title" class="w-full px-4 py-2 rounded-full outline-none" type="text"
+      placeholder="Assignment Title" 
+      style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);" />
+
+    <textarea class="px-4 py-2 rounded-lg outline-none resize-none" [(ngModel)]="description" cols="20" rows="5"
+      placeholder="Assignment Description"
+      style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"></textarea>
+
+    <div class="flex flex-row items-center justify-start w-full gap-2">
+      <input class="w-full px-4 py-2 rounded-full outline-none" type="text" [(ngModel)]="deadline"
+        name="deadline" id="deadline" placeholder="Deadline" onfocus="this.type='date'" onblur="this.type='text'"
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"
+        required />
+
+      <label class="px-4 py-2 rounded-full outline-none cursor-pointer w-fit" for="fileinput"
+        [ngClass]="{'!bg-green-200': file!=null}"
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+        <img src="assets/teacher/Link.png" alt="">
+      </label>
+      <input class="hidden" id="fileinput" type="file" (change)="onFileSelected($event)" />
+    </div>
+
+    <!-- Course Field: Show input in edit mode, select in create mode -->
+    <div class="relative inline-block w-full">
+      <!-- In Edit Mode: Show as blurred input -->
+      <input *ngIf="isEditMode" 
+        [value]="getCourseName(course)" 
+        class="w-full px-4 py-2 rounded-full outline-none opacity-70" 
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"
+        readonly 
+        placeholder="Course" />
+
+      <!-- In Create Mode: Show as dropdown -->
+      <select *ngIf="!isEditMode" [(ngModel)]="course" name="course" id="course" (change)="onCourseChange(course)"
+        class="appearance-none w-full outline-none py-2.5 px-4 pr-8 rounded-full leading-tight focus:outline-none transition-colors duration-200 ease-in-out cursor-pointer"
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+        <option value="" disabled selected hidden>Select Course</option>
+        <option *ngFor="let _course of courses" [value]="_course.id">{{ _course.course }}</option>
+      </select>
+
+      <!-- Dropdown Arrow (only in create mode) -->
+      <div *ngIf="!isEditMode" class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none" style="color: var(--input-text);">
+        <svg class="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Class Field: Show input in edit mode, select in create mode -->
+    <div class="relative inline-block w-full">
+      <!-- In Edit Mode: Show as blurred input -->
+      <input *ngIf="isEditMode" 
+        [value]="getClassName(class)" 
+        class="w-full px-4 py-2 rounded-full outline-none opacity-70" 
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"
+        readonly 
+        placeholder="Class" />
+
+      <!-- In Create Mode: Show as dropdown -->
+      <select *ngIf="!isEditMode" [(ngModel)]="class" name="class" id="class"
+        class="appearance-none w-full outline-none py-2.5 px-4 pr-8 rounded-full leading-tight focus:outline-none transition-colors duration-200 ease-in-out cursor-pointer"
+        style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+        <option value="" disabled selected hidden>{{ filteredClasses.length === 0 && course ? 'No classes found for this course' : 'Select Class' }}</option>
+        <option *ngFor="let _class of filteredClasses" [value]="_class.id">{{ _class.name }}</option>
+      </select>
+
+      <!-- Dropdown Arrow (only in create mode) -->
+      <div *ngIf="!isEditMode" class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none" style="color: var(--input-text);">
+        <svg class="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div *ngIf="existingAttachment" class="mt-2 text-sm" style="color: var(--text-color);">
+      <span>Current Attachment:</span>
+      <a class="text-blue-500 underline" (click)="openAttachment(existingAttachment.split('>')[0])">
+        {{ existingAttachment.split('>')[1] }}
+      </a>
+    </div>
+
+    <!-- Grading Method Selection -->
+    <div class="w-full">
+      <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Grading Method</label>
+      <div class="flex gap-4 flex-wrap">
+        <label class="flex items-center">
+          <input type="radio" 
+                 [(ngModel)]="gradingMethod" 
+                 value="traditional"
+                 (change)="onGradingMethodChange('traditional')"
+                 class="mr-2"
+                 style="accent-color: var(--primary-color);">
+          <span class="text-sm" style="color: var(--text-color);">Traditional Grading</span>
+        </label>
+        <label class="flex items-center">
+          <input type="radio" 
+                 [(ngModel)]="gradingMethod" 
+                 value="rubric"
+                 (change)="onGradingMethodChange('rubric')"
+                 class="mr-2"
+                 style="accent-color: var(--primary-color);">
+          <span class="text-sm" style="color: var(--text-color);">Rubric-Based Grading</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Rubric Selection (only show if rubric grading is selected) -->
+    <div *ngIf="gradingMethod === 'rubric'" class="relative inline-block w-full">
+      <select [(ngModel)]="selectedRubricId" 
+              class="appearance-none w-full outline-none py-2.5 px-4 pr-8 rounded-full leading-tight focus:outline-none transition-colors duration-200 ease-in-out cursor-pointer"
+              style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+        <option value="" disabled selected>Select a Grading Rubric</option>
+        <option *ngFor="let rubric of availableRubrics" [value]="rubric.id">
+          {{ rubric.name }} ({{ rubric.total_points }} pts)
+        </option>
+      </select>
+      
+      <!-- Dropdown Arrow -->
+      <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none" style="color: var(--input-text);">
+        <svg class="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Resubmit Limit -->
+    <div class="w-full">
+      <label class="block text-sm font-medium mb-2" style="color: var(--text-color);">Resubmit Limit</label>
+      <input [(ngModel)]="resubmitLimit" 
+             type="number" 
+             min="1" 
+             max="10"
+             class="w-full px-4 py-2 rounded-full outline-none" 
+             style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);"
+             placeholder="Number of allowed resubmissions" />
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between w-full gap-4 p-4">
+    <button (click)="createOrUpdateTask()"
+      class="w-full py-2.5 hover:scale-105 duration-300 font-semibold rounded-lg"
+      style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);">
+      {{ isEditMode ? 'Update' : 'Save' }}
+    </button>
+    <button (click)="closeModal()"
+      class="w-full py-2.5 hover:scale-105 duration-300 font-semibold rounded-lg"
+      style="background-color: var(--btn-danger-bg); color: var(--btn-primary-text);">
+      Cancel
+    </button>
+  </div>
+</div>

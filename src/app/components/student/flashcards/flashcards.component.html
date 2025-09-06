@@ -1,0 +1,139 @@
+<!-- Header Section -->
+<div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+  <div class="header-content">
+    <div class="title-section">
+      <h1 [style]="{'color': 'var(--text-color)'}">Browse <span [style]="{'color': 'var(--primary-color)'}">{{pages[currentPage].header}}</span></h1>
+      <p [style]="{'color': 'var(--text-muted)'}">{{pages[currentPage].description}}</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- Content Section -->
+<div class="content-section">
+  <div *ngIf="currentPage == 'Browse'; else flashcardView" class="browse-section">
+    <div class="section-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="section-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+          </svg>
+          <span>Available Courses</span>
+        </div>
+      </div>
+      
+      <div class="section-content">
+        <div *ngIf="filteredCourses().length > 0; else noCourses" class="courses-grid">
+          <ng-container *ngFor="let course of filteredCourses()">
+            <app-card
+              *ngIf="course.enrolled"
+              (click)="openFlashCards(course)"
+              [enrolled]="course.enrolled"
+              [difficulty]="course.complexity"
+              [picture]="course.image ? getUrl(course.image) : 'https://img.freepik.com/free-vector/online-tutorials-concept_52683-37480.jpg'"
+              [number]="course.lessoncount + 'x Lessons'"
+              [lecture]="course.course"
+              [profilepic]="course.profile ? getUrl(course.profile) : 'https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg'"
+              [name]="course.firstname + ' ' + course.lastname"
+              [job]="course.job ?? 'N/A'"
+              [description]="course.details"
+              [target_audience]="course.target_audience"
+            ></app-card>
+          </ng-container>
+        </div>
+        <ng-template #noCourses>
+          <div class="empty-state">
+            <div class="empty-icon" [style]="{'color': 'var(--text-muted)'}">📚</div>
+            <h3 [style]="{'color': 'var(--text-color)'}">No Enrolled Courses</h3>
+            <p [style]="{'color': 'var(--text-muted)'}">Currently, you are not enrolled to any courses in this category!</p>
+            <button class="enroll-btn" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)', 'border': '2px solid var(--primary-color)'}" routerLink="/student/courses">
+              Go to courses and enroll to one
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+              </svg>
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #flashcardView>
+      <div class="flashcard-section">
+        <div class="flashcard-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+          <div class="flashcard-header" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+            <div class="flex items-center justify-between flashcard-title">
+              <div class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                <span class="ml-2">Flashcards Practice</span>
+              </div>
+              <button (click)="closeFlashCards()" class="back-btn px-3 py-1 rounded bg-white text-[var(--secondary-color)] font-semibold flex items-center shadow hover:bg-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="mr-1">
+                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                Back
+              </button>
+            </div>
+          </div>
+        
+        <div class="flashcard-content">
+          <div class="flashcard-area">
+            <div *ngFor="let card of flashcards; let i = index" class="flashcard-wrapper">
+              <div *ngIf="i == currentFlashcardIndex" class="flashcard-display">
+                <!-- Navigation Areas -->
+                <div (click)="previousFlashcard()" class="nav-area left" [style]="{'border-right': '2px solid var(--border-color)'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" [style]="{'color': 'var(--text-muted)'}">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                  </svg>
+                </div>
+                
+                <!-- Main Flashcard -->
+                <div (click)="flipCard()" class="flashcard-main" [style]="{'background': card.show ? 'var(--secondary-color-light)' : 'var(--card-bg)', 'border': '2px solid var(--border-color)'}">
+                  <div class="flashcard-inner">
+                    <p class="flashcard-text" [style]="{'color': card.show ? 'white' : 'var(--text-color)'}">
+                      {{ card.show ? card.back : card.front }}
+                    </p>
+                    <div class="flip-hint" [style]="{'color': card.show ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)'}">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                      Click to {{ card.show ? 'show question' : 'show answer' }}
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Navigation Areas -->
+                <div (click)="nextFlashcard()" class="nav-area right" [style]="{'border-left': '2px solid var(--border-color)'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" [style]="{'color': 'var(--text-muted)'}">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Flashcard Controls -->
+          <div class="flashcard-controls" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+            <button (click)="previousFlashcard()" class="control-btn" [style]="{'color': 'var(--text-on-primary)'}">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+              </svg>
+            </button>
+            <div class="progress-info">
+              <span class="current-card">{{currentFlashcardIndex + 1}}</span>
+              <span class="separator">of</span>
+              <span class="total-cards">{{flashcards.length}}</span>
+            </div>
+            <button (click)="nextFlashcard()" class="control-btn" [style]="{'color': 'var(--text-on-primary)'}">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

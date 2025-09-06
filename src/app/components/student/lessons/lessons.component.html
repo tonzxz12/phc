@@ -1,0 +1,268 @@
+<div class="min-h-screen p-6" style="background-color: var(--body-color);">
+  <!-- <div class="flex justify-start mb-6">
+    <button
+      class="px-4 py-2 text-lg font-semibold transition duration-300 ease-in-out bg-white border rounded-lg shadow-md text-[#00cc99] border-amber-500 hover:bg-amber-100"
+      (click)="navigateBack()"
+    >
+      <i class="mr-2 fas fa-arrow-left"></i> Back
+    </button>
+  </div> -->
+
+  <div class="mb-6 flex justify-between">
+    <h1 class="text-3xl font-bold mb-2" style="color: var(--text-color);">
+      {{ courseTitle || 'Course Lessons' }}
+    </h1>
+    <div class="flex justify-start">
+      <button
+        class="px-4 py-2 text-lg font-semibold transition duration-300 ease-in-out border rounded-lg shadow-md"
+        style="background-color: var(--btn-secondary-bg); color: var(--primary-color); border-color: var(--primary-color);"
+        onmouseover="this.style.backgroundColor='var(--btn-secondary-hover)'"
+        onmouseout="this.style.backgroundColor='var(--btn-secondary-bg)'"
+        (click)="navigateBack()"
+      >
+        <i class="mr-2 fas fa-arrow-left"></i> Back
+      </button>
+    </div>
+  </div>
+
+  <!-- Lessons -->
+  <div *ngFor="let lesson of lessons; let i = index" class="mb-8">
+    <div class="p-6 border-l-4 shadow-lg rounded-xl" 
+         style="background-color: var(--card-bg); border-left-color: var(--primary-color);">
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <h2 class="flex items-center text-2xl font-bold" style="color: var(--text-color);">
+            <i class="mr-3 text-3xl fas fa-book" style="color: var(--primary-color);"></i>
+          
+              Lesson #{{ i + 1 }}: {{ lesson.title }}
+            
+
+            <span *ngIf="lesson.hasQuiz" class="px-2 py-1 ml-3 text-xs font-semibold rounded-full"
+                  style="background-color: var(--secondary-color); color: var(--text-color-light);">
+              <i class="mr-1 fas fa-question-circle"></i> Has Quiz
+            </span>
+          </h2>
+
+          <div class="flex items-center mt-2" style="color: var(--text-color);">
+            <i class="mr-2 fas fa-user"></i>
+            <span>{{ lesson.firstname }} {{ lesson.lastname }}</span>
+            <span class="mx-2">•</span>
+            <i class="mr-2 fas fa-clock"></i>
+            <span>{{ parseTime(lesson.time) }}</span>
+          </div>
+        </div>
+
+       <!-- Replace the button section in your template -->
+<div class="flex items-center">
+  <button *ngIf="lesson.hasQuiz" 
+          class="px-4 py-2 mr-3 text-sm font-semibold rounded-md"
+          style="background-color: var(--secondary-color); color: var(--text-color-light);"
+          onmouseover="this.style.backgroundColor='var(--primary-color)'"
+          onmouseout="this.style.backgroundColor='var(--secondary-color)'"
+          (click)="navigateToQuizManagement()">
+    <i class="mr-2 fas fa-tasks"></i> Manage Quiz
+  </button>
+  
+  <!-- Only show progress buttons for students -->
+  <ng-container *ngIf="!isTeacher()">
+    <button *ngIf="!isDone(lesson) && !hideMarkAsDone" 
+            class="px-4 py-2 font-medium transition duration-300 rounded-md cursor-not-allowed"
+            [class.bg-gray-400]="!isLessonTopicsCompleted(lesson)"
+            [class.bg-blue-500]="isLessonTopicsCompleted(lesson)"
+            [class.hover:bg-blue-600]="isLessonTopicsCompleted(lesson)"
+            [style.background-color]="isLessonTopicsCompleted(lesson) ? 'var(--btn-primary-bg)' : '#9ca3af'"
+            [style.color]="'var(--btn-primary-text)'"
+            [disabled]="!isLessonTopicsCompleted(lesson)">
+      <i class="mr-2" 
+         [class.fas.fa-clock]="!isLessonTopicsCompleted(lesson)"
+         [class.fas.fa-check]="isLessonTopicsCompleted(lesson)"></i>
+      {{ isLessonTopicsCompleted(lesson) ? 'Mark as done' : 'Not yet done' }}
+    </button>
+    <button *ngIf="isDone(lesson)"
+            class="px-4 py-2 font-medium transition duration-300 rounded-md"
+            style="background-color: var(--btn-success-bg); color: var(--btn-primary-text);"
+            onmouseover="this.style.backgroundColor='var(--btn-success-hover)'"
+            onmouseout="this.style.backgroundColor='var(--btn-success-bg)'">
+      <i class="mr-2 fas fa-check-double"></i> Completed
+    </button>
+  </ng-container>
+</div>
+      </div>
+
+      <p class="mb-6 leading-relaxed" style="color: var(--text-color);">{{ lesson.details }}</p>
+
+
+      <div *ngIf="lesson.topics && lesson.topics.length > 0">
+        <h4 class="mb-4 text-lg font-semibold" style="color: var(--primary-color);">
+          <i class="mr-2 fas fa-list"></i> Topics
+        </h4>
+        <div class="space-y-4">
+          <div *ngFor="let topic of lesson.topics; let idx = index"
+               [class.blur-sm]="!isTeacher() && idx !== 0 && !topic.show"
+               [class.pointer-events-none]="!isTeacher() && idx !== 0 && !topic.show"
+               [attr.title]="!isTeacher() && idx !== 0 && !topic.show ? 'Complete previous topics to unlock this one' : null"
+               class="p-4 transition-all duration-300 border rounded-lg shadow-sm hover:shadow-md"
+               style="background-color: var(--card-bg); border-color: var(--card-border);"
+               (click)="handleTopicClick(topic)">
+            <div class="flex items-center justify-between mb-2">
+              <h5 class="text-lg font-semibold" style="color: var(--secondary-color);">
+                Topic #{{ idx + 1 }}: {{ topic.title }}
+      
+                <span *ngIf="!isTeacher() && isTopicFinished(topic)" class="ml-2 text-xs font-semibold"
+                      style="color: var(--btn-success-bg);">
+                  <i class="fas fa-check-circle"></i> Completed
+                </span>
+      
+                <span *ngIf="topic.hasQuiz" class="px-2 py-1 ml-2 text-xs font-semibold rounded-full"
+                      style="background-color: var(--btn-danger-bg); color: var(--text-color-light);">
+                  <i class="mr-1 fas fa-question-circle"></i> Has Quiz
+                </span>
+              </h5>
+            </div>
+      
+            <div class="mb-4" style="color: var(--text-color);" *ngIf="topic.show || isTeacher()">
+              <ng-container *ngFor="let line of topic.details.split('\n')">
+                <div *ngIf="line.trim().startsWith('-'); else softBreak">
+                  <ul class="pl-5 list-disc">
+                    <li>{{ line.replace('-', '').trim() }}</li>
+                  </ul>
+                </div>
+                <ng-template #softBreak>
+                  <p>{{ line }}</p>
+                </ng-template>
+              </ng-container>
+            </div>
+      
+            <!-- Attachments -->
+            <div *ngIf="topic.attachments && topic.attachments.length > 0 && (topic.show || isTeacher())" class="mt-4">
+              <h6 class="mb-2 text-sm font-semibold" style="color: var(--secondary-color);">
+                <i class="mr-2 fas fa-paperclip"></i> Attachments:
+              </h6>
+              <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+                <div *ngFor="let file of topic.attachments"
+                     (click)="handleFileClick(file, topic)"
+                     class="p-3 transition-all duration-300 bg-transparent rounded-lg cursor-pointer hover:cursor-pointer">
+                  <div class="flex items-center mb-2">
+                    <i [class]="getFileIcon(file)" class="mr-3 text-2xl"></i>
+                    <div class="overflow-hidden">
+                      <p class="font-sm truncate"
+                        [style.color]="file.isRead ? 'var(--btn-success-bg)' : 'var(--primary-color)'"
+                        [title]="isYoutube(file) && file.youtubeTitle ? file.youtubeTitle : getOriginalFilename(file)">
+                        {{ isYoutube(file) && file.youtubeTitle ? file.youtubeTitle : getOriginalFilename(file) }}
+                      </p>
+                      <p class="text-xs" style="color: var(--text-color);">{{ getFileType(file) }}</p>
+                    </div>
+                    <i *ngIf="file.isRead" class="ml-2 fas fa-check-circle" 
+                       style="color: var(--btn-success-bg);" title="Viewed"></i>
+                  </div>
+      
+                  <!-- File Preview -->
+                  <div class="relative w-full h-48 overflow-hidden" style="background-color: var(--input-bg);">
+                    <ng-container [ngSwitch]="true">
+                      <ng-container *ngSwitchCase="isImage(file)">
+                        <img [src]="getURL(file.file)" 
+                             alt="Preview" 
+                             class="object-cover w-full h-full"
+                             (error)="handleImageError($event)">
+                      </ng-container>
+                      <ng-container *ngSwitchCase="isVideo(file)">
+                        <video [src]="getURL(file.file)"
+                               class="object-cover w-full h-full"
+                               controls>
+                              Your browser does not support the video tag.
+                        </video>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="isPDF(file)">
+                        <div class="flex items-center justify-center w-full h-full">
+                          <i class="text-4xl text-red-500 fas fa-file-pdf"></i>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="isPowerPointFile(file)">
+                        <div class="flex items-center justify-center w-full h-full">
+                          <i class="text-4xl text-orange-500 fas fa-file-powerpoint"></i>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="isDoc(file)">
+                        <div class="flex items-center justify-center w-full h-full">
+                          <i class="text-4xl text-blue-600 fas fa-file-word"></i>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="isExcelFile(file)">
+                        <div class="flex items-center justify-center w-full h-full">
+                          <i class="text-4xl text-green-600 fas fa-file-excel"></i>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="isTextFile(file)">
+                        <div class="flex items-center justify-center w-full h-full">
+                          <i class="text-4xl text-blue-600 fas fa-file-alt"></i>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchCase="isYoutube(file)">
+                        <div class="flex items-center justify-center w-full h-full">
+                          <div class="flex flex-col items-center justify-center w-full h-full">
+                            <div class="relative w-full h-48">
+                              <iframe
+                                *ngIf="file.safeYoutubeUrl"
+                                width="100%"
+                                height="100%"
+                                [src]="file.safeYoutubeUrl"
+                                frameborder="1"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                >
+                              </iframe>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <ng-container *ngSwitchDefault>
+                        <div class="flex items-center justify-center w-full h-full">
+                          <i class="text-4xl text-gray-400 fas fa-file"></i>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+      
+                  <!-- Interactive indicator -->
+                  <span *ngIf="file.type === 'interactive'" class="block mt-2 text-xs font-semibold"
+                        style="color: var(--btn-success-bg);">
+                    <i class="mr-1 fas fa-hand-pointer"></i> Interactive Content
+                  </span>
+      
+                  <!-- Deadline indicator -->
+                  <span *ngIf="file.deadline" class="block mt-2 text-xs font-semibold"
+                        style="color: var(--secondary-color);">
+                    <i class="mr-1 fas fa-clock"></i> Due: {{ file.deadline | date:'medium' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Topic Discussion Link -->
+            <div *ngIf="topic.show || isTeacher()" class="mt-4 pt-3 border-t" 
+                 style="border-color: var(--card-border);">
+              <button (click)="navigateToTopicDiscussion(topic.topicid); $event.stopPropagation()"
+                      class="flex items-center px-3 py-2 text-sm font-medium transition-colors duration-200 bg-transparent border rounded-lg"
+                      style="color: var(--primary-color); border-color: var(--primary-color);"
+                      onmouseover="this.style.backgroundColor='var(--primary-color)'; this.style.color='var(--text-color-light)'"
+                      onmouseout="this.style.backgroundColor='transparent'; this.style.color='var(--primary-color)'">
+                <i class="mr-2 fas fa-comments"></i>
+                Discussion Forum
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No topics message -->
+      <div *ngIf="!lesson.topics || lesson.topics.length === 0" style="color: var(--text-color);">
+        <i class="mr-2 fas fa-info-circle"></i> No topics available for this lesson.
+      </div>
+    </div>
+  </div>
+
+  <!-- No lessons message -->
+  <div *ngIf="!lessons || lessons.length === 0" class="flex flex-col items-center justify-center p-8">
+    <p class="mt-4 text-lg" style="color: var(--text-color);">No lessons available at the moment.</p>
+  </div>
+</div>

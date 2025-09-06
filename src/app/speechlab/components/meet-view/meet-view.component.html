@@ -1,0 +1,40 @@
+<div class="speech-lab-container" *ngIf="!denied || isTeacher">
+  <div class="speech-lab-wrapper">
+      <div class="speech-lab-header">
+          <div class="header-gradient"></div>
+      </div>
+
+      <div class="speech-lab-content">
+          <div class="side-gradient left-gradient"></div>
+          
+          <div class="main-content">
+              <div class="module-selection">
+                  <button class="module-select-button">
+                      <span class="button-text">Select Module</span>
+                      <div class="button-underline"></div>
+                  </button>
+              </div>
+
+              <div class="quick-actions">
+                  <button class="quick-action-button" (click)="openModal()">
+                      <img src="assets/ask.png" alt="Quick Action" class="action-icon">
+                  </button>
+              </div>
+          </div>
+
+          <div class="side-gradient right-gradient"></div>
+      </div>
+
+      <div class="speech-lab-footer">
+          <div class="footer-gradient"></div>
+      </div>
+  </div>
+</div>
+
+<ng-template #notGranted>
+  <div class="access-denied">
+      <div class="access-denied-message">
+          <p>You are not assigned to any speech lab.</p>
+      </div>
+  </div>
+</ng-template>

@@ -1,0 +1,192 @@
+<div class="discussions-container" [style]="{'background': 'var(--body-color)', 'color': 'var(--text-color)', 'min-height': '100vh'}">
+  <!-- Header Section -->
+  <div class="header-section" [style]="{'background': 'var(--card-bg)', 'border-bottom': '2px solid var(--border-color)'}">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 [style]="{'color': 'var(--text-color)'}">Discussion Forums</h1>
+        <p [style]="{'color': 'var(--text-muted)'}">Join course discussions and topic conversations with your classmates and teachers</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner" [style]="{'border-color': 'var(--border-color)', 'border-top-color': 'var(--primary-color)'}"></div>
+    <p [style]="{'color': 'var(--text-muted)'}">Loading discussions...</p>
+  </div>
+
+  <!-- Course Forums Section -->
+  <div *ngIf="!loading" class="forums-section">
+    <div class="section-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="section-header" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <span>Course Forums</span>
+        </div>
+      </div>
+      
+      <div class="section-content">
+        <div *ngIf="enrolledCourses.length === 0" class="empty-state">
+          <div class="empty-icon" [style]="{'color': 'var(--text-muted)'}">🎓</div>
+          <h3 [style]="{'color': 'var(--text-color)'}">No Courses Enrolled</h3>
+          <p [style]="{'color': 'var(--text-muted)'}">You are not enrolled in any courses yet. Enroll in courses to join course discussions.</p>
+        </div>
+
+        <div *ngIf="enrolledCourses.length > 0" class="forums-grid">
+          <div *ngFor="let course of enrolledCourses" class="forum-card" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+            <div class="forum-image" [style]="{'background': 'var(--primary-color)'}">
+              <img *ngIf="course.image" [src]="getURL(course.image)" [alt]="course.course">
+              <div class="forum-overlay">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="forum-content">
+              <h3 class="forum-title" [style]="{'color': 'var(--text-color)'}" [title]="course.course">{{ course.course }}</h3>
+              
+              <p class="forum-teacher" [style]="{'color': 'var(--text-muted)'}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                {{ course.firstname }} {{ course.lastname }}
+              </p>
+              
+              <div class="forum-stats">
+                <span [style]="{'color': 'var(--text-muted)'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                  </svg>
+                  {{ getCourseThreadCount(course.id) }} threads
+                </span>
+                <span [style]="{'color': 'var(--success-color)'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  Active
+                </span>
+              </div>
+              
+              <button (click)="navigateToCourseForum(course.id)" class="forum-btn" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                </svg>
+                Enter Forum
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Section -->
+  <div *ngIf="!loading && recentPosts.length > 0" class="activity-section">
+    <div class="section-container" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
+      <div class="section-header" [style]="{'background': 'var(--secondary-color)', 'color': 'white'}">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <span>Recent Activity</span>
+        </div>
+      </div>
+      
+      <div class="section-content">
+        <div class="activity-list">
+          <div *ngFor="let post of recentPosts; let i = index" class="activity-item" [style]="{'border-bottom': i < recentPosts.length - 1 ? '1px solid var(--border-color)' : 'none'}">
+            <div class="activity-avatar">
+              <img *ngIf="getPostAuthorProfile(post)" [src]="getPostAuthorProfile(post)" [alt]="getPostAuthor(post)">
+              <div *ngIf="!getPostAuthorProfile(post)" class="default-avatar" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div class="activity-content">
+              <div class="activity-header">
+                <span class="activity-author" [style]="{'color': 'var(--text-color)'}">{{ getPostAuthor(post) }}</span>
+                <span class="activity-time" [style]="{'color': 'var(--text-muted)'}">{{ getTimeAgo(post.createdat) }}</span>
+              </div>
+              
+              <p class="activity-body" [style]="{'color': 'var(--text-color)'}">{{ post.body }}</p>
+              
+              <div class="activity-meta">
+                <span class="activity-course" [style]="{'color': 'var(--text-muted)'}">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z"/>
+                  </svg>
+                  {{ post.course_name || 'Topic Discussion' }}
+                </span>
+                <div class="activity-actions">
+                  <button (click)="viewPost(post)" class="activity-action" [style]="{'color': 'var(--primary-color)'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                    View
+                  </button>
+                  <button (click)="replyToPost(post)" class="activity-action" [style]="{'color': 'var(--primary-color)'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                      <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
+                    </svg>
+                    Reply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Tips Section -->
+  <div *ngIf="!loading" class="tips-section">
+    <div class="section-container" [style]="{'background': 'var(--alert-info-bg)', 'border': '1px solid var(--alert-info-border)'}">
+      <div class="tips-header">
+        <h3 [style]="{'color': 'var(--text-color)'}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" [style]="{'color': 'var(--warning-color)'}">
+            <path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"/>
+          </svg>
+          Quick Tips
+        </h3>
+      </div>
+      
+      <div class="tips-content">
+        <div class="tips-grid">
+          <div class="tip-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" [style]="{'color': 'var(--success-color)'}">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            <span [style]="{'color': 'var(--text-color)'}">Access topic discussions directly from lesson pages</span>
+          </div>
+          
+          <div class="tip-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" [style]="{'color': 'var(--success-color)'}">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            <span [style]="{'color': 'var(--text-color)'}">Use course forums for general course-related questions</span>
+          </div>
+          
+          <div class="tip-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" [style]="{'color': 'var(--success-color)'}">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            <span [style]="{'color': 'var(--text-color)'}">Be respectful and constructive in all discussions</span>
+          </div>
+          
+          <div class="tip-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" [style]="{'color': 'var(--success-color)'}">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            <span [style]="{'color': 'var(--text-color)'}">Teachers can pin important threads for easy access</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

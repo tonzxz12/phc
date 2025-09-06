@@ -1,0 +1,141 @@
+<div class="min-h-screen py-8" style="background-color: var(--body-color);">
+  <div class="max-w-6xl mx-auto overflow-hidden rounded-lg" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+    <!-- Header -->
+    <div class="p-6" style="background: linear-gradient(to right, var(--btn-primary-bg), var(--btn-primary-hover)); color: var(--btn-primary-text);">
+      <h1 class="text-3xl font-bold">{{ task.title }}</h1>
+      <p class="mt-2 opacity-90">Submitted on: {{ task.submittedTime }} by {{ task.by }}</p>
+    </div>
+
+    <div class="p-6">
+      <div class="flex flex-col lg:flex-row">
+        <!-- Left Column (Task Details) -->
+        <div class="lg:w-2/3 lg:pr-8">
+          <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2" style="color: var(--text-color);">Description</h2>
+            <p style="color: var(--text-color);">{{ task.description }}</p>
+          </div>
+
+          <!-- Attached Files Section -->
+          <div class="mb-6" *ngIf="task.attachedFiles?.length">
+            <h2 class="text-xl font-semibold mb-2" style="color: var(--text-color);">Attached Files</h2>
+            <ul class="p-4 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+              <li *ngFor="let file of task.attachedFiles" class="mb-2 last:mb-0">
+                <a (click)="openFile(file.url)" class="flex items-center cursor-pointer transition duration-150 ease-in-out" 
+                   style="color: var(--btn-primary-bg); transition: var(--tran-02);"
+                   onmouseover="this.style.color='var(--btn-primary-hover)'"
+                   onmouseout="this.style.color='var(--btn-primary-bg)'">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                  </svg>
+                  {{ file.name }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Submitted Files Section -->
+          <div class="mb-6" *ngIf="task.submittedFiles?.length">
+            <h2 class="text-xl font-semibold mb-2" style="color: var(--text-color);">Submitted by Student</h2>
+            <ul class="p-4 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+              <li *ngFor="let file of task.submittedFiles" class="mb-2 last:mb-0">
+                <a (click)="openFile(file.url)" class="flex items-center cursor-pointer transition duration-150 ease-in-out" 
+                   style="color: var(--btn-primary-bg); transition: var(--tran-02);"
+                   onmouseover="this.style.color='var(--btn-primary-hover)'"
+                   onmouseout="this.style.color='var(--btn-primary-bg)'">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                  </svg>
+                  {{ file.name }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Student Comments Section -->
+          <div class="mb-6" *ngIf="task.userComment">
+            <h2 class="text-xl font-semibold mb-2" style="color: var(--text-color);">Student Comment</h2>
+            <div class="p-4 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+              <p style="color: var(--text-color);">{{ task.userComment }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column (Grading and Comment) -->
+        <div class="mt-6 lg:w-1/3 lg:mt-0">
+          <div class="p-6 rounded-lg" style="background-color: var(--card-bg); border: 1px solid var(--card-border); box-shadow: var(--card-shadow);">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--text-color);">Grading and Comment</h2>
+
+            <!-- Grading Section -->
+            <div class="mb-4">
+              <label for="grading" class="block text-sm font-medium mb-1" style="color: var(--text-color);">Grade</label>
+              <div class="flex items-center">
+                <input [(ngModel)]="gradingText"
+                       (input)="enforceGradeLimit($event)"
+                       type="text"
+                       id="grading"
+                       name="grading"
+                       class="block w-20 rounded-md shadow-sm text-center transition"
+                       style="background-color: var(--input-bg); 
+                              border: 1px solid var(--input-border); 
+                              color: var(--input-text); 
+                              transition: var(--tran-02);"
+                       onfocus="this.style.borderColor='var(--input-focus-border)'"
+                       onblur="this.style.borderColor='var(--input-border)'"
+                       placeholder="Grade"
+                       inputmode="numeric">
+                <span class="ml-2 text-sm" style="color: var(--input-placeholder);">/ 100</span>
+              </div>
+              <!-- Display an error message if the input is not within the range -->
+              <div *ngIf="toNumber(gradingText) < 1 || toNumber(gradingText) > 100" class="text-sm mt-1" style="color: var(--btn-danger-bg);">
+                Please enter a number between 1 and 100.
+              </div>
+            </div>
+
+
+            <!-- Comment Section -->
+            <div class="mb-4">
+              <label for="comment" class="block text-sm font-medium" style="color: var(--text-color);">Comment</label>
+              <textarea [(ngModel)]="commentText" id="comment" name="comment" rows="3"
+                class="mt-1 block w-full rounded-md shadow-sm transition"
+                style="background-color: var(--input-bg); 
+                       border: 1px solid var(--input-border); 
+                       color: var(--input-text); 
+                       transition: var(--tran-02);"
+                onfocus="this.style.borderColor='var(--input-focus-border)'"
+                onblur="this.style.borderColor='var(--input-border)'"></textarea>
+            </div>  
+
+            <!-- Submit Button -->
+            <button type="submit" (click)="submitGrades()"
+              class="w-full py-2 px-4 rounded-md shadow-sm text-sm font-medium transition"
+              [style.background-color]="graded ? 'var(--btn-success-bg)' : 'var(--btn-primary-bg)'"
+              [style.color]="'var(--btn-primary-text)'"
+              style="border: none; transition: var(--tran-02);"
+              onmouseover="this.style.backgroundColor = this.dataset.graded === 'true' ? 'var(--btn-success-hover)' : 'var(--btn-primary-hover)'"
+              onmouseout="this.style.backgroundColor = this.dataset.graded === 'true' ? 'var(--btn-success-bg)' : 'var(--btn-primary-bg)'"
+              [attr.data-graded]="graded">
+              {{ graded ? 'Submitted' : 'Submit Grades' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="p-6" style="border-top: 1px solid var(--card-border); background-color: var(--nav-bg);">
+      <button class="font-bold py-2 px-4 rounded transition"
+              style="background-color: var(--btn-secondary-bg); 
+                     color: var(--btn-secondary-text); 
+                     border: none; 
+                     transition: var(--tran-02);"
+              onmouseover="this.style.backgroundColor='var(--btn-secondary-hover)'"
+              onmouseout="this.style.backgroundColor='var(--btn-secondary-bg)'"
+              (click)="goBack()">
+        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back
+      </button>
+    </div>
+  </div>
+</div>

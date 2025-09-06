@@ -1,0 +1,192 @@
+<!-- Manage Censored Words Modal -->
+<div class="censored-words-modal" [style]="{'background': 'var(--card-bg)', 'color': 'var(--text-color)', 'border-radius': '16px', 'max-width': '700px', 'width': '100%', 'max-height': '80vh', 'overflow': 'hidden', 'display': 'flex', 'flex-direction': 'column'}">
+  
+  <!-- Modal Header -->
+  <div class="modal-header" [style]="{'padding': '1.5rem 2rem 1rem 2rem', 'border-bottom': '1px solid var(--card-border)', 'flex-shrink': '0'}">
+    <div class="header-content" [style]="{'display': 'flex', 'align-items': 'center', 'gap': '1rem'}">
+      <i class="pi pi-shield" [style]="{'color': 'var(--primary-color)', 'font-size': '1.5rem'}"></i>
+      <div>
+        <h3 [style]="{'margin': '0', 'font-size': '1.25rem', 'font-weight': '600', 'color': 'var(--text-color)'}">
+          Manage Censored Words
+        </h3>
+        <p [style]="{'margin': '0.25rem 0 0 0', 'font-size': '0.85rem', 'color': 'var(--text-color)', 'opacity': '0.7'}">
+          Add, remove, and configure inappropriate content filtering
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="modal-body" [style]="{'padding': '1.5rem 2rem', 'flex': '1', 'overflow-y': 'auto'}">
+    
+    <!-- Add New Word Section -->
+    <div class="add-word-section" [style]="{'background': 'var(--input-bg)', 'border': '1px solid var(--input-border)', 'border-radius': '12px', 'padding': '1.5rem', 'margin-bottom': '2rem'}">
+      <h4 [style]="{'margin': '0 0 1rem 0', 'font-size': '1rem', 'font-weight': '600', 'color': 'var(--text-color)'}">
+        Add New Censored Word
+      </h4>
+      
+      <div class="form-grid" [style]="{'display': 'grid', 'grid-template-columns': '1fr 1fr', 'gap': '1rem', 'margin-bottom': '1rem'}">
+        <div class="form-group">
+          <label [style]="{'display': 'block', 'margin-bottom': '0.5rem', 'font-weight': '500', 'color': 'var(--text-color)', 'font-size': '0.9rem'}">
+            Word *
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="newWord"
+            placeholder="Enter word to censor"
+            [style]="{'width': '100%', 'padding': '0.75rem', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'font-size': '0.875rem', 'transition': 'var(--tran-02)'}">
+        </div>
+        
+        <div class="form-group">
+          <label [style]="{'display': 'block', 'margin-bottom': '0.5rem', 'font-weight': '500', 'color': 'var(--text-color)', 'font-size': '0.9rem'}">
+            Severity
+          </label>
+          <select 
+            [(ngModel)]="newSeverity"
+            [style]="{'width': '100%', 'padding': '0.75rem', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'font-size': '0.875rem', 'transition': 'var(--tran-02)'}">
+            <option *ngFor="let severity of severityOptions" [value]="severity.value">
+              {{severity.label}}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-grid" [style]="{'display': 'grid', 'grid-template-columns': '1fr 1fr', 'gap': '1rem', 'margin-bottom': '1rem'}">
+        <div class="form-group">
+          <label [style]="{'display': 'block', 'margin-bottom': '0.5rem', 'font-weight': '500', 'color': 'var(--text-color)', 'font-size': '0.9rem'}">
+            Category
+          </label>
+          <select 
+            [(ngModel)]="newCategory"
+            [style]="{'width': '100%', 'padding': '0.75rem', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'font-size': '0.875rem', 'transition': 'var(--tran-02)'}">
+            <option value="">Select category (optional)</option>
+            <option *ngFor="let category of categoryOptions" [value]="category">
+              {{category | titlecase}}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label [style]="{'display': 'block', 'margin-bottom': '0.5rem', 'font-weight': '500', 'color': 'var(--text-color)', 'font-size': '0.9rem'}">
+            Description
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="newDescription"
+            placeholder="Optional description"
+            [style]="{'width': '100%', 'padding': '0.75rem', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'font-size': '0.875rem', 'transition': 'var(--tran-02)'}">
+        </div>
+      </div>
+      
+      <button 
+        (click)="addNewWord()"
+        [disabled]="!newWord.trim() || saving"
+        [style]="(!newWord.trim() || saving) ? 
+          {'padding': '0.75rem 1.5rem', 'border': 'none', 'border-radius': '8px', 'background': 'var(--input-border)', 'color': 'var(--text-color)', 'font-weight': '500', 'cursor': 'not-allowed', 'transition': 'var(--tran-02)', 'display': 'flex', 'align-items': 'center', 'gap': '0.5rem'} : 
+          {'padding': '0.75rem 1.5rem', 'border': 'none', 'border-radius': '8px', 'background': 'var(--primary-color)', 'color': 'white', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'display': 'flex', 'align-items': 'center', 'gap': '0.5rem'}">
+        <i *ngIf="saving" class="pi pi-spinner pi-spin"></i>
+        <i *ngIf="!saving" class="pi pi-plus"></i>
+        <span>{{saving ? 'Adding...' : 'Add Word'}}</span>
+      </button>
+    </div>
+
+    <!-- Current Words List -->
+    <div class="words-list-section">
+      <div class="section-header" [style]="{'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'margin-bottom': '1rem'}">
+        <h4 [style]="{'margin': '0', 'font-size': '1rem', 'font-weight': '600', 'color': 'var(--text-color)'}">
+          Current Censored Words ({{censoredWords?.length || 0}})
+        </h4>
+        <div class="summary-stats" [style]="{'display': 'flex', 'gap': '1rem', 'font-size': '0.8rem', 'color': 'var(--text-color)', 'opacity': '0.8'}">
+          <span>Active: {{getActiveCount()}}</span>
+          <span>Inactive: {{getInactiveCount()}}</span>
+        </div>
+      </div>
+      
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state" [style]="{'text-align': 'center', 'padding': '2rem', 'color': 'var(--text-color)', 'opacity': '0.7'}">
+        <i class="pi pi-spinner pi-spin" [style]="{'font-size': '1.5rem', 'margin-bottom': '0.5rem', 'display': 'block'}"></i>
+        <p [style]="{'margin': '0', 'font-size': '0.9rem'}">Loading censored words...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && (!censoredWords || censoredWords.length === 0)" class="empty-state" [style]="{'text-align': 'center', 'padding': '2rem', 'color': 'var(--text-color)', 'opacity': '0.6'}">
+        <i class="pi pi-info-circle" [style]="{'font-size': '2.5rem', 'margin-bottom': '1rem', 'opacity': '0.3'}"></i>
+        <h5 [style]="{'font-size': '1rem', 'margin-bottom': '0.5rem', 'color': 'var(--text-color)'}">No Censored Words</h5>
+        <p [style]="{'font-size': '0.85rem', 'margin': '0'}">Add words above to start filtering inappropriate content.</p>
+      </div>
+
+      <!-- Words List -->
+      <div *ngIf="!loading && censoredWords && censoredWords.length > 0" class="words-list" [style]="{'max-height': '300px', 'overflow-y': 'auto', 'border': '1px solid var(--card-border)', 'border-radius': '8px'}">
+        <div *ngFor="let word of censoredWords; let i = index" 
+             class="word-item"
+             [class.inactive]="!word.isActive"
+             [style]="word.isActive ? 
+               {'padding': '0.75rem 1rem', 'border-bottom': '1px solid var(--card-border)', 'transition': 'var(--tran-02)', 'background': 'var(--card-bg)'} : 
+               {'padding': '0.75rem 1rem', 'border-bottom': '1px solid var(--card-border)', 'transition': 'var(--tran-02)', 'background': 'var(--card-bg)', 'opacity': '0.6'}">
+          
+          <div class="word-content" [style]="{'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'}">
+            <div class="word-info" [style]="{'flex': '1'}">
+              <div class="word-text" [style]="{'font-weight': '600', 'margin-bottom': '0.25rem', 'color': 'var(--text-color)'}">
+                {{word.word}}
+              </div>
+              <div class="word-meta" [style]="{'display': 'flex', 'gap': '1rem', 'font-size': '0.75rem', 'color': 'var(--text-color)', 'opacity': '0.8'}">
+                <span class="severity" 
+                      [style]="{'padding': '0.125rem 0.5rem', 'border-radius': '12px', 'background': getSeverityColor(word.severity), 'color': 'white', 'font-weight': '500'}">
+                  {{word.severity | titlecase}}
+                </span>
+                <span *ngIf="word.category" class="category">
+                  {{word.category | titlecase}}
+                </span>
+                <span *ngIf="word.description" class="description">
+                  {{word.description}}
+                </span>
+              </div>
+            </div>
+            
+            <div class="word-actions" [style]="{'display': 'flex', 'gap': '0.5rem', 'align-items': 'center'}">
+              <button 
+                class="toggle-btn"
+                (click)="toggleWordStatus(word)"
+                [title]="word.isActive ? 'Deactivate' : 'Activate'"
+                [style]="word.isActive ? 
+                  {'padding': '0.375rem', 'border': '1px solid var(--success-color)', 'border-radius': '4px', 'background': 'var(--success-color)', 'color': 'white', 'cursor': 'pointer', 'transition': 'var(--tran-02)'} : 
+                  {'padding': '0.375rem', 'border': '1px solid var(--input-border)', 'border-radius': '4px', 'background': 'transparent', 'color': 'var(--text-color)', 'cursor': 'pointer', 'transition': 'var(--tran-02)'}">
+                <i class="pi" [class]="word.isActive ? 'pi-check' : 'pi-times'"></i>
+              </button>
+              <button 
+                class="remove-btn"
+                (click)="removeWord(word.id)"
+                title="Remove"
+                [style]="{'padding': '0.375rem', 'border': '1px solid var(--danger-color)', 'border-radius': '4px', 'background': 'transparent', 'color': 'var(--danger-color)', 'cursor': 'pointer', 'transition': 'var(--tran-02)'}">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer" [style]="{'padding': '1rem 2rem 1.5rem 2rem', 'border-top': '1px solid var(--card-border)', 'display': 'flex', 'gap': '1rem', 'justify-content': 'flex-end', 'flex-shrink': '0'}">
+    <button 
+      class="cancel-btn"
+      (click)="onClose()"
+      [disabled]="saving"
+      [style]="{'padding': '0.75rem 1.5rem', 'border': '1px solid var(--input-border)', 'border-radius': '8px', 'background': 'transparent', 'color': 'var(--text-color)', 'font-weight': '500', 'cursor': 'pointer', 'transition': 'var(--tran-02)'}">
+      Cancel
+    </button>
+    <button 
+      class="save-btn"
+      (click)="onSave()"
+      [disabled]="saving"
+      [style]="saving ? 
+        {'padding': '0.75rem 1.5rem', 'border': 'none', 'border-radius': '8px', 'background': 'var(--input-border)', 'color': 'var(--text-color)', 'font-weight': '600', 'cursor': 'not-allowed', 'transition': 'var(--tran-02)', 'display': 'flex', 'align-items': 'center', 'gap': '0.5rem'} : 
+        {'padding': '0.75rem 1.5rem', 'border': 'none', 'border-radius': '8px', 'background': 'var(--primary-color)', 'color': 'white', 'font-weight': '600', 'cursor': 'pointer', 'transition': 'var(--tran-02)', 'display': 'flex', 'align-items': 'center', 'gap': '0.5rem'}">
+      <i *ngIf="saving" class="pi pi-spinner pi-spin"></i>
+      <i *ngIf="!saving" class="pi pi-save"></i>
+      <span>{{saving ? 'Saving...' : 'Save Changes'}}</span>
+    </button>
+  </div>
+
+</div>

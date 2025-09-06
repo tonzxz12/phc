@@ -1,0 +1,629 @@
+<div class="progress-report-container" style="background-color: var(--body-color);">
+  <div class="header" style="background-color: var(--card-bg); box-shadow: var(--card-shadow);">
+    <h2 style="color: var(--text-color);">Progress Report</h2>
+    <p style="color: var(--text-color);">Monitor student progress and performance analytics</p>
+  </div>
+  
+  <!-- Course Selection Cards -->
+  <div class="course-selection-section" *ngIf="courses.length > 0">
+    <h3 class="section-title" style="color: var(--text-color);">Select a Course to View Progress</h3>
+    <div class="course-grid">
+      <div *ngFor="let course of courses" 
+           class="course-card"
+           style="background-color: var(--card-bg); border: 1px solid var(--card-border); box-shadow: var(--card-shadow);"
+           onmouseover="this.style.boxShadow='var(--card-hover-shadow)'"
+           onmouseout="this.style.boxShadow='var(--card-shadow)'"
+           (click)="openProgressModal(course)">
+        <div class="course-image">
+          <img *ngIf="course.image" [src]="getCourseImage(course.image)" 
+               [alt]="course.course" class="course-img"/>
+          <div *ngIf="!course.image" class="course-placeholder" 
+               style="background-color: var(--primary-color-light); color: var(--primary-color);">
+            <i class="bx bx-book-open"></i>
+          </div>
+        </div>
+        <div class="course-content">
+          <h4 class="course-title" style="color: var(--text-color);">{{ course.course }}</h4>
+          <p class="course-description" *ngIf="course.description" style="color: var(--text-color);">
+            {{ course.description }}
+          </p>
+          <div class="course-meta">
+            <span class="course-lessons" *ngIf="course.lessons" style="color: var(--text-color);">
+              <i class="bx bx-book" style="color: var(--primary-color);"></i> {{ course.lessons }} Lessons
+            </span>
+            <span class="course-assessments" *ngIf="course.assessmentCount" style="color: var(--text-color);">
+              <i class="bx bx-question-mark" style="color: var(--secondary-color);"></i> {{ course.assessmentCount }} Assessments
+            </span>
+            <span class="course-assignments" *ngIf="course.assignmentCount" style="color: var(--text-color);">
+              <i class="bx bx-task" style="color: var(--tertiary-color);"></i> {{ course.assignmentCount }} Assignments
+            </span>
+            <span class="course-code" *ngIf="course.code" style="color: var(--text-color);">
+              <i class="bx bx-code" style="color: var(--primary-color);"></i> {{ course.code }}
+            </span>
+          </div>
+        </div>
+        <div class="course-actions">
+          <button class="view-progress-btn"
+                  style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);"
+                  onmouseover="this.style.backgroundColor='var(--btn-primary-hover)'"
+                  onmouseout="this.style.backgroundColor='var(--btn-primary-bg)'">
+            <i class="bx bx-chart"></i>
+            View Progress
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Modal -->
+  <div class="modal-overlay" *ngIf="showProgressModal" 
+       style="background-color: var(--modal-overlay);" (click)="closeProgressModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()"
+         style="background-color: var(--modal-bg); border: 1px solid var(--modal-border);">
+      <!-- Modal Header -->
+      <div class="modal-header" style="border-bottom: 1px solid var(--card-border);">
+        <h3 class="modal-title" style="color: var(--text-color);">
+          <i class="bx bx-chart" style="color: var(--primary-color);"></i>
+          Progress Report - {{ currentCourse?.course }}
+        </h3>
+        <button class="modal-close" (click)="closeProgressModal()"
+                style="background-color: var(--btn-secondary-bg); color: var(--text-color);"
+                onmouseover="this.style.backgroundColor='var(--btn-secondary-hover)'"
+                onmouseout="this.style.backgroundColor='var(--btn-secondary-bg)'">
+          <i class="bx bx-x"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Error State -->
+        <div class="error-container" *ngIf="error" 
+             style="background-color: var(--alert-error-bg); border: 1px solid var(--alert-error-border);">
+          <div class="error-icon">
+            <i class="bx bx-error-circle" style="color: var(--alert-error-border);"></i>
+          </div>
+          <h3 style="color: var(--text-color);">Error Loading Data</h3>
+          <p style="color: var(--text-color);">{{ errorMessage }}</p>
+          <button class="retry-button" (click)="retry()"
+                  style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text);"
+                  onmouseover="this.style.backgroundColor='var(--btn-primary-hover)'"
+                  onmouseout="this.style.backgroundColor='var(--btn-primary-bg)'">
+            <i class="bx bx-refresh"></i>
+            Try Again
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-container" *ngIf="loadingStats && !error">
+          <div class="loading-spinner" style="border-color: var(--primary-color); border-top-color: transparent;"></div>
+          <p style="color: var(--text-color);">Loading progress data...</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" *ngIf="!loadingStats && !error">
+      <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+          <h3 style="color: var(--text-color);">Total Students</h3>
+              <p class="stat-number" style="color: var(--primary-color);">{{ statsData.totalStudents }}</p>
+      </div>
+      
+      <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+          <h3 style="color: var(--text-color);">Active Courses</h3>
+              <p class="stat-number" style="color: var(--primary-color);">{{ statsData.activeCourses }}</p>
+      </div>
+      
+      <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+          <h3 style="color: var(--text-color);">Average Progress</h3>
+              <p class="stat-number" style="color: var(--primary-color);">{{ statsData.averageProgress }}%</p>
+      </div>
+      
+      <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+          <h3 style="color: var(--text-color);">Top Performers</h3>
+              <p class="stat-number" style="color: var(--primary-color);">{{ statsData.topPerformers }}</p>
+          </div>
+
+          <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+              <h3 style="color: var(--text-color);">Total Time Spent</h3>
+              <p class="stat-number" style="color: var(--primary-color);">{{ formatTimeSpent(statsData.totalTimeSpent) }}</p>
+          </div>
+
+          <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+              <h3 style="color: var(--text-color);">Avg Time/Student</h3>
+              <p class="stat-number" style="color: var(--primary-color);">{{ formatTimeSpent(statsData.averageTimePerStudent) }}</p>
+        </div>
+
+          <!-- Assessment and Assignment Stats -->
+          <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+            <h3 style="color: var(--text-color);">Total Assessments</h3>
+            <p class="stat-number" style="color: var(--primary-color);">{{ statsData.totalAssessments }}</p>
+          </div>
+
+          <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+            <h3 style="color: var(--text-color);">Total Assignments</h3>
+            <p class="stat-number" style="color: var(--primary-color);">{{ statsData.totalAssignments }}</p>
+          </div>
+
+          <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+            <h3 style="color: var(--text-color);">Avg Assessment Score</h3>
+            <p class="stat-number" style="color: var(--primary-color);">{{ statsData.averageAssessmentScore }}%</p>
+          </div>
+
+          <div class="stat-card" style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+            <h3 style="color: var(--text-color);">Avg Assignment Score</h3>
+            <p class="stat-number" style="color: var(--primary-color);">{{ statsData.averageAssignmentScore }}%</p>
+      </div>
+    </div>
+    
+        <!-- Progress Section -->
+        <div class="progress-section" *ngIf="!loadingProgress && !error">
+          <div class="section-header" style="border-bottom: 1px solid var(--card-border);">
+            <h3 style="color: var(--text-color);">Student Progress Details</h3>
+            <div class="progress-summary">
+              <span class="summary-item" style="color: var(--text-color);">
+                <i class="bx bx-users" style="color: var(--primary-color);"></i>
+                {{ studentProgress.length }} Students
+              </span>
+              <span class="summary-item" style="color: var(--text-color);">
+                <i class="bx bx-trending-up" style="color: var(--secondary-color);"></i>
+                {{ statsData.averageProgress }}% Avg
+              </span>
+            </div>
+          </div>
+          
+          <div class="students-table-container" *ngIf="studentProgress.length > 0">
+            <div class="students-table" style="background-color: var(--card-bg);">
+              <div class="table-header" style="background-color: var(--table-header-bg); border-bottom: 1px solid var(--table-border);">
+                <div class="header-cell student-info-header" style="color: var(--text-color);">Student</div>
+                <div class="header-cell progress-header" style="color: var(--text-color);">Progress</div>
+                <div class="header-cell time-header" style="color: var(--text-color);">Time Spent</div>
+                <div class="header-cell assessment-header" style="color: var(--text-color);">Assessments</div>
+                <div class="header-cell assignment-header" style="color: var(--text-color);">Assignments</div>
+                <div class="header-cell status-header" style="color: var(--text-color);">Status</div>
+                <div class="header-cell actions-header" style="color: var(--text-color);">Actions</div>
+              </div>
+              
+              <div class="table-body">
+                <div class="table-row" *ngFor="let student of studentProgress; let i = index" 
+                     style="border-bottom: 1px solid var(--table-border);">
+                  <div class="table-cell student-info" style="background-color: var(--card-bg);">
+                    <div class="student-avatar">
+                      <span class="avatar-text" style="color: var(--text-color); background-color: var(--primary-color);">{{ getInitials(student.name) }}</span>
+                    </div>
+                    <div class="student-details">
+                      <h4 class="student-name" style="color: var(--text-color);">{{ student.name }}</h4>
+                      <p class="student-class" style="color: var(--text-secondary);">{{ student.class }}</p>
+                    </div>
+                  </div>
+                  
+                  <div class="table-cell progress-cell" style="background-color: var(--card-bg);">
+                    <div class="progress-display">
+                      <div class="progress-bar-compact" style="background-color: var(--input-bg);">
+                        <div class="progress-fill-compact" 
+                             [style.width.%]="student.progress"
+                             style="background-color: var(--primary-color);"></div>
+                      </div>
+                      <span class="progress-percentage" style="color: var(--text-color);">{{ student.progress }}%</span>
+                    </div>
+                  </div>
+                  
+                  <div class="table-cell time-cell" style="background-color: var(--card-bg);">
+                    <div class="time-display">
+                      <i class="bx bx-time" style="color: var(--primary-color);"></i>
+                      <span style="color: var(--text-color);">{{ student.timeSpentFormatted }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="table-cell assessment-cell" style="background-color: var(--card-bg);">
+                    <div class="assessment-display">
+                      <div class="assessment-summary">
+                        <span class="assessment-count" style="color: var(--text-color);">{{ student.assessments.length || 0 }}</span>
+                        <span class="assessment-label" style="color: var(--text-secondary);">Completed</span>
+                      </div>
+                      <div class="assessment-score" *ngIf="student.assessments && student.assessments.length > 0">
+                        <span class="score-text" style="color: var(--primary-color);">{{ getAverageAssessmentScore(student.assessments) }}%</span>
+                        <span class="score-label" style="color: var(--text-secondary);">Avg Score</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="table-cell assignment-cell" style="background-color: var(--card-bg);">
+                    <div class="assignment-display">
+                      <div class="assignment-summary">
+                        <span class="assignment-count" style="color: var(--text-color);">{{ getCompletedAssignmentCount(student.assignments) }}</span>
+                        <span class="assignment-label" style="color: var(--text-secondary);">Submitted</span>
+                      </div>
+                      <div class="assignment-score" *ngIf="student.assignments && student.assignments.length > 0">
+                        <span class="score-text" style="color: var(--primary-color);">{{ getAverageAssignmentScore(student.assignments) }}%</span>
+                        <span class="score-label" style="color: var(--text-secondary);">Avg Score</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="table-cell status-cell" style="background-color: var(--card-bg);">
+                    <span class="status-badge" [class]="getStudentStatusClass(student.progress)"
+                          style="background-color: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--badge-border);">
+                      <i class="bx" [class]="getStudentStatusIcon(student.progress)" style="color: var(--primary-color);"></i>
+                      {{ getStudentStatusText(student.progress) }}
+                    </span>
+                  </div>
+                  
+                  <div class="table-cell actions-cell" style="background-color: var(--card-bg);">
+                    <div class="action-buttons">
+                    <button class="view-details-btn" 
+                            (click)="toggleLessonDetails(student)"
+                            [class.expanded]="student.showLessonDetails"
+                            style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1px solid var(--btn-secondary-border);">
+                        <i class="bx bx-book-open" style="color: var(--primary-color);"></i>
+                        {{ student.showLessonDetails ? 'Hide' : 'Lessons' }}
+                      </button>
+                      
+                      <button class="view-details-btn" 
+                              (click)="toggleAssessmentDetails(student)"
+                              [class.expanded]="student.showAssessmentDetails"
+                              *ngIf="student.assessments && student.assessments.length > 0"
+                              style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1px solid var(--btn-secondary-border);">
+                        <i class="bx bx-question-mark" style="color: var(--primary-color);"></i>
+                        {{ student.showAssessmentDetails ? 'Hide' : 'Assessments' }}
+                      </button>
+                      
+                      <button class="view-details-btn" 
+                              (click)="toggleAssignmentDetails(student)"
+                              [class.expanded]="student.showAssignmentDetails"
+                              *ngIf="student.assignments && student.assignments.length > 0"
+                              style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1px solid var(--btn-secondary-border);">
+                        <i class="bx bx-task" style="color: var(--primary-color);"></i>
+                        {{ student.showAssignmentDetails ? 'Hide' : 'Assignments' }}
+                    </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Expanded Lesson Details -->
+            <div class="lesson-details-expanded" *ngFor="let student of studentProgress">
+              <div class="expanded-content" *ngIf="student.showLessonDetails" 
+                   style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+                <div class="lesson-summary-compact" style="background-color: var(--table-header-bg); border-bottom: 1px solid var(--table-border);">
+                  <div class="summary-stats-compact">
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-book-open" style="color: var(--primary-color);"></i>
+                      <span>{{ currentCourse?.lessons || 0 }} Lessons</span>
+                    </div>
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-check-circle" style="color: var(--success-color);"></i>
+                      <span>{{ getCompletedLessonsCount(student.lessonTimeDetails) }} Completed</span>
+                    </div>
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-time" style="color: var(--primary-color);"></i>
+                      <span>{{ student.timeSpentFormatted }} Total</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="lessons-list-compact">
+                  <div class="lesson-item-compact" *ngFor="let lesson of student.lessonTimeDetails; let i = index"
+                       style="background-color: var(--input-bg); border: 1px solid var(--input-border);">
+                    <div class="lesson-header-compact">
+                      <div class="lesson-number-compact" style="background-color: var(--primary-color); color: var(--btn-primary-text);">{{ i + 1 }}</div>
+                      <div class="lesson-title-compact" style="color: var(--text-color);">{{ lesson.lessonTitle }}</div>
+                      <div class="lesson-progress-compact">
+                        <div class="progress-bar-mini" style="background-color: var(--input-bg);">
+                          <div class="progress-fill-mini" 
+                               [style.width.%]="lesson.progress"
+                               style="background-color: var(--primary-color);"></div>
+                        </div>
+                        <span class="progress-text-mini" style="color: var(--text-color);">{{ lesson.progress }}%</span>
+                      </div>
+                      <div class="lesson-time-compact" style="color: var(--text-secondary);">{{ lesson.timeSpentFormatted }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expanded Assessment Details -->
+            <div class="assessment-details-expanded" *ngFor="let student of studentProgress">
+              <div class="expanded-content" *ngIf="student.showAssessmentDetails"
+                   style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+                <div class="assessment-summary-compact" style="background-color: var(--table-header-bg); border-bottom: 1px solid var(--table-border);">
+                  <div class="summary-stats-compact">
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-question-mark" style="color: var(--primary-color);"></i>
+                      <span>{{ student.assessments.length || 0 }} Assessments</span>
+                    </div>
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-check-circle" style="color: var(--success-color);"></i>
+                      <span>{{ getCompletedAssessmentCount(student.assessments) }} Completed</span>
+                    </div>
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-trending-up" style="color: var(--secondary-color);"></i>
+                      <span>{{ getAverageAssessmentScore(student.assessments) }}% Avg Score</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="assessments-list-compact" *ngIf="student.assessments && student.assessments.length > 0">
+                  <div class="assessment-item-compact" *ngFor="let assessment of student.assessments; let i = index"
+                       style="background-color: var(--input-bg); border: 1px solid var(--input-border);">
+                    <div class="assessment-header-compact">
+                      <div class="assessment-number-compact" style="background-color: var(--primary-color); color: var(--btn-primary-text);">{{ i + 1 }}</div>
+                      <div class="assessment-title-compact" style="color: var(--text-color);">{{ assessment.title }}</div>
+                      <div class="assessment-score-compact">
+                        <span class="score-text" style="color: var(--primary-color);">{{ assessment.percentage }}%</span>
+                        <span class="score-label" style="color: var(--text-secondary);">Score</span>
+                      </div>
+                      <div class="assessment-attempts-compact">
+                        <span class="attempts-text" style="color: var(--text-secondary);">Attempt {{ assessment.attemptNumber }}</span>
+                      </div>
+                      <div class="assessment-date-compact" style="color: var(--text-secondary);">{{ formatDateTime(assessment.timestamp) }}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="no-assessments" *ngIf="!student.assessments || student.assessments.length === 0"
+                     style="color: var(--text-secondary); background-color: var(--input-bg); padding: 1rem; text-align: center;">
+                  <p>No assessments completed yet.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expanded Assignment Details -->
+            <div class="assignment-details-expanded" *ngFor="let student of studentProgress">
+              <div class="expanded-content" *ngIf="student.showAssignmentDetails"
+                   style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
+                <div class="assignment-summary-compact" style="background-color: var(--table-header-bg); border-bottom: 1px solid var(--table-border);">
+                  <div class="summary-stats-compact">
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-task" style="color: var(--primary-color);"></i>
+                      <span>{{ student.assignments.length || 0 }} Assignments</span>
+                    </div>
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-check-circle" style="color: var(--success-color);"></i>
+                      <span>{{ getCompletedAssignmentCount(student.assignments) }} Submitted</span>
+                    </div>
+                    <div class="stat-item-compact" style="color: var(--text-color);">
+                      <i class="bx bx-star" style="color: var(--secondary-color);"></i>
+                      <span>{{ getAverageAssignmentScore(student.assignments) }}% Avg Score</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="assignments-list-compact" *ngIf="student.assignments && student.assignments.length > 0">
+                  <div class="assignment-item-compact" *ngFor="let assignment of student.assignments; let i = index"
+                       style="background-color: var(--input-bg); border: 1px solid var(--input-border);">
+                    <div class="assignment-header-compact">
+                      <div class="assignment-number-compact" style="background-color: var(--primary-color); color: var(--btn-primary-text);">{{ i + 1 }}</div>
+                      <div class="assignment-title-compact" style="color: var(--text-color);">{{ assignment.title }}</div>
+                      <div class="assignment-status-compact">
+                        <span class="status-badge" [class]="'status-' + assignment.status"
+                              style="background-color: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--badge-border);">
+                          {{ assignment.status }}
+                        </span>
+                      </div>
+                      <div class="assignment-grade-compact" *ngIf="assignment.grade">
+                        <span class="grade-text" style="color: var(--primary-color);">{{ assignment.grade }}</span>
+                        <span class="grade-label" style="color: var(--text-secondary);">Grade</span>
+                      </div>
+                      <div class="assignment-deadline-compact">
+                        <span class="deadline-text" [class.late]="assignment.isLate" style="color: var(--text-secondary);">
+                          {{ formatDateTime(assignment.deadline) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="no-assignments" *ngIf="!student.assignments || student.assignments.length === 0"
+                     style="color: var(--text-secondary); background-color: var(--input-bg); padding: 1rem; text-align: center;">
+                  <p>No assignments submitted yet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="no-data" *ngIf="studentProgress.length === 0"
+               style="background-color: var(--card-bg); border: 1px solid var(--card-border); padding: 2rem; text-align: center;">
+            <i class="bx bx-info-circle" style="color: var(--primary-color); font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p style="color: var(--text-secondary);">No student progress data available for this course.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" style="background-color: var(--modal-bg); border-top: 1px solid var(--modal-border);">
+        <button class="modal-btn secondary" (click)="closeProgressModal()"
+                style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1px solid var(--btn-secondary-border);">
+          Close
+        </button>
+        <button class="modal-btn primary" (click)="openExportModal()" *ngIf="studentProgress.length > 0"
+                style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text); border: 1px solid var(--btn-primary-border);">
+          <i class="bx bx-download" style="color: var(--btn-primary-text);"></i>
+          Export Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Filter Modal -->
+  <div class="modal-overlay" *ngIf="showExportModal" (click)="closeExportModal()" 
+       style="background-color: var(--modal-overlay-bg);">
+    <div class="modal-content export-modal" (click)="$event.stopPropagation()" 
+         style="background-color: var(--modal-bg); border: 1px solid var(--modal-border);">
+      <!-- Export Modal Header -->
+      <div class="modal-header" style="background-color: var(--modal-header-bg); border-bottom: 1px solid var(--modal-border);">
+        <h3 class="modal-title" style="color: var(--text-color);">
+          <i class="bx bx-download" style="color: var(--primary-color);"></i>
+          Export Progress Data
+        </h3>
+        <button class="modal-close" (click)="closeExportModal()" 
+                style="background-color: var(--btn-danger-bg); color: var(--btn-danger-text); border: 1px solid var(--btn-danger-border);">
+          <i class="bx bx-x"></i>
+        </button>
+      </div>
+
+      <!-- Export Modal Body -->
+      <div class="modal-body" style="background-color: var(--modal-bg); color: var(--text-color);">
+        <div class="export-options">
+          <h4 style="color: var(--text-color);">Select Data to Export</h4>
+          
+          <!-- Data Type Selection -->
+          <div class="export-section">
+            <h5 style="color: var(--text-color);">Data Types</h5>
+            <div class="checkbox-group">
+              <label class="checkbox-item" style="color: var(--text-color);">
+                <input type="checkbox" [(ngModel)]="exportOptions.includeBasicInfo" checked 
+                       style="accent-color: var(--primary-color);">
+                <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                Basic Student Information
+              </label>
+              <label class="checkbox-item" style="color: var(--text-color);">
+                <input type="checkbox" [(ngModel)]="exportOptions.includeProgress" checked 
+                       style="accent-color: var(--primary-color);">
+                <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                Lesson Progress
+              </label>
+              <label class="checkbox-item" style="color: var(--text-color);">
+                <input type="checkbox" [(ngModel)]="exportOptions.includeAssessments" checked 
+                       style="accent-color: var(--primary-color);">
+                <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                Assessment/Quiz Data
+              </label>
+              <label class="checkbox-item" style="color: var(--text-color);">
+                <input type="checkbox" [(ngModel)]="exportOptions.includeAssignments" checked 
+                       style="accent-color: var(--primary-color);">
+                <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                Assignment Data
+              </label>
+              <label class="checkbox-item" style="color: var(--text-color);">
+                <input type="checkbox" [(ngModel)]="exportOptions.includeTimeTracking" checked 
+                       style="accent-color: var(--primary-color);">
+                <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                Time Tracking
+              </label>
+            </div>
+          </div>
+
+          <!-- Student Filter -->
+          <div class="export-section">
+            <h5 style="color: var(--text-color);">Student Filter</h5>
+            <div class="filter-group">
+              <label class="filter-label" style="color: var(--text-color);">Progress Range:</label>
+              <div class="range-inputs">
+                <input type="number" [(ngModel)]="exportOptions.minProgress" placeholder="Min %" min="0" max="100" 
+                       class="range-input" style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+                <span class="range-separator" style="color: var(--text-color);">to</span>
+                <input type="number" [(ngModel)]="exportOptions.maxProgress" placeholder="Max %" min="0" max="100" 
+                       class="range-input" style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+              </div>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label" style="color: var(--text-color);">Status Filter:</label>
+              <div class="checkbox-group horizontal">
+                <label class="checkbox-item" style="color: var(--text-color);">
+                  <input type="checkbox" [(ngModel)]="exportOptions.includeExcellent" checked 
+                         style="accent-color: var(--primary-color);">
+                  <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                  Excellent (80-100%)
+                </label>
+                <label class="checkbox-item" style="color: var(--text-color);">
+                  <input type="checkbox" [(ngModel)]="exportOptions.includeGood" checked 
+                         style="accent-color: var(--primary-color);">
+                  <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                  Good (60-79%)
+                </label>
+                <label class="checkbox-item" style="color: var(--text-color);">
+                  <input type="checkbox" [(ngModel)]="exportOptions.includeAverage" checked 
+                         style="accent-color: var(--primary-color);">
+                  <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                  Average (40-59%)
+                </label>
+                <label class="checkbox-item" style="color: var(--text-color);">
+                  <input type="checkbox" [(ngModel)]="exportOptions.includeBelowAverage" checked 
+                         style="accent-color: var(--primary-color);">
+                  <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                  Below Average (20-39%)
+                </label>
+                <label class="checkbox-item" style="color: var(--text-color);">
+                  <input type="checkbox" [(ngModel)]="exportOptions.includePoor" checked 
+                         style="accent-color: var(--primary-color);">
+                  <span class="checkmark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                  Poor (0-19%)
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Format -->
+          <div class="export-section">
+            <h5 style="color: var(--text-color);">Export Format</h5>
+            <div class="format-selection">
+              <label class="radio-item" style="color: var(--text-color);">
+                <input type="radio" name="exportFormat" value="csv" [(ngModel)]="exportOptions.format" checked 
+                       style="accent-color: var(--primary-color);">
+                <span class="radiomark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                <div class="format-info">
+                  <span class="format-name" style="color: var(--text-color);">CSV</span>
+                  <span class="format-desc" style="color: var(--text-secondary);">Excel compatible, data analysis</span>
+                </div>
+              </label>
+              <label class="radio-item" style="color: var(--text-color);">
+                <input type="radio" name="exportFormat" value="json" [(ngModel)]="exportOptions.format" 
+                       style="accent-color: var(--primary-color);">
+                <span class="radiomark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                <div class="format-info">
+                  <span class="format-name" style="color: var(--text-color);">JSON</span>
+                  <span class="format-desc" style="color: var(--text-secondary);">Data processing, APIs</span>
+                </div>
+              </label>
+              <label class="radio-item" style="color: var(--text-color);">
+                <input type="radio" name="exportFormat" value="pdf" [(ngModel)]="exportOptions.format" 
+                       style="accent-color: var(--primary-color);">
+                <span class="radiomark" style="background-color: var(--input-bg); border: 1px solid var(--input-border);"></span>
+                <div class="format-info">
+                  <span class="format-name" style="color: var(--text-color);">PDF</span>
+                  <span class="format-desc" style="color: var(--text-secondary);">Professional PDF report for printing</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- File Naming -->
+          <div class="export-section">
+            <h5 style="color: var(--text-color);">File Naming</h5>
+            <div class="file-naming">
+              <input type="text" [(ngModel)]="exportOptions.filename" 
+                     placeholder="Enter filename (without extension)" 
+                     class="filename-input"
+                     style="background-color: var(--input-bg); color: var(--input-text); border: 1px solid var(--input-border);">
+              <div class="filename-preview" style="color: var(--text-secondary);">
+                Preview: {{ getFilenamePreview() }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Modal Footer -->
+      <div class="modal-footer" style="background-color: var(--modal-bg); border-top: 1px solid var(--modal-border);">
+        <button class="modal-btn secondary" (click)="closeExportModal()" 
+                style="background-color: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1px solid var(--btn-secondary-border);">
+          Cancel
+        </button>
+        <button class="modal-btn primary" (click)="executeExport()" [disabled]="!canExport()" 
+                style="background-color: var(--btn-primary-bg); color: var(--btn-primary-text); border: 1px solid var(--btn-primary-border);">
+          <i class="bx bx-download" style="color: var(--btn-primary-text);"></i>
+          Export Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Course Selected State
+  <div class="no-course-selected" *ngIf="courses.length > 0">
+    <div class="no-course-content">
+      <i class="bx bx-chart" style="color: var(--primary-color);"></i>
+      <h3 style="color: var(--text-color);">Select a Course</h3>
+      <p style="color: var(--text-secondary);">Click on any course card above to view detailed progress reports and analytics.</p>
+    </div>
+  </div>
+</div> -->

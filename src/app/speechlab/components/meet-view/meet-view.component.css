@@ -1,0 +1,126 @@
+
+
+.speech-lab-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+}
+
+.speech-lab-modal-container {
+    width: 450px;
+    background: var(--background-color);
+    border-radius: 20px;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-height: 90vh;
+}
+
+.modal-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.modal-header {
+    text-align: center;
+}
+
+.modal-header h2 {
+    font-size: 24px;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.modal-header p {
+    color: rgba(248, 250, 252, 0.7);
+    font-size: 14px;
+}
+
+.class-dropdown-button {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    padding: 12px 15px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.class-dropdown-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-color);
+}
+
+.dropdown-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown-icon {
+    font-size: 20px;
+    color: var(--accent-color);
+}
+
+.chevron-icon {
+    font-size: 24px;
+    color: var(--text-color);
+}
+
+.dropdown-class-item {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 12px 15px;
+    text-align: left;
+    transition: background 0.3s ease;
+    border-radius: 8px;
+}
+
+.dropdown-class-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.class-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.class-name {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.course-name {
+    font-size: 13px;
+    color: rgba(248, 250, 252, 0.7);
+}
+
+.meeting-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.control-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

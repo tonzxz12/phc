@@ -1,0 +1,35 @@
+<ng-container>
+  <!-- Module Dropdown -->
+  <div class="form-group">
+    <label for="moduleSelect" class="form-label">Select Module</label>
+    <select id="moduleSelect" class="form-control" [(ngModel)]="selectedModule">
+      <option [value]="null">Select Module</option>
+      <option *ngFor="let module of practices" [value]="module.id">{{module.name}}</option>
+    </select>
+  </div>
+
+  <!-- Drill Title Input -->
+  <div class="form-group">
+    <label for="drillTitle" class="form-label">Drill Title</label>
+    <input id="drillTitle" type="text" class="form-control" name="drillTitle" [(ngModel)]="drillName" placeholder="Enter drill title">
+  </div>
+
+  <!-- Upload Drill File -->
+  <div class="form-group upload-group">
+    <button (click)="lessonInput.click()" class="btn-upload">Upload Drill (PDF)</button>
+    <span class="file-label">{{getFilename(drillFile) || 'No file selected'}}</span>
+    <input #lessonInput (change)="onLessonSelected($event)" type="file" accept=".pdf" hidden>
+  </div>
+
+  <!-- Upload Audio File -->
+  <div class="form-group upload-group">
+    <button (click)="quizInput.click()" class="btn-upload">Add Audio (MP3)</button>
+    <span class="file-label">{{getFilename(audioFile) || 'No file selected'}}</span>
+    <input #quizInput (change)="onQuizSelected($event)" type="file" accept=".mp3" hidden>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="form-group">
+    <input (click)="onSubmit()" class="btn-submit" type="submit" value="Submit">
+  </div>
+</ng-container>

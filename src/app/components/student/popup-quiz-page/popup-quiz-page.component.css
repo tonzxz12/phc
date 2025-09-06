@@ -1,0 +1,73 @@
+.gradient-color1 {
+  background-image: linear-gradient(
+    to right,
+    var(--tw-gradient-color),
+    var(--tw-gradient-color)
+  );
+  background-size: 300% 100%;
+  overflow: hidden;
+  transition: transform 0.5s ease;
+}
+
+.score {
+  background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(
+    to right,
+    rgb(1, 114, 175) 0%,
+    rgb(116, 254, 189) 100%
+  );
+}
+
+:host {
+  display: block;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Ensure modal content is scrollable and doesn't overflow */
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Adjust modal padding for smaller screens */
+@media (max-width: 640px) {
+  .modal-content {
+    padding: 1rem;
+  }
+}
+
+/* Ensure images and buttons are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  touch-action: manipulation; /* Improve touch responsiveness */
+}
+
+/* Ensure the modal dialog is centered and has proper spacing */
+.fixed.inset-0 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050; /* Ensure modal is above other content */
+}
+
+/* Backdrop styling */
+.bg-black.bg-opacity-50 {
+  backdrop-filter: blur(2px); /* Optional: slight blur effect */
+}
+
+/* Ensure buttons have consistent hover effects */
+button.bg-amber-600:hover {
+  background-color: #d97706; /* Tailwind's amber-700 */
+}
+
+/* Fix for input focus styles */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3); /* Tailwind's amber-500 with opacity */
+}

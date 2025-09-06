@@ -1,0 +1,207 @@
+/* Table of Contents Styles */
+.chapter-highlight {
+  transition: all 0.3s ease;
+}
+
+.chapter-highlight:hover {
+  filter: brightness(1.05);
+}
+
+/* Table of Contents Button - Left Side */
+.toc-button-left {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toc-button-left:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.toc-button-left:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toc-button-left svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.toc-button-left .toc-button-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.025em;
+}
+
+/* Table of Contents Button - Right Side */
+.toc-button-right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toc-button-right:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.toc-button-right:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toc-button-right svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.toc-button-right .toc-button-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.025em;
+}
+
+/* Responsive button adjustments */
+@media (max-width: 768px) {
+  .toc-button-left {
+    top: 15px;
+    left: 15px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .toc-button-left svg,
+  .toc-button-right svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .toc-button-right {
+    top: 15px;
+    right: 15px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toc-button-left {
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .toc-button-left .toc-button-text,
+  .toc-button-right .toc-button-text {
+    display: none; /* Hide text on very small screens, show only icon */
+  }
+  
+  .toc-button-left svg,
+  .toc-button-right svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .toc-button-right {
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Table of Contents Sidebar Animations */
+.table-of-contents-sidebar {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Chapter Button Hover Effects */
+.chapter-button:hover {
+  transform: translateX(2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Active Chapter Indicator */
+.chapter-active {
+  position: relative;
+}
+
+.chapter-active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: #3b82f6;
+  border-radius: 2px;
+}
+
+/* Table of Contents Toggle Button */
+.toc-toggle {
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toc-toggle:hover {
+  backdrop-filter: blur(12px);
+  transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table-of-contents-sidebar {
+    width: 100%;
+  }
+}

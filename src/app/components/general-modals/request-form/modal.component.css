@@ -1,0 +1,210 @@
+/* Request Form Modal Styles */
+
+/* Modal Container */
+.modal-container {
+  max-width: 32rem;
+  padding: 2rem;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: var(--card-hover-shadow);
+  transition: var(--tran-03);
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.modal-header h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--tran-02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: var(--primary-color-light);
+}
+
+.close-btn:focus {
+  outline: none;
+  background: var(--primary-color-light);
+}
+
+/* Form Content */
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+/* Form Inputs */
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: var(--tran-02);
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(var(--primary-color), 0.1);
+}
+
+.form-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+.form-select option {
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+/* Error States */
+.error-border {
+  border-color: var(--danger-color) !important;
+  box-shadow: 0 0 0 3px rgba(var(--danger-color), 0.1) !important;
+}
+
+.error-message {
+  font-size: 0.75rem;
+  color: var(--danger-color);
+  margin-top: 0.25rem;
+}
+
+/* Shake Animation */
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 20%, 40%, 60%, 80%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-3px);
+  }
+}
+
+/* Form Actions */
+.form-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--card-border);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--tran-02);
+  box-shadow: var(--card-shadow);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-hover-shadow);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn:focus {
+  outline: none;
+  box-shadow: var(--card-hover-shadow), 0 0 0 3px rgba(var(--primary-color), 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .modal-container {
+    max-width: calc(100vw - 2rem);
+    padding: 1.5rem;
+  }
+
+  .modal-header h4 {
+    font-size: 1.25rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .form-content {
+    gap: 1rem;
+  }
+
+  .form-input,
+  .form-select {
+    padding: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-container {
+    padding: 1rem;
+  }
+
+  .modal-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .modal-header h4 {
+    font-size: 1.125rem;
+  }
+}
