@@ -304,16 +304,21 @@ isClassFormValid(): boolean {
     this.API.showLoader();
     this.API.teacherAllClasses().subscribe(data => {
       if (data.success) {
-        this.classes = data.output.map((cls: any): Class => ({
-          id: cls.id,
-          class: cls.class,
-          classcode: cls.classcode,
-          courseId: cls.courseId || cls.courseid, // Handle API inconsistencies
-          duration: cls.duration,
-          course: cls.course,
-          studentcount: cls.studentcount,
-          name: cls.class // For dropdown
-        }));
+        this.classes = data.output.map((cls: any): Class => {
+          // Handle different possible field names for duration
+          const duration = cls.duration || cls.Duration || cls.DURATION || 0;
+          
+          return {
+            id: cls.id || cls.ID,
+            class: cls.class || cls.Class,
+            classcode: cls.classcode || cls.ClassCode,
+            courseId: cls.courseId || cls.courseid || cls.CourseID, // Handle API inconsistencies
+            duration: duration,
+            course: cls.course,
+            studentcount: cls.studentcount || cls.studentCount || 0,
+            name: cls.class || cls.Class // For dropdown
+          };
+        });
         this.filteredClasses = [...this.classes]; // Default to all classes
         this.populateClassOptions();
       } else {
@@ -465,12 +470,20 @@ isClassFormValid(): boolean {
 
   // For handling class objects in the template
   handleEditClass(classObj: any): void {
+    // Use the raw duration value if available, otherwise try to extract from formatted string
+    let rawDuration = classObj.durationRaw;
+    if (!rawDuration && classObj.duration) {
+      // Extract numeric value from formatted string like "22 days"
+      const match = classObj.duration.toString().match(/(\d+)/);
+      rawDuration = match ? parseInt(match[1]) : 0;
+    }
+    
     this.openEditModal(
       classObj.id,
       classObj.class,
       classObj.classcode,
       classObj.courseId,
-      classObj.duration
+      rawDuration || 0
     );
   }
 
@@ -878,11 +891,23 @@ getSelectedCourseName(): string {
 
   // Methods for custom table data
   getClassTableData(): any[] {
-    return this.paginatedClasses().map((classItem: any) => ({
-      ...classItem,
-      duration: classItem.duration ? `${classItem.duration} days` : 'N/A',
-      studentcount: classItem.studentcount || 0
-    }));
+    return this.paginatedClasses().map((classItem: any) => {
+      // Ensure duration is treated as a number and properly formatted
+      let durationValue = classItem.duration;
+      if (typeof durationValue === 'string') {
+        durationValue = parseInt(durationValue) || 0;
+      }
+      if (!durationValue || durationValue === 0) {
+        durationValue = 0;
+      }
+      
+      return {
+        ...classItem,
+        duration: durationValue > 0 ? `${durationValue} days` : 'No duration set',
+        durationRaw: durationValue, // Store raw numeric value for edit modal
+        studentcount: classItem.studentcount || 0
+      };
+    });
   }
 
   getStudentTableData(): any[] {

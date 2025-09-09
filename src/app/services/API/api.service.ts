@@ -4687,7 +4687,12 @@ async hasInappropriateContent(content: string): Promise<boolean> {
     const id = this.getUserData().id;
     const postObject = {
       selectors: [
-        'classes.*',
+        'classes.ID as id',
+        'classes.Class as class', 
+        'classes.ClassCode as classcode',
+        'classes.CourseID as courseId',
+        'classes.Duration as duration',
+        'classes.Schedule as schedule',
         'courses.ID as course_id',
         'courses.course',
         'COUNT(students.ID) as studentcount',

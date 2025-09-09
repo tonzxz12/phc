@@ -16,8 +16,22 @@
           
           <!-- Actions column -->
           <div *ngIf="col.field === 'actions'" class="flex justify-center gap-2">
+            <!-- Class actions (items with course property indicating it's a class row) -->
+            <ng-container *ngIf="row.course && row.class">
+              <button (click)="$event.stopPropagation(); onActionClick('edit', row)" 
+                      class="action-btn-edit flex items-center justify-center w-10 h-10 text-white rounded-full transition-all duration-200 hover:scale-105"
+                      title="Edit Class">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button (click)="$event.stopPropagation(); onActionClick('delete', row)" 
+                      class="action-btn-delete flex items-center justify-center w-10 h-10 text-white rounded-full transition-all duration-200 hover:scale-105"
+                      title="Delete Class">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </ng-container>
+            
             <!-- Quiz actions -->
-            <ng-container *ngIf="row.title">
+            <ng-container *ngIf="row.title && !row.course">
               <button (click)="$event.stopPropagation(); onActionClick('edit', row)" 
                       class="action-btn-edit flex items-center justify-center w-10 h-10 text-white rounded-full transition-all duration-200 hover:scale-105">
                 <i class="fas fa-edit"></i>
@@ -38,15 +52,15 @@
               </button>
             </ng-container>
             
-            <!-- Student actions -->
-            <ng-container *ngIf="row.name && !row.title && !row.fullName">
+            <!-- Commented out message/feedback button for students -->
+            <!-- <ng-container *ngIf="row.name && !row.title && !row.fullName">
               <button (click)="$event.stopPropagation(); onActionClick('feedback', row)" 
                       class="analytics-feedback-btn p-2 rounded transition-all duration-200 hover:scale-105" 
                       style="background-color: var(--btn-primary-bg); color: white;"
                       title="Send Feedback">
                 <i class="pi pi-comments"></i>
               </button>
-            </ng-container>
+            </ng-container> -->
             
             <!-- Submission actions -->
             <ng-container *ngIf="row.studentName || row.assignmenttitle">
