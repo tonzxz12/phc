@@ -24,15 +24,15 @@ model administrators {
   lastseen                       DateTime?               @default(now()) @db.Timestamp(6)
   studentid                      String?                 @db.VarChar(32)
   students                       students?               @relation(fields: [studentid], references: [id], onUpdate: NoAction, map: "fk_administrators_student")
+  censored_words_added           censored_words[]
   course_evaluations_reviewed    course_evaluations[]
   course_post_reports_reviewed   course_post_reports[]   @relation("CoursePostReportsReviewed")
   course_thread_reports_reviewed course_thread_reports[] @relation("CourseThreadReportsReviewed")
   message_reports_reviewed       message_reports[]       @relation("MessageReportsReviewed")
+  moderation_actions_performed   moderation_actions[]
   teacher_evaluations_reviewed   teacher_evaluations[]
   topic_post_reports_reviewed    topic_post_reports[]    @relation("TopicPostReportsReviewed")
   topic_thread_reports_reviewed  topic_thread_reports[]  @relation("TopicThreadReportsReviewed")
-  censored_words_added           censored_words[]
-  moderation_actions_performed   moderation_actions[]
 }
 
 model assessment_tasks_taken {
@@ -182,7 +182,7 @@ model assessment_grades {
   graded_at       DateTime?                    @db.Timestamp(6)
   feedback        String?
   created_at      DateTime                     @default(now()) @db.Timestamp(6)
-  updated_at      DateTime                     @updatedAt @db.Timestamp(6)
+  updated_at      DateTime                     @db.Timestamp(6)
   criteria_grades assessment_criteria_grades[]
   assessment      assessments                  @relation(fields: [assessment_id], references: [id], onDelete: Cascade)
   grader          teachers?                    @relation("AssessmentGradedBy", fields: [graded_by], references: [id])
@@ -205,7 +205,7 @@ model assignment_grades {
   graded_at       DateTime?                    @db.Timestamp(6)
   feedback        String?
   created_at      DateTime                     @default(now()) @db.Timestamp(6)
-  updated_at      DateTime                     @updatedAt @db.Timestamp(6)
+  updated_at      DateTime                     @db.Timestamp(6)
   criteria_grades assignment_criteria_grades[]
   assignment      assignments                  @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
   grader          teachers?                    @relation("AssignmentGradedBy", fields: [graded_by], references: [id])
@@ -268,7 +268,7 @@ model video_table_contents {
   description     String?
   order_index     Int?        @default(0)
   created_at      DateTime?   @default(now()) @db.Timestamp(6)
-  updated_at      DateTime?   @default(now()) @updatedAt @db.Timestamp(6)
+  updated_at      DateTime?   @default(now()) @db.Timestamp(6)
   attachments     attachments @relation(fields: [attachment_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_video_table_contents_attachment")
 
   @@index([attachment_id], map: "idx_video_table_contents_attachment_id")
@@ -321,6 +321,8 @@ model courses {
   teachers               teachers               @relation(fields: [teacherid], references: [id], onDelete: Cascade, onUpdate: NoAction)
   lessons                lessons[]
   surveys                surveys[]
+  course_time_tracking course_time_tracking[]
+
 }
 
 model interests {
@@ -672,6 +674,8 @@ model students {
   topic_post_reports_made    topic_post_reports[]     @relation("TopicPostReportsByStudent")
   topic_posts                topic_posts[]
   topic_thread_reports_made  topic_thread_reports[]   @relation("TopicThreadReportsByStudent")
+  course_time_tracking course_time_tracking[]
+
 }
 
 model survey_items {
@@ -757,13 +761,13 @@ model word_searches {
 model topic_threads {
   id        Int                    @id @default(autoincrement())
   threadid  String                 @unique @db.VarChar(32)
-  topicid   String                 @db.VarChar(32)
   title     String                 @db.VarChar(255)
   body      String?
   createdat DateTime               @default(now()) @db.Timestamp(6)
   islocked  Boolean                @default(false)
   ispinned  Boolean                @default(false)
   updatedat DateTime               @updatedAt @db.Timestamp(6)
+  topicid   String                 @db.VarChar(32)
   posts     topic_posts[]
   reports   topic_thread_reports[]
   topics    topics                 @relation(fields: [topicid], references: [topicid], onDelete: Cascade, onUpdate: NoAction)
@@ -775,15 +779,15 @@ model topic_threads {
 model topic_posts {
   id               Int                  @id @default(autoincrement())
   postid           String               @unique @db.VarChar(32)
-  parentpostid     Int?
   body             String
   author_studentid String?              @db.VarChar(32)
   author_teacherid String?              @db.VarChar(32)
-  isedited         Boolean              @default(false)
-  isdeleted        Boolean              @default(false)
   createdat        DateTime             @default(now()) @db.Timestamp(6)
   threadid         Int
-  updatedat        DateTime             @updatedAt @db.Timestamp(6)
+  updatedat        DateTime             @db.Timestamp(6)
+  isdeleted        Boolean              @default(false)
+  isedited         Boolean              @default(false)
+  parentpostid     Int?
   reports          topic_post_reports[]
   author_student   students?            @relation(fields: [author_studentid], references: [id], onUpdate: NoAction)
   author_teacher   teachers?            @relation(fields: [author_teacherid], references: [id], onUpdate: NoAction)
@@ -806,16 +810,16 @@ model course_forum_threads {
   courseid         String                  @db.VarChar(32)
   title            String                  @db.VarChar(255)
   body             String?
-  author_studentid String?                 @db.VarChar(32)
-  author_teacherid String?                 @db.VarChar(32)
   createdat        DateTime                @default(now()) @db.Timestamp(6)
   islocked         Boolean                 @default(false)
   ispinned         Boolean                 @default(false)
   updatedat        DateTime                @updatedAt @db.Timestamp(6)
+  author_studentid String?                 @db.VarChar(32)
+  author_teacherid String?                 @db.VarChar(32)
   posts            course_forum_posts[]
-  course           courses                 @relation("CourseThreads", fields: [courseid], references: [id], onDelete: Cascade, onUpdate: NoAction)
   author_student   students?               @relation("ThreadAuthorStudent", fields: [author_studentid], references: [id], onUpdate: NoAction)
   author_teacher   teachers?               @relation("ThreadAuthorTeacher", fields: [author_teacherid], references: [id], onUpdate: NoAction)
+  course           courses                 @relation("CourseThreads", fields: [courseid], references: [id], onDelete: Cascade, onUpdate: NoAction)
   reports          course_thread_reports[]
 
   @@index([courseid])
@@ -828,15 +832,15 @@ model course_forum_threads {
 model course_forum_posts {
   id               Int                   @id @default(autoincrement())
   postid           String                @unique @db.VarChar(32)
-  parentpostid     Int?
   body             String
   author_studentid String?               @db.VarChar(32)
   author_teacherid String?               @db.VarChar(32)
-  isedited         Boolean               @default(false)
-  isdeleted        Boolean               @default(false)
   createdat        DateTime              @default(now()) @db.Timestamp(6)
   threadid         Int
-  updatedat        DateTime              @updatedAt @db.Timestamp(6)
+  updatedat        DateTime              @db.Timestamp(6)
+  isdeleted        Boolean               @default(false)
+  isedited         Boolean               @default(false)
+  parentpostid     Int?
   author_student   students?             @relation(fields: [author_studentid], references: [id], onUpdate: NoAction)
   author_teacher   teachers?             @relation(fields: [author_teacherid], references: [id], onUpdate: NoAction)
   parentPost       course_forum_posts?   @relation("CourseForumPostReplies", fields: [parentpostid], references: [id], onDelete: Cascade)
@@ -1026,32 +1030,32 @@ model report_statistics {
 }
 
 model censored_words {
-  id          Int      @id @default(autoincrement())
-  word        String   @unique @db.VarChar(100)
-  description String?  @db.VarChar(255)
-  severity    String   @default("medium") @db.VarChar(20) // low, medium, high, extreme
-  isActive    Boolean  @default(true)
-  category    String?  @db.VarChar(50) // profanity, spam, harassment, etc.
-  added_by    String   @db.VarChar(32)
-  createdat   DateTime @default(now()) @db.Timestamp(6)
-  updatedat   DateTime @updatedAt @db.Timestamp(6)
+  id          Int            @id @default(autoincrement())
+  word        String         @unique @db.VarChar(100)
+  description String?        @db.VarChar(255)
+  severity    String         @default("medium") @db.VarChar(20)
+  category    String?        @db.VarChar(50)
+  added_by    String         @db.VarChar(32)
+  created_at  DateTime       @default(now()) @db.Timestamp(6)
+  is_active   Boolean        @default(true)
+  updated_at  DateTime       @db.Timestamp(6)
   admin       administrators @relation(fields: [added_by], references: [id])
 
-  @@index([isActive])
   @@index([severity])
   @@index([category])
+  @@index([is_active])
 }
 
 model moderation_actions {
-  id          Int      @id @default(autoincrement())
-  actionid    String   @unique @db.VarChar(32)
-  target_type String   @db.VarChar(30) // message, post, thread, conversation
-  target_id   String   @db.VarChar(32)
-  action_type String   @db.VarChar(30) // delete, warn, censor, dismiss
-  admin_id    String   @db.VarChar(32)
-  reason      String?  @db.VarChar(255)
+  id          Int            @id @default(autoincrement())
+  actionid    String         @unique @db.VarChar(32)
+  target_type String         @db.VarChar(30)
+  target_id   String         @db.VarChar(32)
+  action_type String         @db.VarChar(30)
+  admin_id    String         @db.VarChar(32)
+  reason      String?        @db.VarChar(255)
   notes       String?
-  createdat   DateTime @default(now()) @db.Timestamp(6)
+  createdat   DateTime       @default(now()) @db.Timestamp(6)
   admin       administrators @relation(fields: [admin_id], references: [id])
 
   @@index([target_type, target_id])
@@ -1113,4 +1117,27 @@ model teacher_evaluations {
   @@index([student_id])
   @@index([status])
   @@index([submitted_at])
+}
+
+model course_time_tracking {
+  id           Int      @id @default(autoincrement())
+  student_id   String   @db.VarChar(32)
+  course_id    String   @db.VarChar(32)
+  session_date DateTime @default(now()) @db.Date // Date of the session (for daily tracking)
+  total_time   Int      @default(0) // Total time in minutes for this course on this date
+  last_activity DateTime @default(now()) @db.Timestamp(6) // Last time the record was updated
+  is_active    Boolean  @default(true) // Whether user is currently active in this course
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @updatedAt @db.Timestamp(6)
+
+  // Relations
+  student      students @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  course       courses  @relation(fields: [course_id], references: [id], onDelete: Cascade)
+
+  // Unique constraint: one record per student per course per day
+  @@unique([student_id, course_id, session_date])
+  @@index([student_id, course_id])
+  @@index([session_date])
+  @@index([is_active])
+  @@index([last_activity])
 }
