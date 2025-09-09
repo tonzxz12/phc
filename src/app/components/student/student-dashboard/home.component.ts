@@ -237,6 +237,10 @@ isUrgent(notif:string){
     return this.API.getURL(file) ?? this.API.noProfile();
   }
 
+  getDefaultProfile(){
+    return this.API.noProfile();
+  }
+
   search$?:Subscription;
   people:any = []
   searching:boolean = false

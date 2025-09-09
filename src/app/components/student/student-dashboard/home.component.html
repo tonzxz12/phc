@@ -141,7 +141,7 @@
         <ng-container *ngIf="!searching; else searchingPeople">
           <ng-container *ngIf="people.length && !interests.length; else showConvos">
             <button *ngFor="let person of people" (click)="openChatModal(person)" class="person-item" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
-              <img [src]="getUrl(person.profile)" alt="Profile" class="person-avatar">
+              <img [src]="person.profile ? getUrl(person.profile) : getDefaultProfile()" alt="Profile" class="person-avatar">
               <div class="person-info">
                 <p class="person-name">{{person.firstname + ' '+ person.lastname}}</p>
                 <p class="person-status">{{person.lastseen == 'Just now' ? 'Online' : 'Last seen ' + person.lastseen}}</p>
@@ -167,7 +167,7 @@
             <ng-template #justConvos>
               <ng-container *ngIf="getConvos().length; else empty">
                 <button *ngFor="let person of getConvos()" (click)="openChatModal(person)" class="conversation-item" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
-                  <img [src]="getUrl(person.profile)" alt="Profile" class="person-avatar">
+                  <img [src]="person.profile ? getUrl(person.profile) : getDefaultProfile()" alt="Profile" class="person-avatar">
                   <div class="person-info">
                     <p class="person-name" [style]="{'color': 'var(--text-color)'}">{{person.firstname + ' '+ person.lastname}}</p>
                     <p class="last-message" [style]="{'color': 'var(--text-muted)'}">{{person.lastmessage}}</p>
@@ -215,12 +215,18 @@
         Both of you like<b *ngFor="let interest of chat.interests">&nbsp;&nbsp;{{interest}}</b>
       </div>
       <ng-container *ngFor="let message of getMessages()">
-        <div *ngIf="user.id == message.senderid; else notMe" class="message sent" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
-          {{message.message}}
+        <div *ngIf="user.id == message.senderid; else notMe" class="message-container sent">
+                  <img class="message-avatar" [src]="user.profile ? getUrl(user.profile) : getDefaultProfile()" alt="Your profile">
+          <div class="message sent" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
+            {{message.message}}
+          </div>
         </div>
         <ng-template #notMe>
-          <div class="message received" [style]="{'background': 'var(--secondary-color-light)', 'color': 'var(--text-color)'}">
-            {{message.message}}
+          <div class="message-container received">
+            <img class="message-avatar" [src]="chat.profile ? getUrl(chat.profile) : getDefaultProfile()" alt="Contact profile">
+            <div class="message received" [style]="{'background': 'var(--secondary-color-light)', 'color': 'var(--text-color-primary)'}">
+              {{message.message}}
+            </div>
           </div>
         </ng-template>
       </ng-container>

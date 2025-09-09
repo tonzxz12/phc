@@ -35,7 +35,7 @@
   maintenance: false,
 
   exclude: [
-    'SPEECHLAB',
+    // 'SPEECHLAB',
     'PERFORMANCE',
     // 'COMMUNICATION'
   ],
