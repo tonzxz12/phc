@@ -162,8 +162,10 @@ isUrgent(notif:string){
     }
     this.message = '';
   }
-  interests:string[] = [];
-  listen:boolean = false;
+  // Commented out interest-related functionality
+  // interests:string[] = [];
+  // listen:boolean = false;
+  /*
   searchByInterest(){
     this.listen = true;
     
@@ -203,6 +205,7 @@ isUrgent(notif:string){
     if(this.listen) return;
     this.interests.splice(index, 1);;
   }
+  */
 
   checkOpenModal(){
     return this.API.chat != null && this.chatShowModal
@@ -249,11 +252,14 @@ isUrgent(notif:string){
     if(event.target.value.trim() == ''){
       return;
     }
+    // Commented out interest functionality
+    /*
     if (event.key === "Enter") {
       this.addInterest(event.target.value);
       this.search = '';
     }
     if(this.interests.length>0) return;
+    */
     this.searching = true;
     this.search$?.unsubscribe();
     this.search$ =  this.API.searchPeople(event.target.value.trim().toLowerCase()).subscribe(data=>{

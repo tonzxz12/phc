@@ -306,7 +306,7 @@ redirectToLessons(courseID: string) {
 }
 
 navigateToCourseForum(courseId: string) {
-  this.router.navigate(['/course-forum', courseId]);
+  this.router.navigate(['/teacher/course-forum', courseId]);
 }
 
   trimText(text: string, wordLimit: number): string {

@@ -128,18 +128,21 @@
 
     <div class="modal-body">
       <div class="search-section">
-        <label [style]="{'color': 'var(--text-color)'}">Search {{interests.length? 'Interest':'People'}}: </label>
-        <div *ngIf="interests.length" class="interests-list">
+        <!-- <label [style]="{'color': 'var(--text-color)'}">Search {{interests.length? 'Interest':'People'}}: </label> -->
+        <label [style]="{'color': 'var(--text-color)'}">Search People: </label>
+        <!-- <div *ngIf="interests.length" class="interests-list">
           <span *ngFor="let interest of interests; let i = index" (click)="deleteInterst(i)" class="interest-tag" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
             {{interest}}
           </span>
-        </div>
-        <input [disabled]="listen" [(ngModel)]="search" (keyup)="searchPeople($event)" type="text" placeholder="Type someone..." class="search-input" [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
+        </div> -->
+        <!-- <input [disabled]="listen" [(ngModel)]="search" (keyup)="searchPeople($event)" type="text" placeholder="Type someone..." class="search-input" [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}"> -->
+        <input [(ngModel)]="search" (keyup)="searchPeople($event)" type="text" placeholder="Type someone..." class="search-input" [style]="{'background': 'var(--input-bg)', 'color': 'var(--input-text)', 'border': '1px solid var(--input-border)'}">
       </div>
 
       <div class="conversations-list">
         <ng-container *ngIf="!searching; else searchingPeople">
-          <ng-container *ngIf="people.length && !interests.length; else showConvos">
+          <!-- <ng-container *ngIf="people.length && !interests.length; else showConvos"> -->
+          <ng-container *ngIf="people.length; else showConvos">
             <button *ngFor="let person of people" (click)="openChatModal(person)" class="person-item" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
               <img [src]="person.profile ? getUrl(person.profile) : getDefaultProfile()" alt="Profile" class="person-avatar">
               <div class="person-info">
@@ -149,7 +152,8 @@
             </button>
           </ng-container>
           <ng-template #showConvos>
-            <ng-container *ngIf="interests.length; else justConvos">
+            <!-- Interest-based conversation functionality commented out -->
+            <!-- <ng-container *ngIf="interests.length; else justConvos">
               <ng-container *ngIf="!listen; else listening">
                 <button (click)="searchByInterest()" class="action-btn" [style]="{'background': 'var(--primary-color)', 'color': 'var(--text-on-primary)'}">
                   Start Conversation
@@ -163,8 +167,8 @@
                   Cancel
                 </button>
               </ng-template>
-            </ng-container>
-            <ng-template #justConvos>
+            </ng-container> -->
+            <!-- <ng-template #justConvos> -->
               <ng-container *ngIf="getConvos().length; else empty">
                 <button *ngFor="let person of getConvos()" (click)="openChatModal(person)" class="conversation-item" [style]="{'background': 'var(--card-bg)', 'border': '1px solid var(--border-color)'}">
                   <img [src]="person.profile ? getUrl(person.profile) : getDefaultProfile()" alt="Profile" class="person-avatar">
@@ -180,7 +184,7 @@
                   <span>Start a conversation!</span>
                 </div>
               </ng-template>
-            </ng-template>
+            <!-- </ng-template> -->
           </ng-template>
         </ng-container>
         <ng-template #searchingPeople>
@@ -211,9 +215,9 @@
     </div>
 
     <div class="chat-messages" #scrollMessages>
-      <div *ngIf="chat?.anonymous" class="chat-info" [style]="{'color': 'var(--text-muted)'}">
+      <!-- <div *ngIf="chat?.anonymous" class="chat-info" [style]="{'color': 'var(--text-muted)'}">
         Both of you like<b *ngFor="let interest of chat.interests">&nbsp;&nbsp;{{interest}}</b>
-      </div>
+      </div> -->
       <ng-container *ngFor="let message of getMessages()">
         <div *ngIf="user.id == message.senderid; else notMe" class="message-container sent">
                   <img class="message-avatar" [src]="user.profile ? getUrl(user.profile) : getDefaultProfile()" alt="Your profile">
